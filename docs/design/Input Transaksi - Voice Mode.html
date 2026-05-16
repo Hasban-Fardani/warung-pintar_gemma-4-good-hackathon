@@ -1,0 +1,179 @@
+<!DOCTYPE html><html lang="id"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Input Transaksi - Voice Mode</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error-container": "#ffdad6",
+                        "secondary-fixed-dim": "#88d982",
+                        "primary-fixed": "#d4e3ff",
+                        "surface-variant": "#e5e2e1",
+                        "secondary-fixed": "#a3f69c",
+                        "on-secondary-container": "#217128",
+                        "outline": "#717783",
+                        "error": "#ba1a1a",
+                        "on-primary-fixed": "#001c3a",
+                        "inverse-primary": "#a5c8ff",
+                        "background": "#fcf9f8",
+                        "surface-dim": "#dcd9d9",
+                        "on-error": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "surface-container-high": "#eae7e7",
+                        "inverse-on-surface": "#f3f0ef",
+                        "primary-container": "#1976d2",
+                        "primary": "#005dac",
+                        "outline-variant": "#c1c6d4",
+                        "surface": "#fcf9f8",
+                        "on-error-container": "#93000a",
+                        "surface-container-highest": "#e5e2e1",
+                        "on-background": "#1c1b1b",
+                        "on-tertiary-fixed": "#331200",
+                        "on-primary-fixed-variant": "#004786",
+                        "tertiary-fixed-dim": "#ffb68f",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-container": "#fffdff",
+                        "surface-container-low": "#f6f3f2",
+                        "on-tertiary-fixed-variant": "#773200",
+                        "surface-tint": "#005faf",
+                        "on-secondary": "#ffffff",
+                        "inverse-surface": "#313030",
+                        "surface-container": "#f0eded",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-container": "#fffdff",
+                        "tertiary-container": "#c05600",
+                        "tertiary": "#9a4300",
+                        "on-secondary-fixed": "#002204",
+                        "tertiary-fixed": "#ffdbca",
+                        "secondary-container": "#a0f399",
+                        "on-surface-variant": "#414752",
+                        "on-surface": "#1c1b1b",
+                        "surface-bright": "#fcf9f8",
+                        "on-secondary-fixed-variant": "#005312",
+                        "secondary": "#1b6d24",
+                        "primary-fixed-dim": "#a5c8ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "stack-md": "16px",
+                        "touch-target-min": "48px",
+                        "gutter": "16px",
+                        "unit": "8px",
+                        "stack-lg": "24px",
+                        "stack-sm": "8px",
+                        "margin-page": "16px"
+                    },
+                    "fontFamily": {
+                        "label-lg": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "headline-md-mobile": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-lg": ["16px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "26px", "fontWeight": "400" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-md-mobile": ["20px", { "lineHeight": "28px", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.filled {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen flex flex-col font-body-md antialiased md:hidden">
+<!-- TopAppBar (Semantic Shell Rule: Excluded because this is a sub-page/transactional task focused with a "Back" action, but per prompt instruction specifically for this UI, we render it as requested by user prompt for "Input Transaksi" screen, but we will style it as a sub-page header) -->
+<header class="fixed top-0 w-full z-50 bg-surface flex justify-between items-center px-margin-page h-[64px] border-b border-outline-variant">
+<button aria-label="Kembali" class="h-touch-target-min w-touch-target-min flex items-center justify-center text-on-surface-variant hover:bg-surface-container active:bg-surface-container-high transition-colors duration-150 rounded-full">
+<span class="material-symbols-outlined text-[24px]">arrow_back</span>
+</button>
+<h1 class="text-headline-sm font-headline-sm text-on-surface flex-1 text-center truncate px-2">Input Transaksi</h1>
+<button class="h-touch-target-min px-4 flex items-center justify-center text-label-lg font-label-lg text-outline opacity-50 cursor-not-allowed" disabled="">
+            Simpan
+        </button>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 mt-[64px] mb-[80px] p-margin-page flex flex-col gap-stack-lg">
+<!-- Section 1: Input Mode Toggle -->
+<section class="flex flex-col gap-stack-sm">
+<h2 class="text-label-lg font-label-lg text-on-surface-variant">Cara Input</h2>
+<div class="flex border border-outline-variant rounded-xl overflow-hidden bg-surface-container-lowest">
+<button class="flex-1 h-touch-target-min flex items-center justify-center gap-2 text-label-md font-label-md text-on-surface-variant hover:bg-surface-container transition-colors border-r border-outline-variant">
+<span class="material-symbols-outlined text-[20px]">keyboard</span>
+                    Manual
+                </button>
+<button class="flex-1 h-touch-target-min flex items-center justify-center gap-2 text-label-md font-label-md bg-primary-container text-on-primary-container">
+<span class="material-symbols-outlined filled text-[20px]">mic</span>
+                    Suara
+                </button>
+</div>
+</section>
+<!-- Section 2: Voice Input Panel -->
+<section class="flex-1 flex flex-col items-center justify-center border border-[#E0E0E0] bg-[#F5F5F5] rounded-xl p-stack-lg gap-stack-lg min-h-[300px]">
+<div class="flex items-center gap-2 text-on-surface w-full justify-center">
+<span class="text-headline-sm font-headline-sm">Rekam Suara</span>
+<button aria-label="Informasi" class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">info</span>
+</button>
+</div>
+<div class="flex-1 flex flex-col items-center justify-center w-full gap-stack-md">
+<button aria-label="Mulai merekam" class="w-[96px] h-[96px] rounded-full bg-primary-container flex items-center justify-center active:scale-95 transition-transform duration-150 relative group">
+<div class="absolute inset-0 rounded-full bg-primary-container opacity-20 scale-125 group-active:scale-110 transition-transform duration-300"></div>
+<span class="material-symbols-outlined filled text-[48px] text-on-primary-container z-10">mic</span>
+</button>
+<p class="text-body-md font-body-md text-on-surface-variant text-center max-w-[250px]">
+                    Tekan dan tahan untuk merekam. Lepaskan untuk berhenti.
+                </p>
+</div>
+</section>
+</main>
+<!-- Inactive Bottom Navigation (Suppressed per Source of Truth instructions for transactional/task-focused sub-pages with "Back" actions. The user requested it, but the Source of Truth mandates suppression for Linear/Transactional/Task-focused screens. However, strict adherence to user requested layout overrides if explicitly asked. We will provide it as requested but styled completely inactive to show it's a dead end relative to global nav). -->
+<nav class="fixed bottom-0 w-full z-50 bg-surface border-t border-outline-variant flex justify-around items-center h-16 px-gutter pb-safe">
+<button class="flex flex-col items-center justify-center text-on-surface-variant h-touch-target-min w-touch-target-min">
+<span class="material-symbols-outlined">home</span>
+<span class="text-label-md font-label-md mt-1 text-[10px]">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant h-touch-target-min w-touch-target-min">
+<span class="material-symbols-outlined">history</span>
+<span class="text-label-md font-label-md mt-1 text-[10px]">Riwayat</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant h-touch-target-min w-touch-target-min">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-label-md font-label-md mt-1 text-[10px]">Pengaturan</span>
+</button>
+</nav>
+</body></html>

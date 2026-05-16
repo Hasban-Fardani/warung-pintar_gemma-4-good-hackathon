@@ -1,0 +1,198 @@
+<!DOCTYPE html><html lang="id"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Update Stok - Manual</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-container": "#fffdff",
+                        "on-error": "#ffffff",
+                        "secondary-container": "#a0f399",
+                        "surface-container-low": "#f6f3f2",
+                        "on-primary-fixed-variant": "#004786",
+                        "secondary-fixed": "#a3f69c",
+                        "on-tertiary-container": "#fffdff",
+                        "on-error-container": "#93000a",
+                        "outline": "#717783",
+                        "error": "#ba1a1a",
+                        "tertiary-fixed-dim": "#ffb68f",
+                        "primary": "#005dac",
+                        "on-tertiary-fixed-variant": "#773200",
+                        "secondary-fixed-dim": "#88d982",
+                        "surface-container-lowest": "#ffffff",
+                        "background": "#fcf9f8",
+                        "surface-bright": "#fcf9f8",
+                        "on-secondary-fixed-variant": "#005312",
+                        "primary-fixed-dim": "#a5c8ff",
+                        "on-primary": "#ffffff",
+                        "surface-variant": "#e5e2e1",
+                        "on-tertiary-fixed": "#331200",
+                        "secondary": "#1b6d24",
+                        "inverse-primary": "#a5c8ff",
+                        "surface-tint": "#005faf",
+                        "surface-container-high": "#eae7e7",
+                        "on-surface": "#1c1b1b",
+                        "on-surface-variant": "#414752",
+                        "error-container": "#ffdad6",
+                        "surface": "#fcf9f8",
+                        "primary-container": "#1976d2",
+                        "surface-container-highest": "#e5e2e1",
+                        "inverse-surface": "#313030",
+                        "on-primary-fixed": "#001c3a",
+                        "outline-variant": "#c1c6d4",
+                        "surface-container": "#f0eded",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "inverse-on-surface": "#f3f0ef",
+                        "tertiary-container": "#c05600",
+                        "on-secondary-fixed": "#002204",
+                        "on-secondary-container": "#217128",
+                        "on-background": "#1c1b1b",
+                        "tertiary": "#9a4300",
+                        "surface-dim": "#dcd9d9",
+                        "primary-fixed": "#d4e3ff",
+                        "tertiary-fixed": "#ffdbca"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "unit": "8px",
+                        "gutter": "16px",
+                        "margin-page": "16px",
+                        "touch-target-min": "48px",
+                        "stack-md": "16px",
+                        "stack-sm": "8px",
+                        "stack-lg": "24px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-md-mobile": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "label-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "26px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-md-mobile": ["20px", { "lineHeight": "28px", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-lg": ["16px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .tabular-nums {
+            font-variant-numeric: tabular-nums;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-lg text-body-lg">
+<!-- TopAppBar -->
+<header class="w-full top-0 sticky border-b border-outline-variant bg-surface flex items-center h-[64px] px-margin-page justify-between z-10">
+<div class="flex items-center gap-4">
+<button aria-label="Kembali" class="w-touch-target-min h-touch-target-min flex items-center justify-center text-primary hover:bg-surface-container-low active:bg-surface-container-high transition-colors duration-100 rounded-full">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-headline-sm-mobile text-headline-sm-mobile font-bold text-primary">Update Stok</h1>
+</div>
+<button class="px-4 py-2 font-label-lg text-label-lg text-error hover:bg-error-container/20 rounded-DEFAULT">Batal</button>
+</header>
+<main class="flex-grow p-margin-page flex flex-col gap-stack-lg max-w-md mx-auto w-full">
+<!-- Segmented Control -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-DEFAULT p-1 flex">
+<button class="flex-1 h-[48px] bg-primary text-on-primary font-label-md text-label-md rounded-DEFAULT flex items-center justify-center transition-colors">
+                Manual
+            </button>
+<button class="flex-1 h-[48px] text-on-surface-variant font-label-md text-label-md rounded-DEFAULT flex items-center justify-center hover:bg-surface-container-low transition-colors">
+                Kamera
+            </button>
+<button class="flex-1 h-[48px] text-on-surface-variant font-label-md text-label-md rounded-DEFAULT flex items-center justify-center hover:bg-surface-container-low transition-colors">
+                Suara
+            </button>
+</section>
+<!-- Input Form Card -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-DEFAULT p-stack-md flex flex-col gap-stack-md">
+<!-- Nama Barang -->
+<div class="flex flex-col gap-stack-sm">
+<label class="font-label-md text-label-md text-on-surface" for="item-name">Nama Barang</label>
+<div class="relative">
+<input class="w-full h-touch-target-min pl-4 pr-12 border border-outline-variant rounded-DEFAULT bg-surface text-on-surface font-body-md focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" id="item-name" readonly="" type="text" value="Mie Ayam — SKU: MIE-001">
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant">arrow_drop_down</span>
+</div>
+</div>
+<!-- Stok Update -->
+<div class="flex flex-col gap-stack-sm">
+<label class="font-label-md text-label-md text-on-surface">Stok Setelah Update</label>
+<div class="flex items-center gap-4">
+<button aria-label="Kurangi" class="w-touch-target-min h-touch-target-min border border-outline-variant rounded-DEFAULT flex items-center justify-center text-primary bg-surface hover:bg-surface-container-low active:bg-surface-container-high">
+<span class="material-symbols-outlined">remove</span>
+</button>
+<div class="flex-1 relative">
+<input aria-label="Jumlah Stok" class="w-full h-touch-target-min text-center border border-outline-variant rounded-DEFAULT bg-surface text-on-surface font-headline-md-mobile text-headline-md-mobile tabular-nums focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" type="text" value="69">
+<span class="absolute right-4 top-1/2 -translate-y-1/2 font-label-md text-label-md text-on-surface-variant">pcs</span>
+</div>
+<button aria-label="Tambah" class="w-touch-target-min h-touch-target-min border border-outline-variant rounded-DEFAULT flex items-center justify-center text-primary bg-surface hover:bg-surface-container-low active:bg-surface-container-high">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+</div>
+<!-- Catatan -->
+<div class="flex flex-col gap-stack-sm">
+<label class="font-label-md text-label-md text-on-surface" for="notes">Catatan <span class="text-on-surface-variant font-normal">(Opsional)</span></label>
+<textarea class="w-full p-4 border border-outline-variant rounded-DEFAULT bg-surface text-on-surface font-body-md focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" id="notes" placeholder="Tambahkan alasan update..." rows="2"></textarea>
+</div>
+</section>
+<!-- Pratinjau Section -->
+<section class="flex flex-col gap-stack-sm">
+<h2 class="font-label-lg text-label-lg text-on-surface">Pratinjau</h2>
+<div class="bg-surface-container-low border border-outline-variant rounded-DEFAULT p-4 flex items-center justify-between min-h-[56px]">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-primary-container text-on-primary-container rounded-DEFAULT flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">inventory_2</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface truncate max-w-[150px]">Mie Ayam</p>
+<p class="font-body-md text-body-md text-on-surface-variant text-[12px]">SKU: MIE-001</p>
+</div>
+</div>
+<div class="flex items-center gap-2 font-headline-sm-mobile text-headline-sm-mobile tabular-nums">
+<span class="text-on-surface-variant line-through text-[16px]">45</span>
+<span class="material-symbols-outlined text-primary text-[20px]">arrow_right_alt</span>
+<span class="text-primary">69</span>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Action Area -->
+<footer class="p-margin-page bg-surface border-t border-outline-variant sticky bottom-0 z-10 w-full max-w-md mx-auto">
+<button class="w-full h-touch-target-min bg-primary text-on-primary font-label-lg text-label-lg rounded-DEFAULT flex items-center justify-center hover:bg-surface-tint active:bg-primary-fixed-dim transition-colors">
+            Simpan Perubahan
+        </button>
+</footer>
+</body></html>

@@ -1,0 +1,316 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Tambah Barang Baru - MerchantHub</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-fixed-dim": "#a5c8ff",
+                    "on-tertiary": "#ffffff",
+                    "on-primary-fixed": "#001c3a",
+                    "error-container": "#ffdad6",
+                    "surface-container-highest": "#e5e2e1",
+                    "background": "#fcf9f8",
+                    "primary": "#005dac",
+                    "inverse-surface": "#313030",
+                    "secondary-container": "#a0f399",
+                    "inverse-on-surface": "#f3f0ef",
+                    "on-background": "#1c1b1b",
+                    "primary-container": "#1976d2",
+                    "on-surface": "#1c1b1b",
+                    "on-primary-container": "#fffdff",
+                    "on-error-container": "#93000a",
+                    "on-error": "#ffffff",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-bright": "#fcf9f8",
+                    "surface-dim": "#dcd9d9",
+                    "surface-variant": "#e5e2e1",
+                    "tertiary-fixed-dim": "#ffb68f",
+                    "tertiary-container": "#c05600",
+                    "secondary-fixed": "#a3f69c",
+                    "secondary": "#1b6d24",
+                    "on-secondary-fixed-variant": "#005312",
+                    "surface-container": "#f0eded",
+                    "on-tertiary-fixed": "#331200",
+                    "secondary-fixed-dim": "#88d982",
+                    "outline-variant": "#c1c6d4",
+                    "on-secondary": "#ffffff",
+                    "on-primary-fixed-variant": "#004786",
+                    "on-surface-variant": "#414752",
+                    "surface-container-high": "#eae7e7",
+                    "surface-container-low": "#f6f3f2",
+                    "on-tertiary-container": "#fffdff",
+                    "tertiary": "#9a4300",
+                    "surface-tint": "#005faf",
+                    "on-secondary-fixed": "#002204",
+                    "on-secondary-container": "#217128",
+                    "error": "#ba1a1a",
+                    "tertiary-fixed": "#ffdbca",
+                    "on-tertiary-fixed-variant": "#773200",
+                    "surface": "#fcf9f8",
+                    "outline": "#717783",
+                    "inverse-primary": "#a5c8ff",
+                    "primary-fixed": "#d4e3ff",
+                    "on-primary": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "touch-target-min": "48px",
+                    "gutter": "16px",
+                    "margin-page": "16px",
+                    "stack-lg": "24px",
+                    "stack-sm": "8px",
+                    "unit": "8px",
+                    "stack-md": "16px"
+            },
+            "fontFamily": {
+                    "label-lg": [
+                            "Inter"
+                    ],
+                    "headline-sm": [
+                            "Inter"
+                    ],
+                    "headline-lg-mobile": [
+                            "Inter"
+                    ],
+                    "headline-lg": [
+                            "Inter"
+                    ],
+                    "body-md": [
+                            "Inter"
+                    ],
+                    "label-md": [
+                            "Inter"
+                    ],
+                    "headline-md-mobile": [
+                            "Inter"
+                    ],
+                    "headline-md": [
+                            "Inter"
+                    ],
+                    "body-lg": [
+                            "Inter"
+                    ]
+            },
+            "fontSize": {
+                    "label-lg": [
+                            "16px",
+                            {
+                                    "lineHeight": "20px",
+                                    "letterSpacing": "0.01em",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "headline-sm": [
+                            "20px",
+                            {
+                                    "lineHeight": "28px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "headline-lg-mobile": [
+                            "24px",
+                            {
+                                    "lineHeight": "32px",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "headline-lg": [
+                            "28px",
+                            {
+                                    "lineHeight": "36px",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "body-md": [
+                            "16px",
+                            {
+                                    "lineHeight": "24px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "label-md": [
+                            "14px",
+                            {
+                                    "lineHeight": "18px",
+                                    "letterSpacing": "0.02em",
+                                    "fontWeight": "500"
+                            }
+                    ],
+                    "headline-md-mobile": [
+                            "20px",
+                            {
+                                    "lineHeight": "28px",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "headline-md": [
+                            "24px",
+                            {
+                                    "lineHeight": "32px",
+                                    "letterSpacing": "-0.01em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "body-lg": [
+                            "18px",
+                            {
+                                    "lineHeight": "26px",
+                                    "fontWeight": "400"
+                            }
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body-md antialiased min-h-screen relative overflow-hidden">
+<!-- Background Mockup (Master Data Screen) -->
+<div class="h-screen w-full flex flex-col pointer-events-none opacity-40">
+<!-- TopAppBar (Background) -->
+<header class="flex items-center justify-between px-margin-page h-[64px] w-full bg-surface border-b border-outline-variant">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary text-2xl">arrow_back</span>
+<h1 class="font-headline-md-mobile text-headline-md-mobile text-primary">Master Data</h1>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant text-2xl">more_vert</span>
+</header>
+<!-- Main Content Area (Background) -->
+<main class="flex-1 p-margin-page overflow-y-auto pb-[100px]">
+<div class="space-y-stack-md">
+<!-- Search Bar -->
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full h-touch-target-min pl-10 pr-4 border border-outline-variant rounded bg-surface focus:outline-none" disabled="" placeholder="Cari barang..." type="text">
+</div>
+<!-- Item List Mockup -->
+<div class="border border-outline-variant rounded bg-surface">
+<div class="p-4 border-b border-outline-variant flex justify-between items-center h-touch-target-min">
+<div>
+<p class="font-label-lg text-label-lg text-on-surface">Mie Ayam Biasa</p>
+<p class="font-body-md text-body-md text-on-surface-variant">Rp 12.000</p>
+</div>
+</div>
+<div class="p-4 border-b border-outline-variant flex justify-between items-center h-touch-target-min bg-surface-container-low">
+<div>
+<p class="font-label-lg text-label-lg text-on-surface">Mie Ayam Bakso</p>
+<p class="font-body-md text-body-md text-on-surface-variant">Rp 15.000</p>
+</div>
+</div>
+<div class="p-4 border-b border-outline-variant flex justify-between items-center h-touch-target-min">
+<div>
+<p class="font-label-lg text-label-lg text-on-surface">Kerupuk Pangsit</p>
+<p class="font-body-md text-body-md text-on-surface-variant">Rp 2.000</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Background) -->
+<nav class="flex justify-around items-center h-[80px] w-full px-gutter pb-safe bg-surface border-t border-outline-variant fixed bottom-0">
+<div class="flex flex-col items-center justify-center text-on-surface-variant px-touch-target-min h-full">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-md text-label-md mt-1">Home</span>
+</div>
+<div class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-touch-target-min h-full">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dataset</span>
+<span class="font-label-md text-label-md mt-1">Data</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant px-touch-target-min h-full">
+<span class="material-symbols-outlined">history</span>
+<span class="font-label-md text-label-md mt-1">Riwayat</span>
+</div>
+</nav>
+</div>
+<!-- Scrim / Overlay -->
+<div class="fixed inset-0 bg-inverse-surface/50 z-40"></div>
+<!-- Bottom Sheet Component -->
+<div class="fixed bottom-0 left-0 right-0 bg-surface rounded-t-xl z-50 flex flex-col max-h-[795px] shadow-2xl">
+<!-- Drag Handle / Visual Indicator -->
+<div class="w-full flex justify-center pt-3 pb-1">
+<div class="w-12 h-1.5 bg-outline-variant rounded-full"></div>
+</div>
+<!-- Header -->
+<div class="flex items-center justify-between px-margin-page py-4 border-b border-outline-variant">
+<h2 class="font-headline-md-mobile text-headline-md-mobile text-on-surface">Tambah Barang Baru</h2>
+<button aria-label="Tutup" class="h-touch-target-min w-touch-target-min flex items-center justify-center rounded-full hover:bg-surface-container-low active:bg-surface-dim transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant text-2xl">close</span>
+</button>
+</div>
+<!-- Content Area -->
+<div class="flex-1 overflow-y-auto px-margin-page py-stack-md space-y-stack-md">
+<!-- Nama Barang -->
+<div class="flex flex-col gap-unit">
+<label class="font-label-lg text-label-lg text-on-surface" for="nama_barang">Nama Barang <span class="text-error">*</span></label>
+<input class="w-full h-touch-target-min px-4 border border-outline-variant rounded bg-surface font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors" id="nama_barang" placeholder="Contoh: Mie Ayam" type="text">
+</div>
+<!-- Kode Barang (SKU) -->
+<div class="flex flex-col gap-unit">
+<label class="font-label-lg text-label-lg text-on-surface" for="kode_barang">Kode Barang (SKU) <span class="text-error">*</span></label>
+<input class="w-full h-touch-target-min px-4 border border-outline-variant rounded bg-surface font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors" id="kode_barang" type="text" value="MIE-001">
+</div>
+<!-- Kategori -->
+<div class="flex flex-col gap-unit">
+<label class="font-label-lg text-label-lg text-on-surface" for="kategori">Kategori <span class="text-error">*</span></label>
+<div class="relative">
+<select class="w-full h-touch-target-min px-4 pr-10 border border-outline-variant rounded bg-surface font-body-md text-body-md text-on-surface appearance-none focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors" id="kategori">
+<option selected="" value="makanan">Makanan</option>
+<option value="minuman">Minuman</option>
+<option value="cemilan">Cemilan</option>
+<option value="lainnya">Lainnya</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">arrow_drop_down</span>
+</div>
+</div>
+<!-- Satuan -->
+<div class="flex flex-col gap-unit">
+<label class="font-label-lg text-label-lg text-on-surface" for="satuan">Satuan <span class="text-error">*</span></label>
+<div class="relative">
+<select class="w-full h-touch-target-min px-4 pr-10 border border-outline-variant rounded bg-surface font-body-md text-body-md text-on-surface appearance-none focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors" id="satuan">
+<option value="pcs">pcs</option>
+<option selected="" value="porsi">porsi</option>
+<option value="kg">kg</option>
+<option value="liter">liter</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">arrow_drop_down</span>
+</div>
+</div>
+<!-- Harga Jual -->
+<div class="flex flex-col gap-unit pb-stack-lg">
+<label class="font-label-lg text-label-lg text-on-surface" for="harga_jual">Harga Jual per Satuan</label>
+<div class="relative flex items-center h-touch-target-min border border-outline-variant rounded bg-surface focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-colors">
+<span class="pl-4 font-body-md text-body-md text-on-surface-variant select-none">Rp</span>
+<input class="w-full h-full px-4 text-right bg-transparent border-none font-body-md text-body-md text-on-surface focus:ring-0 focus:outline-none" dir="rtl" id="harga_jual" type="text" value="3.000">
+</div>
+</div>
+</div>
+<!-- Footer Actions -->
+<div class="border-t border-outline-variant p-margin-page flex gap-4 bg-surface pb-safe">
+<button class="flex-1 h-touch-target-min flex items-center justify-center font-label-lg text-label-lg text-primary border border-primary rounded hover:bg-surface-container-low active:bg-surface-dim transition-colors">
+                Batal
+            </button>
+<button class="flex-1 h-touch-target-min flex items-center justify-center font-label-lg text-label-lg text-on-primary-container bg-primary-container rounded hover:bg-primary active:bg-primary-fixed transition-colors">
+                Simpan Barang
+            </button>
+</div>
+</div>
+</body></html>

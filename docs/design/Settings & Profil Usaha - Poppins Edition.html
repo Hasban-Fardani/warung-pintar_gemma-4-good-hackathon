@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+
+<html lang="id" style=""><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Pengaturan - WarungPintar</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed-dim": "#ffb68f",
+                        "on-surface-variant": "#414752",
+                        "outline": "#717783",
+                        "on-surface": "#1c1b1b",
+                        "surface-container-high": "#eae7e7",
+                        "tertiary-fixed": "#ffdbca",
+                        "on-primary": "#ffffff",
+                        "surface": "#fcf9f8",
+                        "surface-container-highest": "#e5e2e1",
+                        "on-secondary-container": "#217128",
+                        "primary-fixed-dim": "#a5c8ff",
+                        "on-tertiary-fixed-variant": "#773200",
+                        "secondary": "#1b6d24",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-tint": "#005faf",
+                        "surface-container-low": "#f6f3f2",
+                        "primary-container": "#1976d2",
+                        "inverse-surface": "#313030",
+                        "inverse-on-surface": "#f3f0ef",
+                        "tertiary": "#9a4300",
+                        "on-tertiary-container": "#fffdff",
+                        "on-error": "#ffffff",
+                        "surface-bright": "#fcf9f8",
+                        "background": "#fcf9f8",
+                        "secondary-container": "#a0f399",
+                        "surface-variant": "#e5e2e1",
+                        "on-primary-container": "#fffdff",
+                        "on-secondary-fixed": "#002204",
+                        "on-background": "#1c1b1b",
+                        "secondary-fixed-dim": "#88d982",
+                        "on-primary-fixed-variant": "#004786",
+                        "on-tertiary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "surface-container": "#f0eded",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed": "#a3f69c",
+                        "outline-variant": "#c1c6d4",
+                        "on-primary-fixed": "#001c3a",
+                        "error": "#ba1a1a",
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed-variant": "#005312",
+                        "primary-fixed": "#d4e3ff",
+                        "surface-dim": "#dcd9d9",
+                        "primary": "#005dac",
+                        "inverse-primary": "#a5c8ff",
+                        "tertiary-container": "#c05600",
+                        "on-tertiary-fixed": "#331200",
+                        "white": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "stack-lg": "24px",
+                        "margin-page": "16px",
+                        "gutter": "16px",
+                        "stack-sm": "8px",
+                        "touch-target-min": "48px",
+                        "stack-md": "16px",
+                        "unit": "8px"
+                    },
+                    "fontFamily": {
+                        "headline-sm": ["Poppins", "sans-serif"],
+                        "headline-md-mobile": ["Poppins", "sans-serif"],
+                        "headline-lg-mobile": ["Poppins", "sans-serif"],
+                        "headline-md": ["Poppins", "sans-serif"],
+                        "label-md": ["Poppins", "sans-serif"],
+                        "body-md": ["Poppins", "sans-serif"],
+                        "body-lg": ["Poppins", "sans-serif"],
+                        "label-lg": ["Poppins", "sans-serif"],
+                        "headline-lg": ["Poppins", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-md-mobile": ["20px", { "lineHeight": "28px", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "26px", "fontWeight": "400" }],
+                        "label-lg": ["16px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-surface-container-lowest text-on-background font-body-md min-h-screen pt-[64px] pb-[80px]">
+<!-- TopAppBar (Suppressed default JSON, mapped to specific layout for Setting intent) -->
+<header class="fixed top-0 w-full z-50 bg-surface-container-lowest border-b border-outline-variant flat no shadows flex justify-between items-center px-margin-page h-touch-target-min">
+<button aria-label="Kembali" class="flex items-center justify-center w-10 h-10 hover:bg-surface-container active:bg-surface-container-high transition-colors duration-150 rounded-full">
+<span class="material-symbols-outlined text-on-surface">arrow_back</span>
+</button>
+<h1 class="text-headline-sm font-headline-sm text-on-surface">Pengaturan</h1>
+<button class="text-label-lg font-label-lg font-bold text-primary hover:bg-surface-container active:bg-surface-container-high transition-colors duration-150 px-2 py-1 rounded">
+            Simpan
+        </button>
+</header>
+<main class="px-margin-page py-stack-md flex flex-col gap-stack-lg max-w-md mx-auto">
+<!-- 1. Profil Usaha Card -->
+<section class="border border-outline-variant rounded-xl p-margin-page flex flex-col gap-stack-md bg-surface-container-lowest">
+<h2 class="text-headline-sm font-headline-sm text-on-surface">Profil Usaha</h2>
+<div class="flex flex-col gap-1">
+<label class="text-label-md font-label-md text-on-surface-variant flex items-center gap-1">
+                    Nama Warung <span class="text-error">*</span>
+<span class="material-symbols-outlined text-[16px] text-outline">info</span>
+</label>
+<input class="h-touch-target-min border border-outline-variant rounded px-margin-page text-body-md font-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none" type="text" value="Warung Ibu Warsih"/>
+</div>
+<div class="flex flex-col gap-1">
+<label class="text-label-md font-label-md text-on-surface-variant flex items-center gap-1">
+                    Nama Pemilik
+                    <span class="material-symbols-outlined text-[16px] text-outline">info</span>
+</label>
+<input class="h-touch-target-min border border-outline-variant rounded px-margin-page text-body-md font-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none" type="text"/>
+</div>
+<div class="flex flex-col gap-1">
+<label class="text-label-md font-label-md text-on-surface-variant flex items-center gap-1">
+                    Alamat
+                </label>
+<textarea class="min-h-[80px] border border-outline-variant rounded p-margin-page text-body-md font-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none resize-y"></textarea>
+</div>
+<div class="flex flex-col gap-1">
+<label class="text-label-md font-label-md text-on-surface-variant flex items-center gap-1">
+                    Nomor Telepon
+                </label>
+<input class="h-touch-target-min border border-outline-variant rounded px-margin-page text-body-md font-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none" type="number"/>
+</div>
+</section>
+<!-- 2. Pengaturan Stok Card -->
+<section class="border border-outline-variant rounded-xl p-margin-page flex flex-col gap-stack-md bg-surface-container-lowest">
+<h2 class="text-headline-sm font-headline-sm text-on-surface">Pengaturan Stok</h2>
+<div class="flex justify-between items-center py-stack-sm">
+<span class="text-body-md font-body-md text-on-surface">Batas Peringatan Stok</span>
+<div class="flex items-center gap-unit border border-outline-variant rounded p-1">
+<button aria-label="Kurangi" class="w-10 h-10 flex items-center justify-center bg-surface-container hover:bg-surface-container-high rounded">
+<span class="material-symbols-outlined">remove</span>
+</button>
+<span class="text-body-md font-body-md font-bold px-2 w-8 text-center">5</span>
+<button aria-label="Tambah" class="w-10 h-10 flex items-center justify-center bg-surface-container hover:bg-surface-container-high rounded">
+<span class="material-symbols-outlined">add</span>
+</button>
+<span class="text-label-md font-label-md text-on-surface-variant pr-2">pcs</span>
+</div>
+</div>
+<div class="flex flex-col gap-stack-sm">
+<span class="text-body-md font-body-md text-on-surface">Kategori Stok Kritis</span>
+<div class="flex flex-wrap gap-unit">
+<button class="h-10 px-margin-page border border-outline-variant rounded-full text-label-md font-label-md text-on-surface-variant hover:bg-surface-container">Makanan</button>
+<button class="h-10 px-margin-page border border-outline-variant rounded-full text-label-md font-label-md text-on-surface-variant hover:bg-surface-container">Minuman</button>
+<button class="h-10 px-margin-page border-transparent bg-primary-container text-on-primary-container rounded-full text-label-md font-label-md font-bold">Sembako</button>
+</div>
+</div>
+</section>
+<!-- 3. Tampilan Card -->
+<section class="border border-outline-variant rounded-xl p-margin-page flex flex-col gap-stack-md bg-surface-container-lowest">
+<h2 class="text-headline-sm font-headline-sm text-on-surface">Tampilan</h2>
+<div class="flex flex-col gap-stack-sm">
+<span class="text-body-md font-body-md text-on-surface">Ukuran Tulisan</span>
+<div class="flex border border-outline-variant rounded-lg overflow-hidden h-touch-target-min">
+<button class="flex-1 text-label-md font-label-md border-r border-outline-variant hover:bg-surface-container active:bg-surface-container-high">Kecil</button>
+<button class="flex-1 text-label-md font-label-md font-bold bg-surface-container border-r border-outline-variant text-on-surface">Sedang</button>
+<button class="flex-1 text-label-md font-label-md hover:bg-surface-container active:bg-surface-container-high">Besar</button>
+</div>
+<div class="bg-surface-container-low p-margin-page rounded mt-unit">
+<p class="text-body-md font-body-md text-on-surface">Contoh tulisan pada layar Anda.</p>
+</div>
+</div>
+</section>
+<!-- 4. Pengaturan AI Card -->
+<section class="border border-outline-variant rounded-xl p-margin-page flex flex-col gap-stack-md bg-surface-container-lowest">
+<h2 class="text-headline-sm font-headline-sm text-on-surface">Pengaturan AI</h2>
+<div class="flex justify-between items-center py-stack-sm">
+<span class="text-body-md font-body-md text-on-surface">Tampilkan Tingkat Keyakinan AI</span>
+<div class="w-12 h-6 bg-surface-variant rounded-full flex items-center p-1 border border-outline-variant">
+<div class="w-4 h-4 bg-outline rounded-full"></div>
+</div>
+</div>
+<div class="flex flex-col gap-stack-sm">
+<span class="text-body-md font-body-md text-on-surface">Sensitivitas Suara</span>
+<div class="relative py-4">
+<div class="h-2 bg-surface-variant rounded-full w-full"></div>
+<div class="h-2 bg-primary rounded-l-full w-1/2 absolute top-4 left-0"></div>
+<div class="w-6 h-6 bg-primary rounded-full absolute top-2 left-1/2 -ml-3 shadow-sm border border-outline-variant"></div>
+<div class="flex justify-between mt-2 text-label-md font-label-md text-on-surface-variant">
+<span class="">Rendah</span>
+<span class="">Sedang</span>
+<span class="">Tinggi</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-1 py-stack-sm">
+<div class="flex justify-between items-center">
+<span class="text-body-md font-body-md text-on-surface">Konfirmasi Sebelum Simpan</span>
+<div class="w-12 h-6 bg-primary-container rounded-full flex items-center justify-end p-1 opacity-50 cursor-not-allowed">
+<div class="w-4 h-4 bg-on-primary-container rounded-full"></div>
+</div>
+</div>
+<p class="text-label-md font-label-md text-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+                    Selalu aktif untuk melindungi data Anda.
+                </p>
+</div>
+</section>
+<!-- 5. Data & Backup Card -->
+<section class="border border-outline-variant rounded-xl p-margin-page flex flex-col gap-stack-md bg-surface-container-lowest">
+<h2 class="text-headline-sm font-headline-sm text-on-surface">Data &amp; Backup</h2>
+<div class="flex flex-col gap-stack-sm">
+<button class="h-touch-target-min border border-primary text-primary font-label-lg text-label-lg font-bold rounded flex justify-center items-center gap-2 hover:bg-surface-container active:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined">upload</span>
+                    Ekspor ke CSV
+                </button>
+<button class="h-touch-target-min border border-primary text-primary font-label-lg text-label-lg font-bold rounded flex justify-center items-center gap-2 hover:bg-surface-container active:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined">save</span>
+                    Backup ke Penyimpanan
+                </button>
+<button class="h-touch-target-min border border-error text-error font-label-lg text-label-lg font-bold rounded flex justify-center items-center gap-2 hover:bg-error-container active:opacity-80 transition-colors mt-stack-sm">
+<span class="material-symbols-outlined">restore</span>
+                    Pulihkan dari Backup
+                </button>
+</div>
+<div class="pt-stack-md border-t border-outline-variant mt-stack-sm text-center">
+<button class="text-label-lg font-label-lg font-bold text-error h-touch-target-min px-margin-page hover:bg-error-container rounded">
+                    Hapus Semua Data
+                </button>
+</div>
+</section>
+<!-- 6. Tentang Card -->
+<section class="border border-outline-variant rounded-xl p-margin-page flex flex-col items-center justify-center gap-stack-md bg-surface-container-lowest text-center">
+<div>
+<p class="text-body-md font-body-md font-bold text-on-surface">WarungPintar v1.0.0</p>
+<p class="text-label-md font-label-md text-on-surface-variant">AI: Gemma 4 (Offline)</p>
+</div>
+<button class="h-touch-target-min px-margin-page border border-primary text-primary font-label-lg text-label-lg font-bold rounded flex justify-center items-center hover:bg-surface-container active:bg-surface-container-high transition-colors">
+                Panduan Penggunaan
+            </button>
+</section>
+</main>
+<!-- BottomNavBar (Semantic Match: 'Pengaturan' context forces specific styling mapping or default suppression. Since the prompt explicitly asks for 'Pengaturan' in the bottom nav, we inject it manually to fulfill requirements while using JSON structure as a guide.) -->
+<nav class="fixed bottom-0 w-full z-50 bg-surface border-t border-outline-variant flat no shadows flex justify-around items-center h-16 px-gutter pb-safe">
+<button class="flex flex-col items-center justify-center text-on-surface-variant w-16 h-full hover:text-primary active:scale-95 transition-transform duration-100">
+<span class="material-symbols-outlined mb-1">home</span>
+<span class="text-label-md font-label-md text-[10px] leading-tight">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant w-16 h-full hover:text-primary active:scale-95 transition-transform duration-100">
+<span class="material-symbols-outlined mb-1">analytics</span>
+<span class="text-label-md font-label-md text-[10px] leading-tight">Riwayat</span>
+</button>
+<button class="flex flex-col items-center justify-center text-primary font-bold w-16 active:scale-95 transition-transform duration-100 h-full">
+<span class="material-symbols-outlined mb-1">settings</span>
+<span class="text-label-md font-label-md text-[10px] leading-tight">Pengaturan</span>
+</button>
+</nav>
+</body></html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Voice input variant for Update Stok</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-container": "#fffdff",
+                        "on-error": "#ffffff",
+                        "secondary-container": "#a0f399",
+                        "surface-container-low": "#f6f3f2",
+                        "on-primary-fixed-variant": "#004786",
+                        "secondary-fixed": "#a3f69c",
+                        "on-tertiary-container": "#fffdff",
+                        "on-error-container": "#93000a",
+                        "outline": "#717783",
+                        "error": "#ba1a1a",
+                        "tertiary-fixed-dim": "#ffb68f",
+                        "primary": "#005dac",
+                        "on-tertiary-fixed-variant": "#773200",
+                        "secondary-fixed-dim": "#88d982",
+                        "surface-container-lowest": "#ffffff",
+                        "background": "#fcf9f8",
+                        "surface-bright": "#fcf9f8",
+                        "on-secondary-fixed-variant": "#005312",
+                        "primary-fixed-dim": "#a5c8ff",
+                        "on-primary": "#ffffff",
+                        "surface-variant": "#e5e2e1",
+                        "on-tertiary-fixed": "#331200",
+                        "secondary": "#1b6d24",
+                        "inverse-primary": "#a5c8ff",
+                        "surface-tint": "#005faf",
+                        "surface-container-high": "#eae7e7",
+                        "on-surface": "#1c1b1b",
+                        "on-surface-variant": "#414752",
+                        "error-container": "#ffdad6",
+                        "surface": "#fcf9f8",
+                        "primary-container": "#1976d2",
+                        "surface-container-highest": "#e5e2e1",
+                        "inverse-surface": "#313030",
+                        "on-primary-fixed": "#001c3a",
+                        "outline-variant": "#c1c6d4",
+                        "surface-container": "#f0eded",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "inverse-on-surface": "#f3f0ef",
+                        "tertiary-container": "#c05600",
+                        "on-secondary-fixed": "#002204",
+                        "on-secondary-container": "#217128",
+                        "on-background": "#1c1b1b",
+                        "tertiary": "#9a4300",
+                        "surface-dim": "#dcd9d9",
+                        "primary-fixed": "#d4e3ff",
+                        "tertiary-fixed": "#ffdbca"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "unit": "8px",
+                        "gutter": "16px",
+                        "margin-page": "16px",
+                        "touch-target-min": "48px",
+                        "stack-md": "16px",
+                        "stack-sm": "8px",
+                        "stack-lg": "24px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-md-mobile": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "label-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "26px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-md-mobile": ["20px", { "lineHeight": "28px", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-lg": ["16px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body-lg antialiased min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface-container text-primary dark:text-primary-fixed-dim font-headline-sm-mobile text-headline-sm-mobile w-full top-0 sticky border-b border-outline-variant hover:bg-surface-container-low dark:hover:bg-surface-container-highest active:bg-surface-container-high transition-colors duration-100 flex items-center h-[64px] px-margin-page justify-between z-50">
+<div class="flex items-center gap-stack-sm">
+<button class="flex items-center justify-center w-touch-target-min h-touch-target-min text-on-surface-variant hover:bg-surface-variant rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-bold">Manajemen Stok</h1>
+</div>
+<button class="font-label-lg text-label-lg text-primary px-stack-sm py-stack-sm hover:bg-primary-container/10 rounded">Batal</button>
+</header>
+<main class="flex-1 px-margin-page py-stack-lg max-w-2xl mx-auto w-full">
+<!-- Segmented Control -->
+<div class="flex border border-outline-variant rounded-lg p-1 bg-surface-container-lowest mb-stack-lg">
+<button class="flex-1 py-3 px-4 font-label-md text-label-md text-center text-on-surface-variant hover:bg-surface-container-low rounded-md transition-colors">Manual</button>
+<button class="flex-1 py-3 px-4 font-label-md text-label-md text-center text-on-surface-variant hover:bg-surface-container-low rounded-md transition-colors">Kamera</button>
+<button class="flex-1 py-3 px-4 font-label-md text-label-md text-center bg-primary-container text-on-primary-container rounded-md shadow-sm transition-colors font-bold">Suara</button>
+</div>
+<!-- Voice Input Card -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-stack-lg flex flex-col items-center justify-center mb-stack-lg text-center gap-stack-md">
+<button class="w-[120px] h-[120px] rounded-full bg-primary flex items-center justify-center text-on-primary hover:bg-surface-tint active:scale-95 transition-all outline-none focus:ring-4 focus:ring-primary-container/50 shadow-md">
+<span class="material-symbols-outlined text-[48px]" style="font-variation-settings: 'FILL' 1;">mic</span>
+</button>
+<p class="font-body-md text-body-md text-on-surface-variant">Tekan dan tahan untuk berbicara</p>
+</div>
+<!-- AI Result Confirmation Card -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-stack-md flex flex-col gap-stack-sm mb-stack-lg">
+<div class="flex justify-between items-start mb-stack-sm">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Hasil Deteksi Suara</h2>
+<span class="bg-secondary-container text-on-secondary-container font-label-md text-label-md px-3 py-1 rounded-full flex items-center gap-1 border border-secondary-fixed">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+                    Percaya 90%
+                </span>
+</div>
+<div class="bg-surface-container p-stack-md rounded border border-outline-variant">
+<div class="flex flex-col gap-2">
+<div class="flex justify-between items-center border-b border-outline-variant pb-2">
+<span class="font-label-lg text-label-lg text-on-surface-variant">Produk</span>
+<span class="font-body-lg text-body-lg font-semibold text-on-surface">Mie Ayam — SKU: MIE-001</span>
+</div>
+<div class="flex justify-between items-center pt-2">
+<span class="font-label-lg text-label-lg text-on-surface-variant">Jumlah</span>
+<span class="font-headline-md-mobile text-headline-md-mobile text-primary">45 pcs</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="flex gap-stack-md mt-stack-lg flex-col sm:flex-row">
+<button class="flex-1 h-touch-target-min border border-outline text-on-surface font-label-lg text-label-lg rounded-lg flex items-center justify-center gap-2 hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined">replay</span>
+                Retake Suara
+            </button>
+<button class="flex-1 h-touch-target-min bg-primary text-on-primary font-label-lg text-label-lg rounded-lg flex items-center justify-center gap-2 hover:bg-surface-tint transition-colors shadow-sm">
+<span class="material-symbols-outlined">check</span>
+                Konfirmasi &amp; Simpan
+            </button>
+</div>
+</main>
+</body></html>

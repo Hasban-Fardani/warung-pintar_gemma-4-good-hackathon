@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+
+<html lang="en" style="width: 390px; height: 884px; overflow: hidden; position: relative;"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Riwayat &amp; Analisis</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom constraints for WarungPintar functionalism */
+        .card-border { border: 1px solid #E0E0E0; }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-surface": "#313030",
+                        "on-secondary-container": "#217128",
+                        "outline": "#717783",
+                        "on-tertiary-fixed-variant": "#773200",
+                        "secondary-fixed-dim": "#88d982",
+                        "primary": "#005dac",
+                        "surface-tint": "#005faf",
+                        "secondary-fixed": "#a3f69c",
+                        "secondary-container": "#a0f399",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed-variant": "#005312",
+                        "inverse-primary": "#a5c8ff",
+                        "on-tertiary-fixed": "#331200",
+                        "surface-variant": "#e5e2e1",
+                        "on-primary-container": "#fffdff",
+                        "surface-dim": "#dcd9d9",
+                        "on-error": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "on-surface": "#1c1b1b",
+                        "tertiary-container": "#c05600",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed": "#ffdbca",
+                        "tertiary-fixed-dim": "#ffb68f",
+                        "primary-container": "#1976d2",
+                        "surface-container-low": "#f6f3f2",
+                        "on-secondary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "surface-container": "#f0eded",
+                        "primary-fixed": "#d4e3ff",
+                        "surface-container-highest": "#e5e2e1",
+                        "secondary": "#1b6d24",
+                        "outline-variant": "#c1c6d4",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-bright": "#fcf9f8",
+                        "surface": "#fcf9f8",
+                        "on-background": "#1c1b1b",
+                        "on-surface-variant": "#414752",
+                        "surface-container-high": "#eae7e7",
+                        "on-primary-fixed-variant": "#004786",
+                        "on-primary-fixed": "#001c3a",
+                        "background": "#fcf9f8",
+                        "on-secondary-fixed": "#002204",
+                        "tertiary": "#9a4300",
+                        "on-tertiary-container": "#fffdff",
+                        "inverse-on-surface": "#f3f0ef",
+                        "primary-fixed-dim": "#a5c8ff",
+                        
+                        /* Custom functional colors requested in prompt */
+                        "wp-blue": "#1976D2",
+                        "wp-blue-light": "#E3F2FD",
+                        "wp-grey-dark": "#424242",
+                        "wp-grey-border": "#E0E0E0",
+                        "wp-sell-bg": "#E8F5E9",
+                        "wp-sell-text": "#2E7D32",
+                        "wp-buy-bg": "#FFF3E0",
+                        "wp-buy-text": "#EF6C00"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem",
+                        "wp": "8px"
+                    },
+                    "spacing": {
+                        "stack-md": "16px",
+                        "touch-target-min": "48px",
+                        "unit": "8px",
+                        "stack-lg": "24px",
+                        "margin-page": "16px",
+                        "gutter": "16px",
+                        "stack-sm": "8px"
+                    },
+                    "fontFamily": {
+                        "label-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-md-mobile": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-lg": ["16px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "26px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                        "headline-md-mobile": ["20px", { "lineHeight": "28px", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md h-screen flex flex-col antialiased">
+<!-- TopAppBar from JSON -->
+<header class="bg-surface dark:bg-inverse-surface text-primary dark:text-inverse-primary border-b border-outline dark:border-outline-variant flex justify-between items-center w-full px-margin-page h-touch-target-min sticky top-0 z-50">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary dark:text-inverse-primary" data-icon="store">store</span>
+<span class="font-headline-md-mobile text-headline-md-mobile font-bold text-primary dark:text-inverse-primary">Riwayat &amp; Analisis</span>
+</div>
+<button class="flex items-center gap-1 h-touch-target-min px-2 hover:bg-surface-container dark:hover:bg-inverse-surface rounded text-primary dark:text-inverse-primary">
+<span class="font-label-lg text-label-lg">Export</span>
+<span class="material-symbols-outlined" data-icon="upload">upload</span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 overflow-y-auto pb-24 px-margin-page py-stack-md flex flex-col gap-stack-md bg-white">
+<!-- 1. Period Toggle -->
+<section class="flex flex-col gap-stack-sm">
+<label class="font-label-md text-label-md text-wp-grey-dark">Periode</label>
+<div class="flex p-1 bg-surface-container-low card-border rounded-wp h-touch-target-min">
+<button class="flex-1 rounded-wp font-label-lg text-label-lg text-on-surface-variant hover:bg-surface-container transition-colors">Harian</button>
+<button class="flex-1 rounded-wp font-label-lg text-label-lg bg-wp-blue text-white shadow-sm">Mingguan</button>
+<button class="flex-1 rounded-wp font-label-lg text-label-lg text-on-surface-variant hover:bg-surface-container transition-colors">Bulanan</button>
+</div>
+</section>
+<!-- 2. Revenue Chart Card -->
+<section class="bg-white card-border rounded-wp p-stack-md flex flex-col gap-stack-md">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Grafik Omzet</h2>
+<div class="flex items-end justify-between h-48 mt-4 tabular-nums">
+<!-- Y-axis -->
+<div class="flex flex-col justify-between h-full font-label-md text-label-md text-on-surface-variant pb-6 pr-4 border-r border-wp-grey-border border-dashed">
+<span class="">Rp150rb</span>
+<span class="">Rp100rb</span>
+<span class="">Rp50rb</span>
+<span class="">0</span>
+</div>
+<!-- Bars (X-axis) -->
+<div class="flex-1 flex justify-between items-end h-full px-2 gap-2 pb-6 relative">
+<div class="w-full h-full absolute bottom-6 border-b border-wp-grey-border"></div>
+<!-- Sen -->
+<div class="flex flex-col items-center gap-2 z-10 w-full group">
+<div class="w-full bg-wp-blue rounded-t-wp h-[30%] group-hover:bg-wp-blue/80 transition-colors"></div>
+<span class="font-label-md text-label-md text-on-surface-variant">Sen</span>
+</div>
+<!-- Sel -->
+<div class="flex flex-col items-center gap-2 z-10 w-full group">
+<div class="w-full bg-wp-blue rounded-t-wp h-[50%] group-hover:bg-wp-blue/80 transition-colors"></div>
+<span class="font-label-md text-label-md text-on-surface-variant">Sel</span>
+</div>
+<!-- Rab -->
+<div class="flex flex-col items-center gap-2 z-10 w-full group">
+<div class="w-full bg-wp-blue rounded-t-wp h-[40%] group-hover:bg-wp-blue/80 transition-colors"></div>
+<span class="font-label-md text-label-md text-on-surface-variant">Rab</span>
+</div>
+<!-- Kam -->
+<div class="flex flex-col items-center gap-2 z-10 w-full group">
+<div class="w-full bg-wp-blue rounded-t-wp h-[70%] group-hover:bg-wp-blue/80 transition-colors"></div>
+<span class="font-label-md text-label-md text-on-surface-variant">Kam</span>
+</div>
+<!-- Jum -->
+<div class="flex flex-col items-center gap-2 z-10 w-full group">
+<div class="w-full bg-wp-blue rounded-t-wp h-[90%] group-hover:bg-wp-blue/80 transition-colors"></div>
+<span class="font-label-md text-label-md text-on-surface-variant">Jum</span>
+</div>
+<!-- Sab -->
+<div class="flex flex-col items-center gap-2 z-10 w-full group">
+<div class="w-full bg-wp-blue rounded-t-wp h-[100%] group-hover:bg-wp-blue/80 transition-colors"></div>
+<span class="font-label-md text-label-md text-on-surface-variant">Sab</span>
+</div>
+<!-- Min -->
+<div class="flex flex-col items-center gap-2 z-10 w-full group">
+<div class="w-full bg-wp-blue rounded-t-wp h-[80%] group-hover:bg-wp-blue/80 transition-colors"></div>
+<span class="font-label-md text-label-md text-on-surface-variant">Min</span>
+</div>
+</div>
+</div>
+</section>
+<!-- 3. Quick Stats -->
+<section class="flex flex-col gap-unit">
+<div class="bg-white card-border rounded-wp p-stack-md flex justify-between items-center hover:bg-surface-container-low transition-colors min-h-touch-target-min">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface-variant">Produk Terlaris</span>
+<span class="font-label-lg text-label-lg text-on-surface mt-1">Minyak Goreng</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-label-lg text-label-lg text-on-surface tabular-nums">45 terjual</span>
+<span class="font-label-md text-label-md text-wp-blue tabular-nums">Rp750.000</span>
+</div>
+</div>
+<div class="bg-white card-border rounded-wp p-stack-md flex justify-between items-center hover:bg-surface-container-low transition-colors min-h-touch-target-min">
+<span class="font-label-md text-label-md text-on-surface-variant">Rata-rata Transaksi</span>
+<span class="font-headline-sm text-headline-sm text-on-surface tabular-nums">Rp45.000</span>
+</div>
+<div class="bg-white card-border rounded-wp p-stack-md flex justify-between items-center hover:bg-surface-container-low transition-colors min-h-touch-target-min">
+<span class="font-label-md text-label-md text-on-surface-variant">Total Transaksi</span>
+<span class="font-headline-sm text-headline-sm text-on-surface tabular-nums">128</span>
+</div>
+</section>
+<!-- 4. Search & Filter -->
+<section class="flex flex-col gap-stack-sm mt-2">
+<div class="relative w-full h-touch-target-min">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant" data-icon="search">search</span>
+<input class="w-full h-full pl-12 pr-4 bg-white card-border rounded-wp font-body-md text-body-md text-on-surface focus:outline-none focus:border-wp-blue focus:ring-1 focus:ring-wp-blue placeholder:text-on-surface-variant" placeholder="Cari nama barang..." type="text"/>
+</div>
+<div class="relative w-full h-touch-target-min">
+<button class="w-full h-full px-4 bg-white card-border rounded-wp font-body-md text-body-md text-on-surface flex justify-between items-center focus:outline-none focus:border-wp-blue focus:ring-1 focus:ring-wp-blue active:bg-surface-container-low transition-colors text-left">
+<span class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="category">category</span>
+<span>Semua Kategori</span>
+</span>
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="expand_more">expand_more</span>
+</button>
+</div>
+<div class="flex gap-unit overflow-x-auto pb-2 hide-scrollbar">
+<button class="h-10 px-4 rounded-full font-label-md text-label-md whitespace-nowrap bg-wp-blue-light text-wp-blue border border-wp-blue">Semua</button>
+<button class="h-10 px-4 rounded-full font-label-md text-label-md whitespace-nowrap bg-white text-on-surface-variant card-border hover:bg-surface-container-low">Jual</button>
+<button class="h-10 px-4 rounded-full font-label-md text-label-md whitespace-nowrap bg-white text-on-surface-variant card-border hover:bg-surface-container-low">Beli</button>
+</div>
+</section>
+<!-- 5. Transaction List -->
+<section class="flex flex-col bg-white card-border rounded-wp overflow-hidden">
+<div class="p-stack-md border-b border-wp-grey-border flex justify-between items-center">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Daftar Transaksi</h3>
+<a class="font-label-md text-label-md text-wp-blue hover:underline p-2 -mr-2" href="#">Lihat Semua</a>
+</div>
+<div class="flex flex-col divide-y divide-wp-grey-border">
+<!-- Item 1 -->
+<div class="p-stack-md flex justify-between items-center hover:bg-surface-container-low transition-colors min-h-touch-target-min cursor-pointer">
+<div class="flex flex-col gap-1">
+<span class="font-label-lg text-label-lg text-on-surface">Beras Pandan 5kg <span class="font-body-md text-body-md text-on-surface-variant ml-1">x1</span></span>
+<div class="flex items-center gap-2 font-label-md text-label-md text-on-surface-variant tabular-nums">
+<span class="">2 Jan · 14:30</span>
+<span class="px-2 py-0.5 rounded bg-wp-sell-bg text-wp-sell-text text-[12px] font-semibold uppercase tracking-wider">Jual</span>
+</div>
+</div>
+<span class="font-label-lg text-label-lg text-on-surface tabular-nums">Rp65.000</span>
+</div>
+<!-- Item 2 -->
+<div class="p-stack-md flex justify-between items-center hover:bg-surface-container-low transition-colors min-h-touch-target-min cursor-pointer">
+<div class="flex flex-col gap-1">
+<span class="font-label-lg text-label-lg text-on-surface">Minyak Goreng 2L <span class="font-body-md text-body-md text-on-surface-variant ml-1">x1</span></span>
+<div class="flex items-center gap-2 font-label-md text-label-md text-on-surface-variant tabular-nums">
+<span class="">2 Jan · 12:15</span>
+<span class="px-2 py-0.5 rounded bg-wp-sell-bg text-wp-sell-text text-[12px] font-semibold uppercase tracking-wider">Jual</span>
+</div>
+</div>
+<span class="font-label-lg text-label-lg text-on-surface tabular-nums">Rp35.000</span>
+</div>
+<!-- Item 3 -->
+<div class="p-stack-md flex justify-between items-center hover:bg-surface-container-low transition-colors min-h-touch-target-min cursor-pointer">
+<div class="flex flex-col gap-1">
+<span class="font-label-lg text-label-lg text-on-surface">Grosir Sembako <span class="font-body-md text-body-md text-on-surface-variant ml-1">x1</span></span>
+<div class="flex items-center gap-2 font-label-md text-label-md text-on-surface-variant tabular-nums">
+<span class="">1 Jan · 09:00</span>
+<span class="px-2 py-0.5 rounded bg-wp-buy-bg text-wp-buy-text text-[12px] font-semibold uppercase tracking-wider">Beli</span>
+</div>
+</div>
+<span class="font-label-lg text-label-lg text-on-surface tabular-nums">Rp200.000</span>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar from JSON -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-gutter h-[72px] bg-surface dark:bg-inverse-surface border-t border-outline dark:border-outline-variant md:hidden">
+<!-- Inactive: Home -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-stack-md py-unit hover:bg-surface-container-high dark:hover:bg-inverse-surface rounded-xl min-w-touch-target-min min-h-touch-target-min">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-label-md text-label-md mt-1">Home</span>
+</button>
+<!-- Active: Riwayat (Applying JSON active styling + prompt specifics) -->
+<button class="flex flex-col items-center justify-center dark:bg-on-secondary-container text-wp-blue dark:text-on-primary-container rounded-xl px-stack-md py-unit scale-95 transition-transform min-w-touch-target-min min-h-touch-target-min relative bg-transparent">
+<span class="material-symbols-outlined" data-icon="history" style="font-variation-settings: 'FILL' 1;">history</span>
+<span class="font-label-md text-label-md mt-1">Riwayat</span>
+</button>
+<!-- Inactive: Pengaturan -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-stack-md py-unit hover:bg-surface-container-high dark:hover:bg-inverse-surface rounded-xl min-w-touch-target-min min-h-touch-target-min">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-md text-label-md mt-1">Pengaturan</span>
+</button>
+</nav>
+<style>
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<div aria-hidden="true" data-snapdom-sandbox="true" id="snapdom-sandbox" style="position: absolute; left: -9999px; top: -9999px; width: 0px; height: 0px; overflow: hidden;"></div></body></html>

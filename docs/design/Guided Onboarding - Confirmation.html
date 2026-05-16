@@ -1,0 +1,254 @@
+<!DOCTYPE html><html lang="id"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>WarungPintar - Konfirmasi Setup</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary-container": "#1976d2",
+                      "on-surface": "#1c1b1b",
+                      "on-primary-container": "#fffdff",
+                      "on-error-container": "#93000a",
+                      "on-error": "#ffffff",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-bright": "#fcf9f8",
+                      "surface-variant": "#e5e2e1",
+                      "surface-dim": "#dcd9d9",
+                      "tertiary-fixed-dim": "#ffb68f",
+                      "tertiary-container": "#c05600",
+                      "secondary-fixed": "#a3f69c",
+                      "secondary": "#1b6d24",
+                      "on-secondary-fixed-variant": "#005312",
+                      "primary-fixed-dim": "#a5c8ff",
+                      "on-tertiary": "#ffffff",
+                      "surface-container-highest": "#e5e2e1",
+                      "on-primary-fixed": "#001c3a",
+                      "error-container": "#ffdad6",
+                      "background": "#fcf9f8",
+                      "primary": "#005dac",
+                      "inverse-surface": "#313030",
+                      "secondary-container": "#a0f399",
+                      "on-background": "#1c1b1b",
+                      "inverse-on-surface": "#f3f0ef",
+                      "on-secondary-container": "#217128",
+                      "error": "#ba1a1a",
+                      "surface": "#fcf9f8",
+                      "outline": "#717783",
+                      "inverse-primary": "#a5c8ff",
+                      "tertiary-fixed": "#ffdbca",
+                      "on-tertiary-fixed-variant": "#773200",
+                      "on-primary": "#ffffff",
+                      "primary-fixed": "#d4e3ff",
+                      "surface-container": "#f0eded",
+                      "on-tertiary-fixed": "#331200",
+                      "secondary-fixed-dim": "#88d982",
+                      "on-surface-variant": "#414752",
+                      "outline-variant": "#c1c6d4",
+                      "on-secondary": "#ffffff",
+                      "on-primary-fixed-variant": "#004786",
+                      "surface-container-high": "#eae7e7",
+                      "tertiary": "#9a4300",
+                      "surface-container-low": "#f6f3f2",
+                      "on-tertiary-container": "#fffdff",
+                      "surface-tint": "#005faf",
+                      "on-secondary-fixed": "#002204"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "touch-target-min": "48px",
+                      "gutter": "16px",
+                      "margin-page": "16px",
+                      "stack-lg": "24px",
+                      "stack-sm": "8px",
+                      "unit": "8px",
+                      "stack-md": "16px"
+              },
+              "fontFamily": {
+                      "headline-md-mobile": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "label-md": [
+                              "Inter"
+                      ],
+                      "headline-sm": [
+                              "Inter"
+                      ],
+                      "headline-lg-mobile": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Inter"
+                      ],
+                      "label-lg": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "headline-md-mobile": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "18px",
+                                      "letterSpacing": "0.02em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-sm": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-lg": [
+                              "28px",
+                              {
+                                      "lineHeight": "36px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "label-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "20px",
+                                      "letterSpacing": "0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "26px",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md text-body-md antialiased">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface fixed top-0 w-full z-50 border-b border-outline-variant dark:border-outline flex justify-between items-center px-margin-page h-touch-target-min">
+<button aria-label="Kembali" class="text-primary dark:text-inverse-primary hover:bg-surface-container-low dark:hover:bg-surface-container-low active:bg-surface-container-high transition-colors flex items-center justify-center w-touch-target-min h-touch-target-min rounded-full">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+</button>
+<h1 class="font-headline-sm text-headline-sm-mobile text-primary dark:text-inverse-primary">Langkah 3 dari 4</h1>
+<div class="w-touch-target-min"></div> <!-- Placeholder for balance -->
+</header>
+<main class="flex-grow pt-[calc(var(--spacing-touch-target-min)+var(--spacing-margin-page))] px-margin-page pb-stack-lg max-w-lg mx-auto w-full">
+<!-- AI Guide Bubble 1 -->
+<div class="flex gap-gutter mb-stack-md">
+<div class="flex-shrink-0 w-12 h-12 rounded-full bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+</div>
+<div class="bg-surface-container-low rounded-xl rounded-tl-none p-stack-md border border-outline-variant">
+<p class="font-body-md text-body-md text-on-surface">Setup hampir selesai! Ini yang sudah Ibu atur:</p>
+</div>
+</div>
+<!-- Summary Card -->
+<div class="bg-surface rounded-xl border border-outline-variant p-stack-md mb-stack-lg">
+<div class="flex justify-between items-start mb-stack-sm">
+<h2 class="font-label-lg text-label-lg text-on-surface">Ringkasan Pengaturan</h2>
+<button aria-label="Edit" class="text-primary hover:bg-surface-container-low active:bg-surface-container-high p-unit rounded-full transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">edit</span>
+</button>
+</div>
+<ul class="space-y-stack-sm">
+<li class="flex items-center gap-unit">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface">Warung: Bu Warsih</span>
+</li>
+<li class="flex items-center gap-unit">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface">Barang: Mie Ayam (10 pcs)</span>
+</li>
+</ul>
+</div>
+<!-- AI Guide Bubble 2 -->
+<div class="flex gap-gutter mb-stack-lg">
+<div class="flex-shrink-0 w-12 h-12 rounded-full bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+</div>
+<div class="bg-surface-container-low rounded-xl rounded-tl-none p-stack-md border border-outline-variant">
+<p class="font-body-md text-body-md text-on-surface mb-stack-sm">Sekarang Ibu sudah siap! Cobalah hal ini nanti:</p>
+<ul class="list-disc list-inside space-y-unit text-on-surface-variant font-body-md text-body-md">
+<li>Catat penjualan dengan suara</li>
+<li>Cek sisa stok barang</li>
+<li>Lihat laporan harian</li>
+</ul>
+</div>
+</div>
+<!-- Tips Card -->
+<div class="bg-secondary-container rounded-xl border border-secondary p-stack-md mb-stack-lg flex gap-gutter items-start">
+<span class="material-symbols-outlined text-on-secondary-container mt-1" style="font-variation-settings: 'FILL' 1;">lightbulb</span>
+<div>
+<h3 class="font-label-lg text-label-lg text-on-secondary-container mb-unit">Tips Pertama</h3>
+<p class="font-body-md text-body-md text-on-secondary-container">Tekan tombol mikrofon nanti dan bilang: <br><strong>"Laku mie ayam dua bungkus"</strong></p>
+</div>
+</div>
+<!-- Primary Action -->
+<div class="mt-auto">
+<button class="w-full h-touch-target-min bg-primary text-on-primary font-label-lg text-label-lg rounded-full flex items-center justify-center gap-unit hover:bg-surface-tint active:bg-on-primary-fixed-variant transition-colors shadow-none border-none">
+                Mulai Catat Transaksi
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_forward</span>
+</button>
+</div>
+</main>
+</body></html>

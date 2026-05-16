@@ -1,0 +1,184 @@
+<!DOCTYPE html><html lang="id"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Update Stok - Kamera</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-container": "#fffdff",
+                        "on-error": "#ffffff",
+                        "secondary-container": "#a0f399",
+                        "surface-container-low": "#f6f3f2",
+                        "on-primary-fixed-variant": "#004786",
+                        "secondary-fixed": "#a3f69c",
+                        "on-tertiary-container": "#fffdff",
+                        "on-error-container": "#93000a",
+                        "outline": "#717783",
+                        "error": "#ba1a1a",
+                        "tertiary-fixed-dim": "#ffb68f",
+                        "primary": "#005dac",
+                        "on-tertiary-fixed-variant": "#773200",
+                        "secondary-fixed-dim": "#88d982",
+                        "surface-container-lowest": "#ffffff",
+                        "background": "#fcf9f8",
+                        "surface-bright": "#fcf9f8",
+                        "on-secondary-fixed-variant": "#005312",
+                        "primary-fixed-dim": "#a5c8ff",
+                        "on-primary": "#ffffff",
+                        "surface-variant": "#e5e2e1",
+                        "on-tertiary-fixed": "#331200",
+                        "secondary": "#1b6d24",
+                        "inverse-primary": "#a5c8ff",
+                        "surface-tint": "#005faf",
+                        "surface-container-high": "#eae7e7",
+                        "on-surface": "#1c1b1b",
+                        "on-surface-variant": "#414752",
+                        "error-container": "#ffdad6",
+                        "surface": "#fcf9f8",
+                        "primary-container": "#1976d2",
+                        "surface-container-highest": "#e5e2e1",
+                        "inverse-surface": "#313030",
+                        "on-primary-fixed": "#001c3a",
+                        "outline-variant": "#c1c6d4",
+                        "surface-container": "#f0eded",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "inverse-on-surface": "#f3f0ef",
+                        "tertiary-container": "#c05600",
+                        "on-secondary-fixed": "#002204",
+                        "on-secondary-container": "#217128",
+                        "on-background": "#1c1b1b",
+                        "tertiary": "#9a4300",
+                        "surface-dim": "#dcd9d9",
+                        "primary-fixed": "#d4e3ff",
+                        "tertiary-fixed": "#ffdbca"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "unit": "8px",
+                        "gutter": "16px",
+                        "margin-page": "16px",
+                        "touch-target-min": "48px",
+                        "stack-md": "16px",
+                        "stack-sm": "8px",
+                        "stack-lg": "24px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-md-mobile": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "label-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", {"lineHeight": "26px", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "headline-lg": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-md-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "label-lg": ["16px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body-lg min-h-screen flex flex-col antialiased">
+<!-- TopAppBar -->
+<header class="flex items-center h-[64px] px-margin-page w-full bg-surface dark:bg-surface-container top-0 sticky border-b border-outline-variant z-10">
+<button aria-label="Kembali" class="flex items-center justify-center min-w-[48px] min-h-[48px] text-primary dark:text-primary-fixed-dim hover:bg-surface-container-low dark:hover:bg-surface-container-highest active:bg-surface-container-high transition-colors duration-100 rounded">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="flex-1 text-center font-headline-sm-mobile text-headline-sm-mobile font-bold text-primary dark:text-primary-fixed-dim px-2 truncate">
+            Manajemen Stok
+        </h1>
+<button class="flex items-center justify-center min-h-[48px] px-2 text-error font-label-md text-label-md hover:bg-surface-container-low transition-colors duration-100 rounded uppercase">
+            Batal
+        </button>
+</header>
+<!-- Main Canvas -->
+<main class="flex-1 w-full max-w-2xl mx-auto flex flex-col p-margin-page">
+<!-- Segmented Control -->
+<div class="flex w-full border border-outline-variant rounded mb-stack-lg bg-surface h-[48px]">
+<button class="flex-1 flex items-center justify-center font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low transition-colors">
+                Manual
+            </button>
+<div class="w-px bg-outline-variant"></div>
+<button class="flex-1 flex items-center justify-center font-label-md text-label-md text-on-surface bg-surface-variant font-bold shadow-[inset_0_-2px_0_0_#005dac] transition-colors">
+                Kamera
+            </button>
+<div class="w-px bg-outline-variant"></div>
+<button class="flex-1 flex items-center justify-center font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low transition-colors">
+                Suara
+            </button>
+</div>
+<!-- Camera Viewfinder Card -->
+<div class="relative w-full aspect-[4/3] border border-outline-variant bg-surface-container-highest overflow-hidden mb-stack-lg flex items-center justify-center shadow-none">
+<!-- Simulated Camera Feed Background -->
+<img alt="Retail store shelves filled with various packaged goods and boxes. The lighting is bright and functional, typical of a warehouse or wholesale environment. The perspective is a straight-on, objective view as if seen through a digital scanner or smartphone camera lens. The overall aesthetic aligns with a high-contrast, utilitarian user interface designed for reliable outdoor and industrial use." class="absolute inset-0 w-full h-full object-cover opacity-80" data-alt="Retail store shelves filled with various packaged goods and boxes. The lighting is bright and functional, typical of a warehouse or wholesale environment. The perspective is a straight-on, objective view as if seen through a digital scanner or smartphone camera lens. The overall aesthetic aligns with a high-contrast, utilitarian user interface designed for reliable outdoor and industrial use." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKqnNRJO7dMR2q6mO15GkyI0B-Now-JcelSVSJ5c8u6DpTZ_DqZh8auB3qSl1kviUMeJ0L8CA939tl2H2sZaKG_0t2xKLd4qzlycpohY3XlMkY1KGGypiGTJ3SQYLwV1yrcXK0TbDXT1tRmI28t8Ce6ADp03hUYLXQ9R3naaVFKeO7RrrBCUgNDD4d_iZjrrNpBaMIjS23GI6Zq42NjYpS_o5zFj8PTQWnB6fEqRPemZK5BPuljxMkZSX14FC_6RF04Bj09j9fhJk">
+<!-- Dark Overlay for better contrast of the box -->
+<div class="absolute inset-0 bg-black/20"></div>
+<!-- Dashed Targeting Rectangle -->
+<div class="absolute inset-stack-lg border-2 border-dashed border-primary shadow-[0_0_0_4000px_rgba(0,0,0,0.4)]">
+<!-- Corner markers for technical feel -->
+<div class="absolute top-0 left-0 w-4 h-4 border-t-4 border-l-4 border-primary -ml-[2px] -mt-[2px]"></div>
+<div class="absolute top-0 right-0 w-4 h-4 border-t-4 border-r-4 border-primary -mr-[2px] -mt-[2px]"></div>
+<div class="absolute bottom-0 left-0 w-4 h-4 border-b-4 border-l-4 border-primary -ml-[2px] -mb-[2px]"></div>
+<div class="absolute bottom-0 right-0 w-4 h-4 border-b-4 border-r-4 border-primary -mr-[2px] -mb-[2px]"></div>
+</div>
+<!-- Instruction Text Overlay -->
+<div class="absolute bottom-stack-md left-0 right-0 px-stack-lg flex justify-center">
+<div class="bg-inverse-surface/90 backdrop-blur-sm px-stack-md py-stack-sm rounded border border-outline-variant">
+<p class="font-label-md text-label-md text-surface-container-lowest text-center">
+                        Arahkan ke barang atau nota belanja
+                    </p>
+</div>
+</div>
+</div>
+<!-- Controls Area -->
+<div class="flex flex-col items-center justify-center flex-1">
+<!-- Capture Button -->
+<button aria-label="Ambil Gambar" class="relative w-[88px] h-[88px] flex items-center justify-center rounded-full border-2 border-outline-variant mb-stack-md active:scale-95 transition-transform">
+<div class="w-[72px] h-[72px] bg-primary rounded-full flex items-center justify-center border-4 border-surface shadow-sm">
+<span class="material-symbols-outlined text-on-primary text-[32px]" data-icon="photo_camera" style="font-variation-settings: 'FILL' 1;">photo_camera</span>
+</div>
+</button>
+<!-- Status Indicator -->
+<div class="flex items-center space-x-unit px-stack-md py-stack-sm bg-surface-container-low border border-outline-variant rounded-full">
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]" data-icon="cloud_off">cloud_off</span>
+<span class="font-label-md text-label-md text-on-surface-variant">Offline · AI Gemma</span>
+</div>
+</div>
+</main>
+</body></html>

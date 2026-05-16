@@ -1,0 +1,306 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Input Transaksi - WarungPintar</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "error-container": "#ffdad6",
+                      "secondary-fixed-dim": "#88d982",
+                      "primary-fixed": "#d4e3ff",
+                      "surface-variant": "#e5e2e1",
+                      "secondary-fixed": "#a3f69c",
+                      "on-secondary-container": "#217128",
+                      "outline": "#717783",
+                      "error": "#ba1a1a",
+                      "on-primary-fixed": "#001c3a",
+                      "inverse-primary": "#a5c8ff",
+                      "background": "#fcf9f8",
+                      "surface-dim": "#dcd9d9",
+                      "on-error": "#ffffff",
+                      "on-primary": "#ffffff",
+                      "surface-container-high": "#eae7e7",
+                      "inverse-on-surface": "#f3f0ef",
+                      "primary-container": "#1976d2",
+                      "primary": "#005dac",
+                      "outline-variant": "#c1c6d4",
+                      "surface": "#fcf9f8",
+                      "on-error-container": "#93000a",
+                      "surface-container-highest": "#e5e2e1",
+                      "on-background": "#1c1b1b",
+                      "on-tertiary-fixed": "#331200",
+                      "on-primary-fixed-variant": "#004786",
+                      "tertiary-fixed-dim": "#ffb68f",
+                      "on-tertiary": "#ffffff",
+                      "on-primary-container": "#fffdff",
+                      "surface-container-low": "#f6f3f2",
+                      "on-tertiary-fixed-variant": "#773200",
+                      "surface-tint": "#005faf",
+                      "on-secondary": "#ffffff",
+                      "inverse-surface": "#313030",
+                      "surface-container": "#f0eded",
+                      "surface-container-lowest": "#ffffff",
+                      "on-tertiary-container": "#fffdff",
+                      "tertiary-container": "#c05600",
+                      "tertiary": "#9a4300",
+                      "on-secondary-fixed": "#002204",
+                      "tertiary-fixed": "#ffdbca",
+                      "secondary-container": "#a0f399",
+                      "on-surface-variant": "#414752",
+                      "on-surface": "#1c1b1b",
+                      "surface-bright": "#fcf9f8",
+                      "on-secondary-fixed-variant": "#005312",
+                      "secondary": "#1b6d24",
+                      "primary-fixed-dim": "#a5c8ff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "stack-md": "16px",
+                      "touch-target-min": "48px",
+                      "gutter": "16px",
+                      "unit": "8px",
+                      "stack-lg": "24px",
+                      "stack-sm": "8px",
+                      "margin-page": "16px"
+              },
+              "fontFamily": {
+                      "label-lg": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "headline-sm": [
+                              "Inter"
+                      ],
+                      "headline-md-mobile": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "Inter"
+                      ],
+                      "headline-lg-mobile": [
+                              "Inter"
+                      ],
+                      "label-md": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "label-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "20px",
+                                      "letterSpacing": "0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg": [
+                              "28px",
+                              {
+                                      "lineHeight": "36px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "26px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-sm": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-md-mobile": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "18px",
+                                      "letterSpacing": "0.02em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        body {
+            -webkit-tap-highlight-color: transparent;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.filled {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface-container-lowest text-on-surface font-body-md min-h-screen flex flex-col pt-touch-target-min pb-[144px]"> <!-- pb handles sticky bar + nav space if any, though nav is suppressed -->
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface border-b border-outline-variant flex justify-between items-center px-margin-page h-touch-target-min">
+<button aria-label="Kembali" class="w-touch-target-min h-touch-target-min flex items-center justify-start text-primary">
+<span class="material-symbols-outlined text-[24px]" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="text-headline-sm font-headline-sm text-on-surface truncate px-2">Input Transaksi</h1>
+<button aria-label="Simpan" class="w-touch-target-min h-touch-target-min flex items-center justify-end text-on-surface-variant opacity-50 cursor-not-allowed" disabled="">
+<span class="text-label-lg font-label-lg">Simpan</span>
+</button>
+</header>
+<main class="flex-grow flex flex-col px-margin-page py-stack-md gap-stack-lg">
+<!-- Section 1: Input Mode Toggle -->
+<section class="flex flex-col gap-stack-sm">
+<h2 class="text-label-lg font-label-lg text-on-surface">Cara Input</h2>
+<div class="flex border border-outline-variant rounded-lg overflow-hidden h-touch-target-min">
+<button class="flex-1 flex items-center justify-center gap-2 bg-surface text-on-surface-variant hover:bg-surface-container transition-colors border-r border-outline-variant">
+<span class="material-symbols-outlined" data-icon="mic">mic</span>
+<span class="text-label-lg font-label-lg">Suara</span>
+</button>
+<button class="flex-1 flex items-center justify-center gap-2 bg-primary-container text-on-primary-container font-bold">
+<span class="material-symbols-outlined filled" data-icon="edit">edit</span>
+<span class="text-label-lg font-label-lg">Manual</span>
+</button>
+</div>
+</section>
+<!-- Section 2: Manual Input Form -->
+<form class="flex flex-col gap-stack-md">
+<!-- Field 1: Jenis Transaksi -->
+<div class="flex flex-col gap-unit">
+<label class="text-label-lg font-label-lg text-on-surface">Jenis Transaksi *</label>
+<div class="flex border border-outline-variant rounded-lg overflow-hidden h-touch-target-min">
+<button class="flex-1 flex items-center justify-center bg-secondary-container text-on-secondary-container font-bold border-r border-outline-variant" type="button">
+<span class="text-label-lg font-label-lg">Jual</span>
+</button>
+<button class="flex-1 flex items-center justify-center bg-surface text-on-surface-variant hover:bg-surface-container transition-colors" type="button">
+<span class="text-label-lg font-label-lg">Beli</span>
+</button>
+</div>
+<p class="text-label-md font-label-md text-on-surface-variant">Pilih 'Jual' untuk pendapatan, 'Beli' untuk pengeluaran.</p>
+</div>
+<!-- Field 2: Nama Barang -->
+<div class="flex flex-col gap-unit">
+<label class="text-label-lg font-label-lg text-on-surface" for="nama-barang">Nama Barang *</label>
+<div class="relative flex items-center">
+<input class="w-full h-touch-target-min border border-outline-variant rounded-lg px-gutter text-body-lg font-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary placeholder:text-on-surface-variant bg-surface" id="nama-barang" placeholder="Cari atau ketik nama barang..." type="text">
+<span class="absolute right-gutter material-symbols-outlined text-on-surface-variant" data-icon="arrow_drop_down">arrow_drop_down</span>
+</div>
+<p class="text-label-md font-label-md text-on-surface-variant">Pilih dari daftar agar laporan akurat.</p>
+</div>
+<!-- Field 3: Jumlah -->
+<div class="flex flex-col gap-unit">
+<label class="text-label-lg font-label-lg text-on-surface">Jumlah *</label>
+<div class="flex items-center gap-gutter">
+<div class="flex items-center border border-outline-variant rounded-lg h-touch-target-min bg-surface w-full max-w-[200px]">
+<button aria-label="Kurangi" class="w-touch-target-min h-full flex items-center justify-center text-primary border-r border-outline-variant active:bg-surface-container" type="button">
+<span class="material-symbols-outlined" data-icon="remove">remove</span>
+</button>
+<input aria-label="Jumlah barang" class="flex-1 h-full text-center text-body-lg font-body-lg font-bold text-on-surface border-none bg-transparent tabular-nums focus:ring-0" type="text" value="1">
+<button aria-label="Tambah" class="w-touch-target-min h-full flex items-center justify-center text-primary border-l border-outline-variant active:bg-surface-container" type="button">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+</button>
+</div>
+<span class="text-body-lg font-body-lg text-on-surface">pcs</span>
+</div>
+<p class="text-label-md font-label-md text-on-surface-variant">Minimal 1. Gunakan angka bulat.</p>
+</div>
+<!-- Field 4: Harga per Unit -->
+<div class="flex flex-col gap-unit">
+<label class="text-label-lg font-label-lg text-on-surface" for="harga-unit">Harga per Unit *</label>
+<div class="relative flex items-center h-touch-target-min border border-outline-variant rounded-lg bg-surface overflow-hidden focus-within:border-primary focus-within:ring-1 focus-within:ring-primary">
+<span class="flex items-center justify-center px-gutter h-full bg-surface-container text-on-surface font-bold border-r border-outline-variant">Rp</span>
+<input class="flex-1 h-full px-gutter text-right text-body-lg font-body-lg font-bold text-on-surface border-none bg-transparent tabular-nums focus:ring-0" id="harga-unit" inputmode="numeric" placeholder="0" type="number">
+</div>
+<p class="text-label-md font-label-md text-on-surface-variant">Contoh: 3000 untuk Rp3.000</p>
+</div>
+<!-- Field 5: Total -->
+<div class="flex flex-col gap-unit">
+<label class="text-label-lg font-label-lg text-on-surface">Total</label>
+<div class="flex items-center justify-between h-touch-target-min border border-outline-variant rounded-lg bg-surface-container-high px-gutter">
+<span class="text-body-lg font-body-lg text-on-surface-variant">Rp</span>
+<span class="text-headline-md-mobile font-headline-md-mobile text-on-surface-variant tabular-nums">0</span>
+</div>
+</div>
+<!-- Field 6: Tanggal -->
+<div class="flex flex-col gap-unit pt-unit">
+<label class="text-label-lg font-label-lg text-on-surface">Tanggal</label>
+<button class="flex items-center justify-between h-touch-target-min border border-outline-variant rounded-lg bg-surface px-gutter text-left active:bg-surface-container transition-colors" type="button">
+<span class="text-body-lg font-body-lg text-on-surface">2 Jan 2026 · 14:30</span>
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="calendar_today">calendar_today</span>
+</button>
+</div>
+<!-- Field 7: Catatan -->
+<div class="flex flex-col gap-unit pt-unit">
+<label class="text-label-lg font-label-lg text-on-surface" for="catatan">Catatan</label>
+<textarea class="w-full p-gutter border border-outline-variant rounded-lg text-body-lg font-body-lg text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary placeholder:text-on-surface-variant bg-surface resize-none" id="catatan" placeholder="Misalnya 'untuk Bu Siti'" rows="3"></textarea>
+</div>
+</form>
+</main>
+<!-- Sticky Bottom Bar -->
+<div class="fixed bottom-0 left-0 right-0 bg-surface border-t border-outline-variant p-margin-page flex gap-gutter z-40 pb-safe">
+<button class="flex-1 h-touch-target-min flex items-center justify-center border border-outline-variant text-on-surface font-label-lg text-label-lg rounded-lg hover:bg-surface-container active:bg-surface-container-high transition-colors">
+            Batal
+        </button>
+<button class="flex-[2] h-touch-target-min flex items-center justify-center bg-primary text-on-primary font-label-lg text-label-lg font-bold rounded-lg hover:bg-primary-container active:scale-[0.98] transition-transform shadow-none disabled:opacity-50 disabled:cursor-not-allowed">
+            Simpan Transaksi
+        </button>
+</div>
+<!-- Navigation suppressed per rules (transactional screen with Back action) -->
+</body></html>
