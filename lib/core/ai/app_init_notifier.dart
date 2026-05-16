@@ -5,6 +5,9 @@ import 'package:warung_pintar_cimahi/core/ai/app_init_state.dart';
 import 'package:warung_pintar_cimahi/core/ai/gemma_isolate_service.dart';
 import 'package:warung_pintar_cimahi/core/ai/model_download_service.dart';
 import 'package:warung_pintar_cimahi/core/ai/model_storage.dart';
+import 'package:warung_pintar_cimahi/core/di/injection.dart';
+import 'package:warung_pintar_cimahi/core/voice/voice_init_result.dart';
+import 'package:warung_pintar_cimahi/core/voice/voice_service_impl.dart';
 
 /// Riverpod provider for app initialization state.
 final appInitProvider =
@@ -27,6 +30,7 @@ class AppInitNotifier extends StateNotifier<AppInitState> {
   AppInitNotifier(this._ref) : super(const AppInitModelLoading());
 
   final Ref _ref;
+  bool _voiceInitialized = false;
 
   static final _logger = Logger(
     printer: PrettyPrinter(methodCount: 0),
@@ -75,6 +79,10 @@ class AppInitNotifier extends StateNotifier<AppInitState> {
       final modelPath = await ModelStorage.modelPath;
       await GemmaIsolateService.initialize(modelPath: modelPath);
       state = const AppInitModelReady();
+
+      // Initialize voice service after model ready (PRD §16.4)
+      await _initVoiceService();
+
       _logger.i('AppInitNotifier: Model ready — AI fully operational');
     } catch (e) {
       _logger.e(
@@ -82,6 +90,20 @@ class AppInitNotifier extends StateNotifier<AppInitState> {
         error: e,
       );
       state = AppInitModelFailed('Model gagal dimuat: $e');
+    }
+  }
+
+  /// Initialize voice service (STT) after model is ready.
+  Future<void> _initVoiceService() async {
+    if (_voiceInitialized) return;
+    try {
+      final voiceService = getIt<VoiceService>();
+      final result = await voiceService.initialize();
+      _voiceInitialized = result is VoiceInitSuccess;
+      _logger.i('AppInitNotifier: Voice service init result: $result');
+    } catch (e) {
+      _logger.w('AppInitNotifier: Voice service init failed: $e');
+      // Non-fatal — app works without voice
     }
   }
 
