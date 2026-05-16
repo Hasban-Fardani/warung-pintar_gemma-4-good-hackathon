@@ -11,7 +11,8 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
-import 'package:warung_pintar_cimahi/core/di/injection.dart' as _i679;
+import 'package:warung_pintar_cimahi/core/database/database_service.dart'
+    as _i916;
 
 extension GetItInjectableX on _i174.GetIt {
   // initializes the registration of main-scope dependencies inside of GetIt
@@ -20,7 +21,7 @@ extension GetItInjectableX on _i174.GetIt {
     _i526.EnvironmentFilter? environmentFilter,
   }) {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
-    gh.lazySingleton<_i679.DatabaseService>(() => _i679.DatabaseServiceImpl());
+    gh.lazySingleton<_i916.DatabaseService>(() => _i916.DatabaseServiceImpl());
     return this;
   }
 }
