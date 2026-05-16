@@ -8,14 +8,7 @@ final getIt = GetIt.instance;
 @InjectableInit()
 void configureDependencies() => getIt.init();
 
-abstract class AiService {
-  Future<dynamic> infer({
-    required String systemPrompt,
-    required String userInput,
-    String? imageBase64,
-  });
-}
-
+// TODO: Move DatabaseService to core/database/ in ACT-04
 abstract class DatabaseService {
   Future<void> init();
 }
@@ -24,6 +17,7 @@ abstract class DatabaseService {
 class DatabaseServiceImpl implements DatabaseService {
   @override
   Future<void> init() async {
-    // SQLite WAL mode placeholder
+    // TODO: SQLite WAL mode setup in ACT-19
   }
 }
+
