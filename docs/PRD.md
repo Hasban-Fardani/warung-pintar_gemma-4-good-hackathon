@@ -1,7 +1,7 @@
 # Product Requirements Document: WarungPintar Cimahi
 ## Gemma 4 Good Hackathon Submission — Digital Equity & LiteRT Track
 
-**Version:** 9.0.0 (Final Architectural Review)
+**Version:** 10.0.0 (AI Runtime Technical Specification Added)
 **Last Updated:** Mei 2026
 **Platform:** Android (min SDK 26, target SDK 34)
 **Framework:** Flutter 3.27+ / Dart 3.6+
@@ -777,12 +777,11 @@ Mengacu pada ERP best practice untuk pengguna 40–70 tahun:
   🎤  Suara    — voice input panjang multi-item
   📷  Foto     — kamera (struk supplier atau kemasan produk)
   ✏️  Manual   — form fallback
-```
 
-Saat FAB expand: konten di belakang di-dim (overlay semi-transparan). Tap FAB lagi (berubah jadi ×) untuk tutup.
+Saat FAB expand: konten di belakang di-dim (overlay semi-transparan).
+Tap FAB lagi (berubah jadi ×) untuk tutup.
 
 Sub-FAB foto memunculkan pilihan kedua:
-```
 [Tap Foto] → Bottom sheet:
   📄  Foto Struk Supplier  → Agent 4 (Vision Struk)
   📦  Foto Kemasan Produk  → Agent 5 (Vision Kemasan)
@@ -997,7 +996,7 @@ Section 9: Performance Benchmark
 2.  **Five Gemma 4 Agents (500 kata):** Onboarding, long-speech kasir, voice confirm pending, vision struk, vision kemasan.
 3.  **Enterprise Integrity at Edge (400 kata):** Price history immutable, pending non-blocking, UUIDv7, idempotency, audit log raw AI output.
 4.  **Bukti Teknis (200 kata):** Kaggle Notebook, Logcat, APK demo.
-5.  **Roadmap (100 kata):** P2P Bluetooth sync, RAG lokal, QRIS offline.
+5.  **Roadmap (100 kata):** P2P Bluetooth sync, RAG lokal offline.
 6.  **Links (100 kata):** GitHub, APK, YouTube.
 
 ### 15.2 YouTube Video Storyboard (3:00)
@@ -1178,6 +1177,9 @@ dependencies:
   path_provider: ^2.1.0
   file_picker: ^8.0.0
   permission_handler: ^11.3.0
+  
+  # Networking (untuk model download — Section 16)
+  dio: ^5.4.0
 
 dev_dependencies:
   flutter_test:
@@ -1234,11 +1236,16 @@ TEKNIS
 [ ] 0 hardcoded network URL
 [ ] Build: APK Obfuscated
 [ ] Linter: analysis_options.yaml aktif & passed
+[ ] Model delivery: download on first launch + SHA-256 verify (Section 16)
+[ ] Cold start UX: degraded mode aktif saat model loading (Section 16)
+[ ] STT: bahasa pack id-ID availability check on startup (Section 16)
+[ ] Fallback hierarchy Level 1–3 implemented (Section 16)
+[ ] Vision quality gate: brightness + min size check sebelum inference (Section 16)
 
 BUKTI VERIFIABLE
 [ ] Audit log drawer menampilkan STT transcript + raw JSON Gemma
-[ ] Screenshot Logcat: zero HttpClient call
-[ ] Screenshot Android Network Profiler: 0 outbound connection
+[ ] Screenshot Logcat: zero HttpClient call (saat normal operasi, bukan saat download model)
+[ ] Screenshot Android Network Profiler: 0 outbound connection setelah model ter-download
 [ ] Kaggle Notebook publik: semua 5 agent dibuktikan
 [ ] GitHub repo publik (Apache 2.0), README jelas, APK di Releases
 
@@ -1250,4 +1257,1415 @@ DELIVERABLES
 
 ---
 
-**END OF PRODUCT REQUIREMENTS DOCUMENT v9.0.0**
+## Section 16: AI Runtime Technical Specification
+
+> **Patch v10.0.0** — Menutup 10 gap teknis yang tidak tercakup di Section sebelumnya.
+> Section ini bersifat **additive** — tidak mengubah konten Section 1–15.
+
+---
+
+### 16.1 Model Delivery Strategy
+
+#### 16.1.1 Mekanisme: Download on First Launch (Bukan Bundle APK)
+
+File model `gemma-4-E2B-it-litertlm-Q4_K_M.litertlm` **tidak di-bundle ke dalam APK**. Alasan:
+
+- Ukuran model ~2.5GB melebihi batas upload APK Google Play (150MB untuk base APK)
+- Bundle ke APK akan membuat cold start install lebih berat untuk user dengan storage terbatas
+- Download on first launch memungkinkan SHA-256 verification dan resume jika interrupted
+
+**Lokasi penyimpanan di device:**
+
+```dart
+// lib/core/ai/model_storage.dart
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+
+class ModelStorage {
+  static const String _modelFileName = 'gemma-4-E2B-it-litertlm-Q4_K_M.litertlm';
+  static const String _modelSha256   = 'a3f8c2d1e9b047f6a1c3e5d7b9f2a4c6'
+                                        'e8d0b2f4a6c8e0d2b4f6a8c0e2d4b6f8'; // placeholder — ganti dengan hash resmi
+  
+  /// Path lengkap file model di storage internal app
+  static Future<String> get modelPath async {
+    final dir = await getApplicationDocumentsDirectory();
+    return '${dir.path}/models/$_modelFileName';
+  }
+
+  /// Cek apakah model sudah ada dan valid
+  static Future<bool> isModelReady() async {
+    final path = await modelPath;
+    final file = File(path);
+    if (!await file.exists()) return false;
+    final verified = await _verifySha256(file);
+    return verified;
+  }
+
+  static Future<bool> _verifySha256(File file) async {
+    import 'package:crypto/crypto.dart';
+    final bytes = await file.readAsBytes();
+    final digest = sha256.convert(bytes);
+    return digest.toString() == _modelSha256;
+  }
+}
+```
+
+> **Catatan:** Tambahkan `crypto: ^3.0.3` ke `pubspec.yaml` untuk SHA-256 verification.
+
+#### 16.1.2 Sumber Download
+
+Model diunduh dari salah satu sumber berikut (URL dikonfigurasi di `app_settings`, bukan hardcoded):
+
+```dart
+// lib/core/ai/model_download_config.dart
+class ModelDownloadConfig {
+  /// Primary: Kaggle Models (diutamakan untuk submission hackathon)
+  static const String primaryUrl =
+      'https://www.kaggle.com/models/google/gemma-4/frameworks/litert/variations/gemma-4-e2b-it-litertlm/versions/1/download/gemma-4-E2B-it-litertlm-Q4_K_M.litertlm';
+
+  /// Fallback: GitHub Releases mirror (jika Kaggle tidak accessible)
+  static const String fallbackUrl =
+      'https://github.com/your-org/warungpintar-models/releases/download/v1.0.0/gemma-4-E2B-it-litertlm-Q4_K_M.litertlm';
+
+  static const int expectedFileSizeBytes = 2_684_354_560; // 2.5 GB estimasi
+}
+```
+
+#### 16.1.3 Download Manager dengan Resume Support
+
+Menggunakan `dio: ^5.4.0` untuk resume download via HTTP `Range` header.
+
+```dart
+// lib/core/ai/model_download_service.dart
+import 'dart:io';
+import 'package:dio/dio.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:riverpod/riverpod.dart';
+
+/// State download model
+sealed class ModelDownloadState {
+  const ModelDownloadState();
+}
+final class DownloadIdle       extends ModelDownloadState { const DownloadIdle(); }
+final class DownloadProgress   extends ModelDownloadState {
+  final double percent;          // 0.0–1.0
+  final int    downloadedBytes;
+  final int    totalBytes;
+  final int    estimatedSecondsRemaining;
+  const DownloadProgress({
+    required this.percent,
+    required this.downloadedBytes,
+    required this.totalBytes,
+    required this.estimatedSecondsRemaining,
+  });
+}
+final class DownloadVerifying  extends ModelDownloadState { const DownloadVerifying(); }
+final class DownloadComplete   extends ModelDownloadState { const DownloadComplete(); }
+final class DownloadFailed     extends ModelDownloadState {
+  final String reason;
+  const DownloadFailed(this.reason);
+}
+
+/// Provider Riverpod
+final modelDownloadProvider =
+    StateNotifierProvider<ModelDownloadNotifier, ModelDownloadState>(
+  (ref) => ModelDownloadNotifier(),
+);
+
+class ModelDownloadNotifier extends StateNotifier<ModelDownloadState> {
+  ModelDownloadNotifier() : super(const DownloadIdle());
+
+  final _dio = Dio();
+  CancelToken? _cancelToken;
+
+  Future<void> startDownload() async {
+    final savePath = await ModelStorage.modelPath;
+    final saveFile = File(savePath);
+    await saveFile.parent.create(recursive: true);
+
+    // Resume: cek berapa byte sudah terdownload
+    int startByte = 0;
+    if (await saveFile.exists()) {
+      startByte = await saveFile.length();
+    }
+
+    _cancelToken = CancelToken();
+    final startTime = DateTime.now();
+
+    try {
+      await _dio.download(
+        ModelDownloadConfig.primaryUrl,
+        savePath,
+        cancelToken: _cancelToken,
+        options: Options(
+          headers: startByte > 0 ? {'Range': 'bytes=$startByte-'} : null,
+          responseType: ResponseType.stream,
+        ),
+        onReceiveProgress: (received, total) {
+          final actualTotal = total + startByte;
+          final actualReceived = received + startByte;
+          final percent = actualReceived / actualTotal;
+
+          // Estimasi waktu tersisa
+          final elapsed = DateTime.now().difference(startTime).inSeconds;
+          final speed = received / (elapsed == 0 ? 1 : elapsed); // bytes/detik
+          final remaining = ((actualTotal - actualReceived) / speed).round();
+
+          state = DownloadProgress(
+            percent: percent,
+            downloadedBytes: actualReceived,
+            totalBytes: actualTotal,
+            estimatedSecondsRemaining: remaining,
+          );
+        },
+      );
+
+      // Verifikasi SHA-256
+      state = const DownloadVerifying();
+      final valid = await ModelStorage.isModelReady();
+      if (!valid) {
+        await saveFile.delete(); // Hapus file korup
+        state = const DownloadFailed('SHA-256 mismatch — file korup, silakan coba lagi');
+        return;
+      }
+
+      state = const DownloadComplete();
+    } on DioException catch (e) {
+      if (CancelToken.isCancel(e)) {
+        state = const DownloadIdle(); // User batalkan — progress tersimpan untuk resume
+      } else {
+        // Coba fallback URL
+        await _retryWithFallback(savePath, startByte, startTime);
+      }
+    }
+  }
+
+  Future<void> _retryWithFallback(String savePath, int startByte, DateTime startTime) async {
+    try {
+      await _dio.download(
+        ModelDownloadConfig.fallbackUrl,
+        savePath,
+        options: Options(
+          headers: startByte > 0 ? {'Range': 'bytes=$startByte-'} : null,
+        ),
+      );
+      state = const DownloadComplete();
+    } catch (e) {
+      state = DownloadFailed('Download gagal dari semua sumber: $e');
+    }
+  }
+
+  void cancelDownload() => _cancelToken?.cancel();
+}
+```
+
+#### 16.1.4 UI Progress Download
+
+```dart
+// lib/features/dashboard/presentation/widgets/model_download_banner.dart
+//
+// Widget ini ditampilkan fullscreen overlay di atas SplashScreen
+// selama state == MODEL_DOWNLOADING. Bukan snackbar — ini blocking UX
+// karena tanpa model, app belum bisa beroperasi sama sekali.
+
+class ModelDownloadScreen extends ConsumerWidget {
+  const ModelDownloadScreen({super.key});
+
+  String _formatBytes(int bytes) {
+    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
+    if (bytes < 1024 * 1024 * 1024) return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+    return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(2)} GB';
+  }
+
+  String _formatEta(int seconds) {
+    if (seconds < 60) return '$seconds detik';
+    final m = seconds ~/ 60;
+    final s = seconds % 60;
+    return '${m}m ${s}s';
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final downloadState = ref.watch(modelDownloadProvider);
+
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.all(32.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.cloud_download_outlined, size: 64, color: Color(0xFF1976D2)),
+            const SizedBox(height: 24),
+            const Text(
+              'Mengunduh AI WarungPintar',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Ini hanya dilakukan sekali. Setelah selesai,\napp berjalan 100% offline.',
+              style: TextStyle(fontSize: 15, color: Colors.grey),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 32),
+            if (downloadState is DownloadProgress) ...[
+              LinearProgressIndicator(
+                value: downloadState.percent,
+                minHeight: 10,
+                borderRadius: BorderRadius.circular(8),
+                backgroundColor: const Color(0xFFE0E0E0),
+                color: const Color(0xFF1976D2),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '${(downloadState.percent * 100).toStringAsFixed(1)}%',
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    '${_formatBytes(downloadState.downloadedBytes)} / ${_formatBytes(downloadState.totalBytes)}',
+                    style: const TextStyle(fontSize: 14, color: Colors.grey),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Estimasi selesai: ${_formatEta(downloadState.estimatedSecondsRemaining)}',
+                style: const TextStyle(fontSize: 14, color: Colors.grey),
+              ),
+            ],
+            if (downloadState is DownloadVerifying)
+              const Column(
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 12),
+                  Text('Memverifikasi integritas file...'),
+                ],
+              ),
+            if (downloadState is DownloadFailed)
+              Column(
+                children: [
+                  const Icon(Icons.error_outline, color: Color(0xFFDC2626), size: 48),
+                  const SizedBox(height: 12),
+                  Text(
+                    (downloadState).reason,
+                    style: const TextStyle(color: Color(0xFFDC2626)),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () => ref.read(modelDownloadProvider.notifier).startDownload(),
+                    child: const Text('Coba Lagi'),
+                  ),
+                ],
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+
+---
+
+### 16.2 Cold Start UX & Degraded Mode
+
+#### 16.2.1 State Machine App Initialization
+
+Didefinisikan sebagai `sealed class` di `lib/core/ai/app_init_state.dart`:
+
+```dart
+// lib/core/ai/app_init_state.dart
+
+sealed class AppInitState {
+  const AppInitState();
+}
+
+/// Model belum terdownload sama sekali — tampilkan ModelDownloadScreen
+final class AppInitModelDownloading extends AppInitState {
+  const AppInitModelDownloading();
+}
+
+/// Model sudah ada di disk, sedang di-load ke memori via flutter_gemma
+final class AppInitModelLoading extends AppInitState {
+  const AppInitModelLoading();
+}
+
+/// Model siap — AI fully operational
+final class AppInitModelReady extends AppInitState {
+  const AppInitModelReady();
+}
+
+/// Model gagal load (file korup, RAM tidak cukup, dll)
+/// App masuk permanent manual mode — data tetap bisa dicatat ke SQLite
+final class AppInitModelFailed extends AppInitState {
+  final String reason;
+  const AppInitModelFailed(this.reason);
+}
+```
+
+Transisi state dikelola oleh `AppInitNotifier`:
+
+```dart
+// lib/core/ai/app_init_notifier.dart
+
+final appInitProvider =
+    StateNotifierProvider<AppInitNotifier, AppInitState>(
+  (ref) => AppInitNotifier(ref),
+);
+
+class AppInitNotifier extends StateNotifier<AppInitState> {
+  AppInitNotifier(this._ref) : super(const AppInitModelLoading());
+
+  final Ref _ref;
+
+  Future<void> initialize() async {
+    // Step 1: Apakah model sudah ada dan valid?
+    final modelReady = await ModelStorage.isModelReady();
+    if (!modelReady) {
+      state = const AppInitModelDownloading();
+      // Tunggu download selesai — watch downloadProvider
+      _ref.listen(modelDownloadProvider, (_, next) {
+        if (next is DownloadComplete) _loadModel();
+        if (next is DownloadFailed) {
+          state = AppInitModelFailed((next).reason);
+        }
+      });
+      await _ref.read(modelDownloadProvider.notifier).startDownload();
+      return;
+    }
+
+    // Step 2: Load model ke memori
+    await _loadModel();
+  }
+
+  Future<void> _loadModel() async {
+    state = const AppInitModelLoading();
+    try {
+      await GemmaIsolateService.initialize(
+        modelPath: await ModelStorage.modelPath,
+      );
+      state = const AppInitModelReady();
+    } catch (e) {
+      state = AppInitModelFailed('Model gagal dimuat: $e');
+    }
+  }
+}
+```
+
+#### 16.2.2 Degraded Mode saat MODEL_LOADING
+
+Selama state `AppInitModelLoading`, app **tidak menampilkan layar kosong** — dashboard tetap bisa diakses dengan batasan:
+
+| Fitur | Status di Degraded Mode |
+|---|---|
+| Input manual (form) | ✅ Aktif penuh |
+| Lihat transaksi & laporan | ✅ Aktif penuh |
+| SQLite read/write | ✅ Aktif penuh |
+| FAB sub-tombol Suara 🎤 | ❌ Disabled, tooltip: "AI sedang memuat..." |
+| FAB sub-tombol Foto 📷 | ❌ Disabled, tooltip: "AI sedang memuat..." |
+| Banner loading | ✅ Tampil di atas dashboard |
+
+```dart
+// lib/features/dashboard/presentation/widgets/ai_loading_banner.dart
+
+class AiLoadingBanner extends ConsumerWidget {
+  const AiLoadingBanner({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final initState = ref.watch(appInitProvider);
+
+    // Hanya tampil saat MODEL_LOADING
+    if (initState is! AppInitModelLoading) return const SizedBox.shrink();
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      color: const Color(0xFFFFF3CD), // kuning muda
+      child: Row(
+        children: [
+          const SizedBox(
+            width: 16, height: 16,
+            child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFFBA7517)),
+          ),
+          const SizedBox(width: 10),
+          const Expanded(
+            child: Text(
+              'AI sedang memuat — fitur suara & foto akan aktif sebentar lagi',
+              style: TextStyle(fontSize: 13, color: Color(0xFFBA7517)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+```
+
+```dart
+// lib/features/dashboard/presentation/widgets/ai_aware_fab.dart
+// FAB yang sadar terhadap status AI
+
+class AiAwareFab extends ConsumerWidget {
+  const AiAwareFab({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final initState = ref.watch(appInitProvider);
+    final aiReady = initState is AppInitModelReady;
+
+    return SpeedDial( // atau custom FAB expansion
+      children: [
+        SpeedDialChild(
+          child: const Icon(Icons.mic),
+          label: 'Suara',
+          onTap: aiReady ? () => _openVoiceInput(context) : null,
+          backgroundColor: aiReady ? const Color(0xFF1976D2) : Colors.grey,
+          tooltip: aiReady ? null : 'AI sedang memuat...',
+        ),
+        SpeedDialChild(
+          child: const Icon(Icons.camera_alt),
+          label: 'Foto',
+          onTap: aiReady ? () => _openCameraInput(context) : null,
+          backgroundColor: aiReady ? const Color(0xFF1976D2) : Colors.grey,
+          tooltip: aiReady ? null : 'AI sedang memuat...',
+        ),
+        SpeedDialChild(
+          child: const Icon(Icons.edit),
+          label: 'Manual',
+          onTap: () => _openManualInput(context), // selalu aktif
+          backgroundColor: const Color(0xFF1976D2),
+        ),
+      ],
+    );
+  }
+
+  void _openVoiceInput(BuildContext context) { /* ... */ }
+  void _openCameraInput(BuildContext context) { /* ... */ }
+  void _openManualInput(BuildContext context) { /* ... */ }
+}
+```
+
+#### 16.2.3 State Machine Diagram (Teks)
+
+```
+APP_LAUNCH
+    │
+    ▼
+[cek ModelStorage.isModelReady()]
+    │
+    ├─ false ──► MODEL_DOWNLOADING
+    │                │
+    │                ├─ DownloadComplete ──► MODEL_LOADING
+    │                └─ DownloadFailed  ──► MODEL_FAILED (permanent manual mode)
+    │
+    └─ true ──► MODEL_LOADING
+                    │
+                    ├─ load sukses ──► MODEL_READY (AI fully operational)
+                    └─ load gagal ──► MODEL_FAILED (permanent manual mode)
+```
+
+---
+
+### 16.3 Gemma 4 E2B Capability Clarification
+
+#### 16.3.1 Context Window
+
+Gemma 4 E2B (2 billion parameter, instruction-tuned, quantized Q4_K_M via LiteRT) memiliki context window **8.192 token** berdasarkan spesifikasi arsitektur Gemma 4 yang dipublikasikan Google. Untuk keamanan (menghindari truncation), WarungPintar membatasi total prompt context (system prompt + user input + stock context) di **6.000 token**, menyisakan 2.192 token untuk output.
+
+```dart
+// lib/core/ai/prompt_budget.dart
+class PromptBudget {
+  static const int contextWindowTokens    = 8192;
+  static const int maxPromptTokens        = 6000; // ~73% dari context window
+  static const int maxOutputTokens        = 512;  // cukup untuk JSON multi-item
+  static const int safetyMarginTokens     = 1680; // buffer tersisa
+}
+```
+
+#### 16.3.2 Mengapa 512 Token Output Cukup untuk JSON Multi-Item
+
+Estimasi token per item transaksi dalam output JSON:
+
+```
+{
+  "name": "record_transactions",                    →  ~8 token
+  "arguments": {                                    →  ~3 token
+    "transactions": [                               →  ~4 token
+      {                                             →  ~2 token
+        "item_name": "Beras Premium 5kg",           → ~10 token
+        "quantity": 3,                              →  ~5 token
+        "total_price_sen": 4500000,                 →  ~7 token
+        "transaction_type": "sell",                 →  ~8 token
+        "needs_clarification": false                →  ~6 token
+      }                                             →  ~2 token
+    ]                                               →  ~2 token
+  }                                                 →  ~2 token
+}                                                   →  ~2 token
+```
+
+**Estimasi per item: ~30 token.**
+Dengan batas 512 token output: `512 / 30 ≈ 17 item per satu ucapan`.
+Dalam realita penggunaan Ibu Warsih, satu ucapan paling banyak 10–12 item — **512 token lebih dari cukup**.
+
+#### 16.3.3 Konfirmasi Multimodal Vision Support
+
+`flutter_gemma ^0.2.0` dengan backend LiteRT mendukung multimodal input (teks + gambar) untuk model yang dicompile dengan vision encoder aktif. Gemma 4 E2B `litertlm` varian instruction-tuned menyertakan vision encoder berdasarkan dokumentasi LiteRT-LM Google.
+
+**Implementasi verifikasi di runtime:**
+
+```dart
+// lib/core/ai/gemma_capability_check.dart
+class GemmaCapabilityCheck {
+  /// Kirim inference test dengan gambar dummy 1x1 pixel saat cold start.
+  /// Jika sukses → vision aktif. Jika error → log warning, disable vision FAB.
+  static Future<bool> checkVisionSupport(GemmaModel gemma) async {
+    try {
+      const dummyBase64 = '/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAgGBgcGBQgHBwcJ'
+          'CQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgy'
+          'PC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIy'
+          'MjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAABAAEDASIAAhEBAxEB/8QAFgAB'
+          'AQEAAAAAAAAAAAAAAAAABgUEB//EAB4QAAICAgMBAAAAAAAAAAAAAAECAxEEEiEx/8QA'
+          'FABAQAAAAAAAAAAAAAAAAAAAAP/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIR'
+          'AxEAPwCwABr2H5QAH//Z'; // JPEG 1x1 pixel base64
+      final result = await gemma.generate(
+        prompt: 'Describe this image in one word.',
+        imageBase64: dummyBase64,
+        maxTokens: 10,
+      );
+      return result.isNotEmpty;
+    } catch (_) {
+      return false;
+    }
+  }
+}
+```
+
+#### 16.3.4 Batasan: Tidak Ada Token Streaming
+
+`flutter_gemma ^0.2.0` **tidak mendukung streaming token per token** — output dikembalikan sebagai satu string setelah inference selesai. Ini berarti:
+
+- Tidak ada typing animation saat inference berlangsung
+- UI menampilkan `CircularProgressIndicator` selama inference
+- Untuk voice inference ~5–8 detik, ini acceptable untuk target user Ibu Warsih
+- Streaming akan dipertimbangkan jika `flutter_gemma ^0.3.0` tersedia sebelum submission
+
+---
+
+### 16.4 STT Offline Verification
+
+#### 16.4.1 Engine yang Digunakan
+
+`speech_to_text ^7.0.0` pada Android menggunakan **Android `SpeechRecognizer` API** bawaan sistem, yang memanfaatikan on-device speech recognition engine. Ini berarti:
+
+- Tidak ada network call selama STT berlangsung
+- Bahasa pack harus terinstall di device (tidak otomatis)
+- Kualitas recognition bergantung pada Android version dan OEM customization
+
+**Verifikasi offline behavior di runtime:**
+
+```dart
+// lib/core/voice/voice_service_impl.dart
+import 'package:speech_to_text/speech_to_text.dart';
+
+class VoiceServiceImpl implements VoiceService {
+  final SpeechToText _stt = SpeechToText();
+  bool _isInitialized = false;
+
+  @override
+  Future<VoiceInitResult> initialize() async {
+    _isInitialized = await _stt.initialize(
+      onStatus: _onStatus,
+      onError: _onError,
+      // debugLogging: false di production
+    );
+
+    if (!_isInitialized) {
+      return VoiceInitResult.failed('STT engine tidak tersedia di device ini');
+    }
+
+    // Cek ketersediaan bahasa id-ID
+    final locales = await _stt.locales();
+    final hasIndonesian = locales.any(
+      (locale) => locale.localeId.startsWith('id'),
+    );
+
+    if (!hasIndonesian) {
+      return VoiceInitResult.missingLanguagePack();
+    }
+
+    return VoiceInitResult.success();
+  }
+}
+
+// Result type untuk inisialisasi STT
+sealed class VoiceInitResult {
+  const VoiceInitResult();
+  factory VoiceInitResult.success()             => const VoiceInitSuccess();
+  factory VoiceInitResult.failed(String reason) => VoiceInitFailed(reason);
+  factory VoiceInitResult.missingLanguagePack() => const VoiceInitMissingPack();
+}
+final class VoiceInitSuccess     extends VoiceInitResult { const VoiceInitSuccess(); }
+final class VoiceInitFailed      extends VoiceInitResult {
+  final String reason;
+  const VoiceInitFailed(this.reason);
+}
+final class VoiceInitMissingPack extends VoiceInitResult { const VoiceInitMissingPack(); }
+```
+
+#### 16.4.2 Dialog Language Pack Missing
+
+Jika `id-ID` language pack tidak terdeteksi, tampilkan dialog dengan deep link ke Android Language Settings:
+
+```dart
+// lib/core/voice/language_pack_dialog.dart
+import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+class LanguagePackDialog extends StatelessWidget {
+  const LanguagePackDialog({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Bahasa Belum Terpasang'),
+      content: const Text(
+        'Fitur suara membutuhkan paket bahasa Indonesia (id-ID) '
+        'yang terpasang di Android. Silakan pasang melalui Pengaturan '
+        'Bahasa, lalu restart aplikasi.',
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Nanti'),
+        ),
+        ElevatedButton(
+          onPressed: () async {
+            // Deep link ke Android Language & Input settings
+            final uri = Uri.parse('android-app://com.android.settings/.LanguageSettings');
+            if (await canLaunchUrl(uri)) {
+              await launchUrl(uri);
+            } else {
+              // Fallback: buka Settings umum
+              await launchUrl(Uri.parse('package:com.android.settings'));
+            }
+          },
+          child: const Text('Buka Pengaturan'),
+        ),
+      ],
+    );
+  }
+
+  static Future<void> show(BuildContext context) {
+    return showDialog(
+      context: context,
+      barrierDismissible: false, // Harus explicitly dismiss
+      builder: (_) => const LanguagePackDialog(),
+    );
+  }
+}
+```
+
+#### 16.4.3 VAD (Voice Activity Detection) Threshold
+
+`speech_to_text` menggunakan VAD bawaan Android. Konfigurasi WarungPintar:
+
+```dart
+// lib/core/voice/voice_config.dart
+class VoiceConfig {
+  /// Berapa milidetik diam setelah ada suara sebelum STT dianggap selesai.
+  /// Nilai 2000ms dipilih untuk memberi ruang jeda alami Ibu Warsih
+  /// saat menyebut daftar item panjang (mis. jeda pikir antar item).
+  static const int vadSilenceThresholdMs = 2000;
+
+  /// Bahasa target STT
+  static const String localeId = 'id-ID';
+
+  /// Durasi maksimum satu sesi listening (30 detik)
+  /// Jika user masih bicara setelah ini, auto-submit dan proses
+  static const int maxListenDurationMs = 30000;
+
+  /// Minimum confidence score untuk menerima hasil STT (0.0–1.0)
+  /// Di bawah nilai ini → minta user ulangi
+  static const double minConfidenceScore = 0.5;
+}
+```
+
+```dart
+// Penggunaan di VoiceServiceImpl
+Future<void> startListening({required Function(String) onResult}) async {
+  await _stt.listen(
+    localeId: VoiceConfig.localeId,
+    listenFor: const Duration(milliseconds: VoiceConfig.maxListenDurationMs),
+    pauseFor: const Duration(milliseconds: VoiceConfig.vadSilenceThresholdMs),
+    onResult: (result) {
+      if (result.finalResult && result.confidence >= VoiceConfig.minConfidenceScore) {
+        onResult(result.recognizedWords);
+      }
+    },
+  );
+}
+```
+
+#### 16.4.4 Known Limitation: Noise Pre-Processing
+
+Tidak ada audio pre-processing tambahan (noise gate, bandpass filter, normalization) pada versi ini. STT mengandalkan sepenuhnya engine Android. Pada kondisi warung ramai dengan noise tinggi, recognition accuracy mungkin menurun. Ini adalah **known limitation** yang tercatat dan tidak diselesaikan dalam scope hackathon.
+
+---
+
+### 16.5 Inference Timeout & Retry Logic
+
+#### 16.5.1 Nilai Timeout Konkret
+
+| Jenis Inference | Timeout | Alasan |
+|---|---|---|
+| Voice inference (teks saja) | **30 detik** | Prompt lebih ringan, tanpa gambar |
+| Vision inference (teks + gambar) | **45 detik** | Vision encoder lebih berat, terutama di device ≤ 4GB RAM |
+
+#### 16.5.2 Retry Strategy
+
+- **Maksimal 2x retry** setelah failure pertama
+- **Exponential backoff:** retry pertama setelah 1 detik, retry kedua setelah 3 detik
+- Setelah 2x retry gagal → error snackbar + fallback ke input manual
+- Retry hanya dilakukan untuk `InferenceTimeoutFailure` dan `ModelNotLoadedFailure`
+- **Tidak** retry untuk `InvalidJsonOutputFailure` pada level ini — ditangani oleh Fallback Level 1 (Section 16.6)
+
+#### 16.5.3 Implementasi Dart Retry Wrapper
+
+```dart
+// lib/core/ai/inference_retry.dart
+
+/// Wrapper retry dengan exponential backoff untuk AiService.infer().
+/// Digunakan oleh semua agent — bukan di dalam AiService itu sendiri,
+/// melainkan di use case layer agar testable secara terpisah.
+
+class InferenceRetry {
+  static const int _maxRetries        = 2;
+  static const int _firstBackoffMs    = 1000;  // 1 detik
+  static const int _secondBackoffMs   = 3000;  // 3 detik
+
+  static const int _voiceTimeoutSec   = 30;
+  static const int _visionTimeoutSec  = 45;
+
+  /// [isVision]: true jika ada imageBase64 (pakai timeout lebih panjang)
+  static Future<Result<ToolCallResult, AiFailure>> runWithRetry({
+    required AiService aiService,
+    required String systemPrompt,
+    required String userInput,
+    String? imageBase64,
+  }) async {
+    final timeoutDuration = Duration(
+      seconds: imageBase64 != null ? _visionTimeoutSec : _voiceTimeoutSec,
+    );
+
+    int attempt = 0;
+    AiFailure? lastFailure;
+
+    while (attempt <= _maxRetries) {
+      try {
+        final result = await aiService.infer(
+          systemPrompt: systemPrompt,
+          userInput: userInput,
+          imageBase64: imageBase64,
+        ).timeout(
+          timeoutDuration,
+          onTimeout: () => const Error(InferenceTimeoutFailure()),
+        );
+
+        // Jika sukses, langsung return — tidak perlu retry
+        if (result is Success) return result;
+
+        // Jika failure yang tidak perlu di-retry, langsung return error
+        final failure = (result as Error<ToolCallResult, AiFailure>).failure;
+        if (failure is InvalidJsonOutputFailure) {
+          // JSON malformed → tangani di Fallback Level 1 (Section 16.6)
+          return result;
+        }
+
+        lastFailure = failure;
+      } catch (e) {
+        lastFailure = ModelNotLoadedFailure();
+      }
+
+      // Backoff sebelum retry
+      if (attempt < _maxRetries) {
+        final backoffMs = attempt == 0 ? _firstBackoffMs : _secondBackoffMs;
+        await Future.delayed(Duration(milliseconds: backoffMs));
+      }
+
+      attempt++;
+    }
+
+    // Semua retry habis
+    return Error(lastFailure ?? const ModelNotLoadedFailure());
+  }
+}
+```
+
+**Penggunaan di use case:**
+
+```dart
+// lib/features/transaction/domain/usecases/record_voice_transaction_usecase.dart
+
+class RecordVoiceTransactionUseCase {
+  final AiService _aiService;
+
+  const RecordVoiceTransactionUseCase(this._aiService);
+
+  Future<Result<List<TransactionModel>, AiFailure>> call(String sttTranscript) async {
+    final result = await InferenceRetry.runWithRetry(
+      aiService: _aiService,
+      systemPrompt: AgentPrompts.voiceTransaction,
+      userInput: sttTranscript,
+      imageBase64: null,
+    );
+
+    return switch (result) {
+      Success(data: final toolCall) => _parseTransactions(toolCall),
+      Error(failure: final f)       => Error(f),
+    };
+  }
+
+  Result<List<TransactionModel>, AiFailure> _parseTransactions(ToolCallResult toolCall) {
+    // ... parsing logic
+    return Success([]);
+  }
+}
+```
+
+---
+
+### 16.6 Fallback Hierarchy
+
+Tiga level fallback didefinisikan secara bertingkat. Level 1 ditangani dulu, jika gagal baru ke Level 2, dan seterusnya.
+
+#### 16.6.1 Level 1 — JSON Malformed Output
+
+**Trigger:** `InvalidJsonOutputFailure` — model output bukan JSON valid (ada markdown fence, trailing text, atau JSON tidak lengkap).
+
+**Aksi:**
+1. Panggil `_stripJsonFences()` pada raw output (sudah ada di Section 10.5)
+2. Coba parse ulang hasil cleaned output
+3. Jika berhasil → lanjut normal
+4. Jika tetap gagal → retry inference 1x dengan prompt tambahan yang lebih eksplisit
+
+```dart
+// lib/core/ai/fallback/level1_json_repair.dart
+
+class Level1JsonRepair {
+  static Future<Result<ToolCallResult, AiFailure>> attempt({
+    required AiService aiService,
+    required String systemPrompt,
+    required String userInput,
+    required String rawMalformedOutput,
+    String? imageBase64,
+  }) async {
+    // Coba strip fence dulu
+    try {
+      final cleaned = _stripJsonFences(rawMalformedOutput);
+      final parsed  = parseToolCall(cleaned);
+      return Success(parsed);
+    } catch (_) {
+      // Strip tidak cukup — retry inference dengan instruksi lebih ketat
+    }
+
+    // Retry inference dengan reinforcement prompt
+    const jsonRepairSuffix =
+        '\n\nPENTING: Output HARUS berupa JSON murni tanpa teks lain, '
+        'tanpa markdown code fence, tanpa penjelasan. '
+        'Mulai langsung dengan karakter { dan akhiri dengan }.';
+
+    final retryResult = await aiService.infer(
+      systemPrompt: systemPrompt + jsonRepairSuffix,
+      userInput: userInput,
+      imageBase64: imageBase64,
+    ).timeout(
+      const Duration(seconds: 30),
+      onTimeout: () => const Error(InferenceTimeoutFailure()),
+    );
+
+    return retryResult;
+  }
+
+  static String _stripJsonFences(String raw) {
+    var clean = raw.replaceAll(RegExp(r'```json\s*'), '');
+    clean = clean.replaceAll(RegExp(r'```\s*'), '');
+    final jsonMatch = RegExp(r'\{[\s\S]*\}').firstMatch(clean);
+    if (jsonMatch == null) throw const FormatException('No JSON found after strip');
+    jsonDecode(jsonMatch.group(0)!); // validate
+    return jsonMatch.group(0)!;
+  }
+}
+```
+
+#### 16.6.2 Level 2 — Inference Gagal 2x (AI Input Disabled)
+
+**Trigger:** Semua retry (Section 16.5) dan Level 1 repair gagal.
+
+**Aksi:**
+- Disable FAB Suara dan Foto (sama seperti Degraded Mode di Section 16.2)
+- Tampilkan banner warning merah di atas dashboard
+- Input manual tetap aktif penuh
+- State ini bersifat **session-scoped** — jika user restart app dan model berhasil load, kembali normal
+
+```dart
+// lib/core/ai/app_init_state.dart — tambahan state
+final class AppInitAiDegraded extends AppInitState {
+  final String reason;
+  const AppInitAiDegraded(this.reason);
+}
+```
+
+```dart
+// lib/features/dashboard/presentation/widgets/ai_degraded_banner.dart
+
+class AiDegradedBanner extends ConsumerWidget {
+  const AiDegradedBanner({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final initState = ref.watch(appInitProvider);
+    if (initState is! AppInitAiDegraded) return const SizedBox.shrink();
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      color: const Color(0xFFFFEDED),
+      child: Row(
+        children: [
+          const Icon(Icons.warning_amber_rounded, color: Color(0xFFDC2626), size: 18),
+          const SizedBox(width: 8),
+          const Expanded(
+            child: Text(
+              'AI sedang bermasalah — gunakan input manual',
+              style: TextStyle(fontSize: 13, color: Color(0xFFDC2626)),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              // User bisa coba reload model
+              ref.read(appInitProvider.notifier).initialize();
+            },
+            child: const Text('Coba Lagi', style: TextStyle(fontSize: 12)),
+          ),
+        ],
+      ),
+    );
+  }
+}
+```
+
+**Penanganan di use case setelah failure Level 2:**
+
+```dart
+// Di presenter/controller setelah InferenceRetry.runWithRetry() return Error
+switch (failure) {
+  case ModelNotLoadedFailure() || InferenceTimeoutFailure():
+    // Trigger Level 2
+    ref.read(appInitProvider.notifier).markAsDegraded(failure.message);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('AI tidak merespons — silakan gunakan input manual'),
+        duration: Duration(seconds: 5),
+        backgroundColor: Color(0xFFDC2626),
+      ),
+    );
+    // Buka form manual secara otomatis
+    context.push('/manual-input');
+
+  case InvalidJsonOutputFailure():
+    // Sudah ditangani Level 1 — jika sampai sini berarti Level 1 juga gagal
+    ref.read(appInitProvider.notifier).markAsDegraded(failure.message);
+    // ...sama seperti di atas
+}
+```
+
+#### 16.6.3 Level 3 — Model Tidak Bisa Load Sama Sekali (Permanent Manual Mode)
+
+**Trigger:** `AppInitModelFailed` — model tidak bisa di-load (RAM tidak cukup, file korup, LiteRT crash).
+
+**Aksi:**
+- App berjalan sepenuhnya dalam **Manual Mode**
+- Semua data tetap tersimpan normal ke SQLite
+- Banner permanen berwarna abu gelap di atas semua halaman
+- FAB Suara dan Foto dihapus dari tampilan (bukan hanya disabled)
+- User tetap bisa akses semua fitur manual: input transaksi, lihat laporan, kelola katalog
+
+```dart
+// lib/features/dashboard/presentation/widgets/permanent_manual_mode_banner.dart
+
+class PermanentManualModeBanner extends ConsumerWidget {
+  const PermanentManualModeBanner({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final initState = ref.watch(appInitProvider);
+    if (initState is! AppInitModelFailed) return const SizedBox.shrink();
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      color: const Color(0xFF424242),
+      child: const Row(
+        children: [
+          Icon(Icons.info_outline, color: Colors.white70, size: 16),
+          SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'Mode Manual Aktif — fitur AI tidak tersedia',
+              style: TextStyle(fontSize: 12, color: Colors.white70),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+```
+
+**Semua data tetap aman:**
+
+```dart
+// Data integrity tidak bergantung pada AI — SQLite berjalan independen
+// Semua transaksi manual tetap masuk dengan input_method = 'manual'
+// Status pending/confirmed tetap berjalan normal
+// Laporan, export PDF/CSV tetap berfungsi
+// Audit log tetap mencatat dengan action = 'CREATED_MANUAL'
+```
+
+---
+
+### 16.7 Vision Input Quality Gate
+
+Validasi kualitas gambar dilakukan **sebelum** memanggil inference — mencegah waste waktu 45 detik untuk gambar yang sudah pasti tidak bisa dibaca.
+
+#### 16.7.1 Tiga Kriteria Validasi
+
+| Kriteria | Nilai Minimum | Alasan |
+|---|---|---|
+| Ukuran file | ≥ 10.240 bytes (10 KB) | Di bawah ini kemungkinan besar blank/corrupt |
+| Resolusi | ≥ 400 × 400 px | Terlalu kecil untuk OCR teks struk |
+| Brightness rata-rata | ≥ 40 (skala 0–255) | Di bawah ini gambar terlalu gelap |
+
+#### 16.7.2 Implementasi Quality Gate
+
+```dart
+// lib/core/vision/image_quality_gate.dart
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:image/image.dart' as img;
+
+/// Hasil validasi kualitas gambar sebelum dikirim ke inference
+sealed class ImageQualityResult {
+  const ImageQualityResult();
+}
+final class ImageQualityPass   extends ImageQualityResult { const ImageQualityPass(); }
+final class ImageQualityFail   extends ImageQualityResult {
+  final ImageQualityFailReason reason;
+  const ImageQualityFail(this.reason);
+}
+
+enum ImageQualityFailReason {
+  fileTooSmall,   // < 10 KB
+  resolutionTooLow, // < 400x400
+  tooDark,        // brightness < 40
+}
+
+class ImageQualityGate {
+  static const int _minFileSizeBytes = 10240;       // 10 KB
+  static const int _minWidth         = 400;
+  static const int _minHeight        = 400;
+  static const double _minBrightness = 40.0;        // 0–255 scale
+
+  /// Validasi gambar sebelum inference.
+  /// Proses sampling pixel dilakukan pada versi thumbnail untuk efisiensi.
+  static Future<ImageQualityResult> validate(File imageFile) async {
+    // 1. Cek ukuran file
+    final fileSize = await imageFile.length();
+    if (fileSize < _minFileSizeBytes) {
+      return const ImageQualityFail(ImageQualityFailReason.fileTooSmall);
+    }
+
+    // 2. Decode gambar untuk cek resolusi dan brightness
+    final bytes = await imageFile.readAsBytes();
+    final decoded = img.decodeImage(bytes);
+    if (decoded == null) {
+      return const ImageQualityFail(ImageQualityFailReason.fileTooSmall);
+    }
+
+    // 3. Cek resolusi minimum
+    if (decoded.width < _minWidth || decoded.height < _minHeight) {
+      return const ImageQualityFail(ImageQualityFailReason.resolutionTooLow);
+    }
+
+    // 4. Brightness check via pixel sampling (ambil 100 pixel acak, hitung rata-rata)
+    final brightness = _sampleBrightness(decoded);
+    if (brightness < _minBrightness) {
+      return const ImageQualityFail(ImageQualityFailReason.tooDark);
+    }
+
+    return const ImageQualityPass();
+  }
+
+  /// Ambil rata-rata brightness dari 100 pixel tersebar merata di gambar
+  static double _sampleBrightness(img.Image image) {
+    const sampleCount = 100;
+    double totalLuminance = 0;
+    final stepX = image.width  ~/ 10;
+    final stepY = image.height ~/ 10;
+
+    for (int row = 0; row < 10; row++) {
+      for (int col = 0; col < 10; col++) {
+        final x = col * stepX + stepX ~/ 2;
+        final y = row * stepY + stepY ~/ 2;
+        final pixel = image.getPixel(x, y);
+        // Luminance perceptual (ITU-R BT.709)
+        final luminance =
+            0.2126 * pixel.r + 0.7152 * pixel.g + 0.0722 * pixel.b;
+        totalLuminance += luminance;
+      }
+    }
+
+    return totalLuminance / sampleCount;
+  }
+}
+```
+
+#### 16.7.3 Dialog Feedback ke User
+
+```dart
+// lib/core/vision/image_quality_dialog.dart
+
+class ImageQualityFailDialog extends StatelessWidget {
+  final ImageQualityFailReason reason;
+  const ImageQualityFailDialog({super.key, required this.reason});
+
+  String get _message => switch (reason) {
+    ImageQualityFailReason.fileTooSmall =>
+        'Foto tidak terbaca — mungkin terlalu buram atau tidak tertangkap kamera. '
+        'Coba ambil foto lagi.',
+    ImageQualityFailReason.resolutionTooLow =>
+        'Foto terlalu kecil. Pastikan struk atau kemasan mengisi sebagian besar layar kamera.',
+    ImageQualityFailReason.tooDark =>
+        'Foto terlalu gelap. Coba lagi dengan cahaya lebih baik — dekat jendela '
+        'atau nyalakan lampu.',
+  };
+
+  String get _title => switch (reason) {
+    ImageQualityFailReason.fileTooSmall   => 'Foto Tidak Terdeteksi',
+    ImageQualityFailReason.resolutionTooLow => 'Foto Terlalu Kecil',
+    ImageQualityFailReason.tooDark         => 'Foto Terlalu Gelap',
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Row(
+        children: [
+          const Icon(Icons.camera_alt_outlined, color: Color(0xFFBA7517)),
+          const SizedBox(width: 8),
+          Text(_title),
+        ],
+      ),
+      content: Text(_message, style: const TextStyle(fontSize: 15)),
+      actions: [
+        ElevatedButton(
+          onPressed: () => Navigator.of(context).pop(true), // true = coba lagi
+          child: const Text('Foto Ulang'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false), // false = batal
+          child: const Text('Batal'),
+        ),
+      ],
+    );
+  }
+
+  /// Return true jika user pilih "Foto Ulang", false jika "Batal"
+  static Future<bool> show(BuildContext context, ImageQualityFailReason reason) async {
+    final result = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => ImageQualityFailDialog(reason: reason),
+    );
+    return result ?? false;
+  }
+}
+```
+
+#### 16.7.4 Integrasi Quality Gate ke Vision Flow
+
+```dart
+// lib/features/vision/domain/usecases/parse_receipt_usecase.dart
+
+class ParseReceiptUseCase {
+  final AiService _aiService;
+  const ParseReceiptUseCase(this._aiService);
+
+  Future<Result<List<TransactionModel>, AiFailure>> call({
+    required File imageFile,
+    required BuildContext context, // untuk show dialog
+  }) async {
+    // STEP 1: Quality Gate — sebelum inference dipanggil
+    final qualityResult = await ImageQualityGate.validate(imageFile);
+    if (qualityResult is ImageQualityFail) {
+      // Tampilkan dialog, tawarkan foto ulang
+      final retry = await ImageQualityFailDialog.show(context, qualityResult.reason);
+      if (retry) {
+        return const Error(ImageUnreadableFailure()); // caller akan open camera lagi
+      }
+      return const Error(ImageUnreadableFailure());
+    }
+
+    // STEP 2: Compress & encode
+    final compressed = await FlutterImageCompress.compressWithFile(
+      imageFile.path, minWidth: 800, quality: 70,
+    );
+    if (compressed == null || compressed.isEmpty) {
+      return const Error(ImageUnreadableFailure());
+    }
+    final base64Image = base64Encode(compressed);
+
+    // STEP 3: Inference dengan retry
+    final inferResult = await InferenceRetry.runWithRetry(
+      aiService: _aiService,
+      systemPrompt: AgentPrompts.visionReceipt,
+      userInput: '',
+      imageBase64: base64Image,
+    );
+
+    // STEP 4: Fallback Level 1 jika JSON malformed
+    if (inferResult is Error) {
+      final failure = (inferResult as Error<ToolCallResult, AiFailure>).failure;
+      if (failure is InvalidJsonOutputFailure) {
+        final repaired = await Level1JsonRepair.attempt(
+          aiService: _aiService,
+          systemPrompt: AgentPrompts.visionReceipt,
+          userInput: '',
+          rawMalformedOutput: failure.rawOutput,
+          imageBase64: base64Image,
+        );
+        return _mapToTransactions(repaired);
+      }
+      return Error(failure);
+    }
+
+    return _mapToTransactions(inferResult);
+  }
+
+  Result<List<TransactionModel>, AiFailure> _mapToTransactions(
+    Result<ToolCallResult, AiFailure> result,
+  ) {
+    return switch (result) {
+      Success(data: final toolCall) => Success(_parseTransactions(toolCall)),
+      Error(failure: final f)       => Error(f),
+    };
+  }
+
+  List<TransactionModel> _parseTransactions(ToolCallResult toolCall) {
+    // ... parsing logic sesuai schema record_transactions
+    return [];
+  }
+}
+```
+
+---
+
+### 16.8 Integrasi Section 16 ke Dependency Injection
+
+Semua service baru dari Section 16 didaftarkan di `lib/core/di/injection.dart`:
+
+```dart
+Future<void> setupDependencies() async {
+  // === Existing (Section 5.2) ===
+  getIt.registerLazySingleton<DatabaseService>(() => DatabaseServiceImpl());
+  getIt.registerLazySingleton<AiService>(() => GemmaAiService());
+  getIt.registerLazySingleton<VoiceService>(() => VoiceServiceImpl());
+  getIt.registerFactory<TransactionRepository>(
+    () => TransactionRepositoryImpl(getIt()),
+  );
+
+  // === Section 16 Additions ===
+
+  // Model download — singleton karena ada state download aktif
+  getIt.registerLazySingleton<ModelDownloadNotifier>(
+    () => ModelDownloadNotifier(),
+  );
+
+  // Image quality gate — stateless, bisa factory
+  getIt.registerFactory<ImageQualityGate>(() => ImageQualityGate());
+
+  // Use cases dengan retry + fallback built-in
+  getIt.registerFactory<ParseReceiptUseCase>(
+    () => ParseReceiptUseCase(getIt<AiService>()),
+  );
+  getIt.registerFactory<RecordVoiceTransactionUseCase>(
+    () => RecordVoiceTransactionUseCase(getIt<AiService>()),
+  );
+}
+```
+
+---
+
+### 16.9 Checklist Teknis Section 16
+
+Tambahan ke Appendix D — semua item di bawah ini harus hijau sebelum submission:
+
+```
+SECTION 16 — AI RUNTIME TECHNICAL SPECIFICATION
+
+MODEL DELIVERY
+[ ] File model TIDAK di-bundle ke APK
+[ ] Download on first launch dengan Dio + resume support (Range header)
+[ ] Progress bar linear + persentase + estimasi waktu tampil selama download
+[ ] SHA-256 verification setelah download selesai
+[ ] Fallback URL ke GitHub Releases jika Kaggle tidak accessible
+[ ] ModelStorage.modelPath menggunakan getApplicationDocumentsDirectory
+
+COLD START UX
+[ ] AppInitState sealed class: ModelDownloading, ModelLoading, ModelReady, ModelFailed, AiDegraded
+[ ] Degraded Mode: FAB Suara + Foto disabled dengan tooltip "AI sedang memuat..."
+[ ] Banner kuning tampil selama MODEL_LOADING
+[ ] Input manual tetap bisa dipakai selama model loading
+[ ] Banner merah tampil saat Level 2 fallback aktif
+[ ] Banner abu tampil saat Level 3 (permanent manual mode)
+
+GEMMA 4 CAPABILITY
+[ ] Context window limit 6000 token dari maximum 8192
+[ ] maxOutputTokens = 512 di semua inference call
+[ ] Vision support check (1x1 pixel test) saat cold start
+[ ] Tidak ada streaming token — CircularProgressIndicator selama inference
+
+STT OFFLINE
+[ ] speech_to_text menggunakan Android SpeechRecognizer API (on-device)
+[ ] Cek ketersediaan id-ID locale saat app startup
+[ ] Dialog + deep link ke Android Language Settings jika id-ID tidak ada
+[ ] VAD silence threshold = 2000ms (pauseFor: Duration(milliseconds: 2000))
+[ ] Min confidence score = 0.5 sebelum transcript diteruskan ke inference
+
+TIMEOUT & RETRY
+[ ] Voice inference timeout = 30 detik
+[ ] Vision inference timeout = 45 detik
+[ ] Maksimal 2x retry dengan backoff 1s, 3s
+[ ] InferenceRetry.runWithRetry() dipakai di semua agent use case
+
+FALLBACK HIERARCHY
+[ ] Level 1: _stripJsonFences() + retry inference 1x dengan reinforcement prompt
+[ ] Level 2: AppInitAiDegraded, disable AI FAB, banner merah, buka form manual
+[ ] Level 3: AppInitModelFailed, permanent manual mode, banner abu, semua data aman
+
+VISION QUALITY GATE
+[ ] Validasi file size ≥ 10 KB sebelum inference
+[ ] Validasi resolusi ≥ 400×400 px sebelum inference
+[ ] Brightness sampling 100 pixel, rata-rata ≥ 40/255 sebelum inference
+[ ] Dialog "Foto Ulang" dengan pesan spesifik per failure reason
+[ ] Quality gate dijalankan SEBELUM compression dan encoding base64
+```
+
+---
+
+**END OF PRODUCT REQUIREMENTS DOCUMENT v10.0.0**
