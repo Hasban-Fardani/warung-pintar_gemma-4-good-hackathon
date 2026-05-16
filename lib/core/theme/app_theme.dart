@@ -41,7 +41,7 @@ class AppTheme {
           minimumSize: const Size(48, 48), // 48dp touch targets
         ),
       ),
-      checkboxTheme: CheckboxThemeData(
+      checkboxTheme: const CheckboxThemeData(
         splashRadius: 24, // Touch target 48
       ),
     );
