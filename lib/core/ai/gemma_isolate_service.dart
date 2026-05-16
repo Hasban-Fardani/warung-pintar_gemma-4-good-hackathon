@@ -17,24 +17,26 @@ class GemmaIsolateService {
   static SendPort? _sendPort;
   static Isolate? _isolate;
   static bool _isInitialized = false;
+  static String? _modelPath;
 
   /// Whether the isolate has been initialized and model is loaded.
   static bool get isInitialized => _isInitialized;
 
-  /// Initialize the Gemma isolate and load the model.
+  /// Initialize the Gemma isolate and load the model from [modelPath].
   ///
-  /// Must be called once during app startup (in `main.dart`).
+  /// Called by [AppInitNotifier] after model download/verification.
   /// No-op if already initialized.
-  static Future<void> init() async {
+  static Future<void> initialize({required String modelPath}) async {
     if (_isInitialized) return;
+    _modelPath = modelPath;
 
-    _logger.i('GemmaIsolateService: Initializing isolate...');
+    _logger.i('GemmaIsolateService: Initializing with model: $modelPath');
 
     try {
       final receivePort = ReceivePort();
       _isolate = await Isolate.spawn(
         _gemmaWorker,
-        receivePort.sendPort,
+        (receivePort.sendPort, modelPath),
       );
 
       // First message from worker is its SendPort
@@ -90,17 +92,24 @@ class GemmaIsolateService {
     _logger.i('GemmaIsolateService: Disposed');
   }
 
+  /// Backward-compatible init without model path.
+  /// Delegates to [initialize] with a default path.
+  static Future<void> init() async {
+    if (_isInitialized) return;
+    final defaultPath = _modelPath ?? 'models/gemma-4-E2B-it-litertlm-Q4_K_M.litertlm';
+    await initialize(modelPath: defaultPath);
+  }
+
   /// Worker function running in the background isolate.
   ///
   /// Loads the Gemma model once, then listens for inference requests.
-  static void _gemmaWorker(SendPort mainSendPort) async {
+  static void _gemmaWorker((SendPort, String) args) async {
+    final (mainSendPort, modelPath) = args;
     final port = ReceivePort();
     mainSendPort.send(port.sendPort);
 
     // TODO: Load actual Gemma model when flutter_gemma is available
-    // final gemma = await GemmaModel.load(
-    //   'assets/gemma-4-E2B-it-litertlm-Q4_K_M.litertlm'
-    // );
+    // final gemma = await GemmaModel.load(modelPath);
 
     await for (final msg in port) {
       final replyPort = msg['replyPort'] as SendPort;

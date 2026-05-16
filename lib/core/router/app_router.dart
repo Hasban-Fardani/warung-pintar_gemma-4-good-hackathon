@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/dashboard/presentation/dashboard_screen.dart';
+import '../../features/onboarding/presentation/pages/model_download_screen.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey =
     GlobalKey<NavigatorState>(debugLabel: 'root');
@@ -17,6 +18,12 @@ final appRouter = GoRouter(
     return null;
   },
   routes: [
+    // ── Model Download (first launch, PRD §16.1.4) ──
+    GoRoute(
+      path: '/model-download',
+      builder: (context, state) => const ModelDownloadScreen(),
+    ),
+
     // ── Onboarding (first launch only, no bottom nav) ──
     GoRoute(
       path: '/onboarding',
