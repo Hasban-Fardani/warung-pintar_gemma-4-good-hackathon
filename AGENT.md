@@ -905,14 +905,15 @@ final (name, age) = getUserInfo();
 final name = user?.profile?.displayName ?? 'Anonymous';
 list?.forEach(print);
 ```
-## 17. Git Workflow & Commit Hygiene (Mandatory)
+## 17. Git Workflow & Action-Based Commit Hygiene (Mandatory)
 
-### Atomic Commits
-- One task/phase = one commit. Never bundle unrelated changes.
-- Format: `feat: Phase [X] - [concise description]` or `fix: [component] - [issue]`
-- Local-only during development: `git commit` allowed, `git push` strictly forbidden until explicitly approved.
+### Atomic Actions & Commits
+- One **action** = one atomic, verifiable unit of work. A larger milestone may require multiple sequential actions.
+- Commit format: `feat: [Action-ID] - [concise description]` (e.g., `feat: ACT-01-setup-router`, `fix: ACT-03-resolve-import-conflict`)
+- Local-only during development: `git commit` is allowed. `git push` is strictly forbidden until explicit approval.
+- If an action requires multiple turns/iterations, squash or amend commits to maintain a clean history. Report as `Action [X] - Turn [Y]`.
 
-### Pre-Commit Gate
+### Pre-Action & Pre-Commit Gate
 - MUST pass `flutter analyze --fatal-infos` before staging. Zero warnings allowed.
 - MUST pass `dart format --set-exit-if-changed .`
 - Zero broken imports, zero syntax errors, zero unhandled async exceptions.
@@ -920,21 +921,22 @@ list?.forEach(print);
 
 ### Post-Commit Diff Verification
 - Run `git diff HEAD~1..HEAD --stat` and review output.
-- Confirm only intended files were modified/created.
+- Confirm only intended files were modified/created for the current action.
 - Check for accidental deletions, whitespace noise, or style drift in unrelated files.
 - If diff contains out-of-scope changes or linter violations: `git commit --amend` or `git reset --soft HEAD~1`, fix, and recommit.
 
-### Anti-Patterns (Git)
-- ❌ `git push` before phase verification & diff review
-- ❌ Monolithic commits mixing UI, DB, AI, and router logic
+### Anti-Patterns (Git & Actions)
+- ❌ `git push` before action verification & diff review
+- ❌ Bundling multiple actions or unrelated changes into one commit
 - ❌ Committing with failing `flutter analyze` or `dart format`
-- ❌ Leaving `print()`, debug `TODO:`, or mock data without clear `// HACK:` or `// DEV:` tags
+- ❌ Leaving `print()`, debug markers, or mock data without clear `// TODO:`, `// DEV:`, or `// HACK:` tags
 - ❌ Ignoring merge conflicts or auto-resolving without manual review
 
 ### LLM Execution Rule
 - When generating or modifying code, simulate this workflow internally: analyze → format → stage → commit → diff-verify → report.
-- Never skip verification steps. If a command fails, output the exact error, propose a surgical fix, and STOP. Wait for explicit approval before proceeding.
-
+- Treat each prompt iteration as a discrete **action**. Never skip verification steps.
+- If a command fails or diff shows anomalies, output the exact error, propose a surgical fix, and STOP. Wait for explicit approval before proceeding to the next action or turn.
+- Always ground changes in `@docs/PRD.md` and `@docs/DESIGN.md`. If uncertain, halt and ask. Never assume missing tokens or logic.
 ---
 
 *Last updated: May 2026 | Flutter 3.x / Dart 3.x*
