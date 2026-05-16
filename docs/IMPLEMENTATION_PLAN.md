@@ -172,84 +172,97 @@ Layer 6 — Deliverables (requires Layer 5)
 ## Milestone 3: Domain + Agent Logic
 
 > **Layer 3** — Bergantung pada M1 (AI core + init state) dan M2 (database + voice + vision gate + retry). Semua agent use case **wajib** menggunakan `InferenceRetry.runWithRetry()` dan `Level1JsonRepair` — tidak boleh memanggil `AiService.infer()` langsung.
+> 
+> **RULE IMPLEMENTASI UI**: Semua screen presentation WAJIB mengacu ke file `docs/design/*.html` sebagai source of truth visual — JANGAN hanya dari deskripsi markdown. Token warna, spacing, font, border-radius, dan icon HARUS dicocokkan persis dengan HTML design. Lihat preamble Design Token Reference di Appendix E.
 
 ### 3A — Transaction Domain & Data
 
-| Action ID | Deskripsi | Scope | Status |
-|-----------|-----------|-------|--------|
-| ACT-44 | Transaction domain layer — `TransactionEntity`, abstract `TransactionRepository`, usecases: `RecordVoiceTransactionUseCase`, `ConfirmTransactionUseCase`, `GetPendingTransactionsUseCase` | features/transaction/domain/ | ⬜ Belum |
-| ACT-45 | Transaction data layer — `TransactionModel`, `TransactionDatasource`, `TransactionRepositoryImpl` | features/transaction/data/ | ⬜ Belum |
-| ACT-46 | Unit test: `RecordVoiceTransactionUseCase` — mock `AiService` via mocktail, verify `InferenceRetry` dipakai, verify output masuk pending | test/features/transaction/ | ⬜ Belum |
+| Action ID | Deskripsi | Scope | Design Reference | Status |
+|-----------|-----------|-------|-----------------|--------|
+| ACT-44 | Transaction domain layer — `TransactionEntity`, abstract `TransactionRepository`, usecases: `RecordVoiceTransactionUseCase`, `ConfirmTransactionUseCase`, `GetPendingTransactionsUseCase` | features/transaction/domain/ | — (pure Dart) | ⬜ Belum |
+| ACT-45 | Transaction data layer — `TransactionModel`, `TransactionDatasource`, `TransactionRepositoryImpl` | features/transaction/data/ | — (data layer) | ⬜ Belum |
+| ACT-46 | Unit test: `RecordVoiceTransactionUseCase` — mock `AiService` via mocktail, verify `InferenceRetry` dipakai, verify output masuk pending | test/features/transaction/ | — (test) | ⬜ Belum |
 
-### 3B — Agent 1: Onboarding
+### 3B — Agent 1: Onboarding (5 Screens)
 
-| Action ID | Deskripsi | Scope | Status |
-|-----------|-----------|-------|--------|
-| ACT-47 | Onboarding domain — `SetupBusinessUseCase` — parse `setup_business` tool call → insert categories + stock ke SQLite | features/onboarding/domain/ | ⬜ Belum |
-| ACT-48 | Onboarding presentation — `OnboardingPage` + Riverpod `AutoDispose` provider + state machine 4 state (Listening → Inference → Execution → Feedback) | features/onboarding/presentation/ | ⬜ Belum |
+| Action ID | Deskripsi | Scope | Design Reference | Status |
+|-----------|-----------|-------|-----------------|--------|
+| ACT-47 | Onboarding domain — `SetupBusinessUseCase` — parse `setup_business` tool call → insert categories + stock ke SQLite | features/onboarding/domain/ | — (pure Dart) | ⬜ Belum |
+| ACT-48 | Onboarding presentation — 5 screen flow: Welcome → Profile Setup → Initial Stock → AI Processing → Confirmation. Step indicator `1/4`–`4/4` di TopAppBar. AI guide bubble `bg-primary-fixed`, `border-primary-fixed-dim`, icon `smart_toy` di lingkaran `bg-primary` 40×40. Input field `h-touch-target-min`, `border-outline`, `rounded`, `focus:border-primary`. Layout `max-w-md mx-auto`, `px-margin-page`. Bottom action bar `bg-surface`, `border-t`. | features/onboarding/presentation/ | `docs/design/Guided Onboarding - Welcome.html`<br>`docs/design/Guided Onboarding - Profile Setup.html`<br>`docs/design/Guided Onboarding - Initial Stock.html`<br>`docs/design/Onboarding - AI Processing.html`<br>`docs/design/Guided Onboarding - Confirmation.html` | ⬜ Belum |
 
-### 3C — Agent 2 & 3: Voice Transaction + Confirmation
+### 3C — Agent 2 & 3: Voice Transaction + Manual Form (3 Screen States)
 
-| Action ID | Deskripsi | Scope | Status |
-|-----------|-----------|-------|--------|
-| ACT-49 | Voice transaction provider (Agent 2) — `VoiceTransactionNotifier`: start STT → collect transcript → call `RecordVoiceTransactionUseCase` → insert pending → update Riverpod state | features/transaction/presentation/ | ⬜ Belum |
-| ACT-50 | Pending confirmation provider (Agent 3) — `PendingConfirmNotifier`: load pending list → STT → `ConfirmTransactionUseCase` → handle `confirm_all` flag → update state | features/transaction/presentation/ | ⬜ Belum |
-| ACT-51 | Unit test: `ConfirmTransactionUseCase` — verify "semua benar" → semua pending jadi confirmed; verify "skip" → item tetap pending | test/features/transaction/ | ⬜ Belum |
+| Action ID | Deskripsi | Scope | Design Reference | Status |
+|-----------|-----------|-------|-----------------|--------|
+| ACT-49 | Voice transaction provider (Agent 2) — `VoiceTransactionNotifier`: start STT → collect transcript → call `RecordVoiceTransactionUseCase` → insert pending → update Riverpod state. **Mode toggle**: segmented control `border-outline-variant`, `rounded-xl`, 2 button (Manual/Suara). Active tab: `bg-primary-container`, `text-on-primary-container`. **Voice panel**: `bg-[#F5F5F5]`, `border-[#E0E0E0]`, `rounded-xl`. Mic button: `w-[96px] h-[96px]`, `rounded-full`, `bg-primary-container`. **Manual form**: stepper ± untuk qty `w-touch-target-min`, outline border. Total field `bg-surface-container-high`. Form field: `h-touch-target-min`, `border-outline-variant`, `rounded-lg`, label `font-label-lg`, helper `text-label-md text-on-surface-variant`. Bottom bar `bg-surface`, `border-t`, button Simpan `bg-primary`. | features/transaction/presentation/ | `docs/design/Input Transaksi - Voice Mode.html`<br>`docs/design/Input Transaksi - Manual Default.html`<br>`docs/design/Input Transaksi - Modern Error State.html` | ⬜ Belum |
+| ACT-50 | Pending confirmation provider (Agent 3) — `PendingConfirmNotifier`: load pending list → STT → `ConfirmTransactionUseCase` → handle `confirm_all` flag → update state. List item: `font-label-lg` item name, `tabular-nums` amount, `bg-wp-sell-bg` / `bg-wp-buy-bg` badge. | features/transaction/presentation/ | `docs/design/WarungPintar History & Analytics.html` (bagian transaction list) | ⬜ Belum |
+| ACT-51 | Unit test: `ConfirmTransactionUseCase` — verify "semua benar" → semua pending jadi confirmed; verify "skip" → item tetap pending | test/features/transaction/ | — (test) | ⬜ Belum |
 
-### 3D — Agent 4 & 5: Vision
+### 3D — Agent 4 & 5: Vision / Camera (3 Screen States)
 
-| Action ID | Deskripsi | Scope | Status |
-|-----------|-----------|-------|--------|
-| ACT-52 | Vision domain — `ParseReceiptUseCase` (Agent 4) — **wajib**: run `ImageQualityGate.validate()` dulu → compress → `InferenceRetry.runWithRetry()` → `Level1JsonRepair` jika perlu → insert pending per PRD §16.7.4 | features/vision/domain/ | ⬜ Belum |
-| ACT-53 | Vision presentation — `ReceiptCapturePage` + provider — camera intent → kirim ke `ParseReceiptUseCase` → tampilkan preview card | features/vision/presentation/ | ⬜ Belum |
-| ACT-54 | Vision domain — `ParseProductUseCase` (Agent 5) — quality gate → inference → pre-fill form → STT untuk harga → insert ke `stock` | features/vision/domain/ | ⬜ Belum |
-| ACT-55 | Vision presentation — `ProductCapturePage` + provider | features/vision/presentation/ | ⬜ Belum |
-| ACT-56 | Unit test: `ParseReceiptUseCase` — mock `ImageQualityGate` return fail → verify dialog triggered, inference NOT called; mock pass → verify inference called | test/features/vision/ | ⬜ Belum |
+| Action ID | Deskripsi | Scope | Design Reference | Status |
+|-----------|-----------|-------|-----------------|--------|
+| ACT-52 | Vision domain — `ParseReceiptUseCase` (Agent 4) — **wajib**: run `ImageQualityGate.validate()` dulu → compress → `InferenceRetry.runWithRetry()` → `Level1JsonRepair` jika perlu → insert pending per PRD §16.7.4 | features/vision/domain/ | — (pure Dart) | ⬜ Belum |
+| ACT-53 | Vision presentation — `ReceiptCapturePage` + provider — camera intent → kirim ke `ParseReceiptUseCase` → tampilkan preview card. **Segmented control** 3 tab (Manual/Kamera/Suara), active tab `bg-surface-variant` + `shadow-[inset_0_-2px_0_0_#005dac]`. **Viewfinder**: `aspect-[4/3]`, dashed targeting rectangle `border-primary`, corner markers 4px. Capture button `w-[88px] h-[88px]`. | features/vision/presentation/ | `docs/design/Update Stok - Kamera Mode.html`<br>`docs/design/Update Stok - Manual Input.html`<br>`docs/design/Update Stok - Voice Confirmation.html` | ⬜ Belum |
+| ACT-54 | Vision domain — `ParseProductUseCase` (Agent 5) — quality gate → inference → pre-fill form → STT untuk harga → insert ke `stock` | features/vision/domain/ | — (pure Dart) | ⬜ Belum |
+| ACT-55 | Vision presentation — `ProductCapturePage` + provider. Sama dengan ACT-53 untuk capture flow. **AI Result Confirmation card**: confidence badge `bg-secondary-container`, `rounded-full`. Produk info `border-b`, jumlah `text-headline-md-mobile text-primary`. Action buttons: Retake `border-outline` + Confirm `bg-primary`. | features/vision/presentation/ | `docs/design/Update Stok - Kamera Mode.html`<br>`docs/design/Update Stok - Voice Confirmation.html` | ⬜ Belum |
+| ACT-56 | Unit test: `ParseReceiptUseCase` — mock `ImageQualityGate` return fail → verify dialog triggered, inference NOT called; mock pass → verify inference called | test/features/vision/ | — (test) | ⬜ Belum |
 
-### 3E — Catalog + Price History
+### 3E — Catalog + Price History (2 Screens)
 
-| Action ID | Deskripsi | Scope | Status |
-|-----------|-----------|-------|--------|
-| ACT-57 | Catalog domain — `StockEntity`, `PriceHistoryEntity`, abstract `CatalogRepository`, usecases: `GetCatalogUseCase`, `AddItemUseCase`, `UpdateItemPriceUseCase` (append-only per PRD §10.6), `SoftDeleteItemUseCase` | features/catalog/domain/ | ⬜ Belum |
-| ACT-58 | Catalog data — `StockModel`, `PriceHistoryModel`, `CatalogDatasource`, `CatalogRepositoryImpl` | features/catalog/data/ | ⬜ Belum |
-| ACT-59 | Catalog presentation — list page, detail page, category drawer, add item via foto+suara | features/catalog/presentation/ | ⬜ Belum |
-| ACT-60 | Unit test: `UpdateItemPriceUseCase` — verify insert ke `price_history`, BUKAN update kolom di `stock.default_price_sen` langsung; verify transaksi lama tidak berubah | test/features/catalog/ | ⬜ Belum |
-| **VERIFY-M3** | `flutter analyze` ✅, semua agent unit tests ✅, `ParseReceiptUseCase` terbukti panggil quality gate sebelum inference ✅, `UpdateItemPriceUseCase` append-only verified ✅, camera permissions declared ✅ | — | ⬜ Belum |
+| Action ID | Deskripsi | Scope | Design Reference | Status |
+|-----------|-----------|-------|-----------------|--------|
+| ACT-57 | Catalog domain — `StockEntity`, `PriceHistoryEntity`, abstract `CatalogRepository`, usecases: `GetCatalogUseCase`, `AddItemUseCase`, `UpdateItemPriceUseCase` (append-only per PRD §10.6), `SoftDeleteItemUseCase` | features/catalog/domain/ | — (pure Dart) | ⬜ Belum |
+| ACT-58 | Catalog data — `StockModel`, `PriceHistoryModel`, `CatalogDatasource`, `CatalogRepositoryImpl` | features/catalog/data/ | — (data layer) | ⬜ Belum |
+| ACT-59 | Catalog presentation — **List View**: stats row (Total Barang/Kategori Aktif/Barang Tanpa Stok) `grid-cols-3`, `border-outline-variant rounded p-gutter`. Search bar `pl-[56px]`. Filter chips `rounded-full`, active: `bg-primary-fixed text-on-primary-fixed border-primary`. Table `w-full text-left`, header `bg-surface-container-low`, row `hover:bg-surface-container-lowest`. Status badge `bg-secondary-container text-on-secondary-container`, `rounded`. **Tambah Barang (Bottom Sheet)**: `bg-surface rounded-t-xl`, drag handle `w-12 h-1.5 bg-outline-variant`. Form: input fields `h-touch-target-min`, select `appearance-none` with dropdown arrow. Footer: Batal `border-primary` + Simpan `bg-primary-container`. | features/catalog/presentation/ | `docs/design/Master Data Barang - List View.html`<br>`docs/design/Master Data - Tambah Barang Form.html`<br>`docs/design/Update Stok - Voice Confirmation.html` | ⬜ Belum |
+| ACT-60 | Unit test: `UpdateItemPriceUseCase` — verify insert ke `price_history`, BUKAN update kolom di `stock.default_price_sen` langsung; verify transaksi lama tidak berubah | test/features/catalog/ | — (test) | ⬜ Belum |
+| **VERIFY-M3** | `flutter analyze` ✅, semua agent unit tests ✅, `ParseReceiptUseCase` terbukti panggil quality gate sebelum inference ✅, `UpdateItemPriceUseCase` append-only verified ✅, camera permissions declared ✅ | — | — | ⬜ Belum |
+
+### 3F — Settings & Reports (2 Screens — tambahan dari design HTML)
+
+> Screens ini ada di design HTML (`docs/design/`) tapi belum tercakup di M3 plan sebelumnya. Ditambahkan untuk completeness sebelum masuk M5 verifikasi 16 screens.
+
+| Action ID | Deskripsi | Scope | Design Reference | Status |
+|-----------|-----------|-------|-----------------|--------|
+| ACT-59B | **Settings Page** — `SettingsPage` + provider. Sections: Profil Usaha (nama warung, pemilik, alamat, telepon), Pengaturan Stok (batas peringatan 5 pcs, kategori stok kritis chip), Tampilan (ukuran tulisan Kecil/Sedang/Besar segmented), Pengaturan AI (keyakinan toggle, slider sensitivitas suara, konfirmasi sebelum simpan), Data & Backup (ekspor CSV, backup, pulihkan, hapus semua data), Tentang (v1.0.0, AI Gemma). TopAppBar `bg-surface-container-lowest`. Layout `max-w-md mx-auto`, setiap card `border-outline-variant rounded-xl p-margin-page`. BottomNav tab "Pengaturan" active (`text-primary font-bold`). | features/settings/presentation/ | `docs/design/Settings & Profil Usaha - Poppins Edition.html` | ⬜ Belum |
+| ACT-59C | **Reports / History Page** — `ReportsPage` + provider. Period toggle: Harian/Mingguan/Bulanan segmented. Grafik omzet bar chart 7 hari. Quick stats: Produk Terlaris, Rata-rata Transaksi, Total Transaksi. Search + filter (Semua/Jual/Beli chips). Daftar Transaksi: item name + qty, timestamp + badge (Jual: `bg-wp-sell-bg text-wp-sell-text`, Beli: `bg-wp-buy-bg text-wp-buy-text`). Export button di TopAppBar. BottomNav tab "Riwayat" active (`text-wp-blue`). | features/reports/presentation/ | `docs/design/WarungPintar History & Analytics.html` | ⬜ Belum |
 
 ---
 
 ## Milestone 4: Presentation Layer — UI/UX Polish
 
 > **Layer 4** — Bergantung pada M3. Semua widget yang berinteraksi dengan AI **wajib** membaca `AppInitState` dari Riverpod — tidak boleh assume model selalu ready.
+>
+> **RULE**: Setiap screen WAJIB diverifikasi terhadap HTML design file. Gunakan token persis: `bg-background: #fcf9f8`, `on-surface: #1c1b1b`, `primary: #005dac`, `primary-container: #1976d2`, `secondary: #1b6d24`, `error: #ba1a1a`, `outline-variant: #c1c6d4`. Default radius `rounded: 0.125rem`, `xl: 0.5rem`. Spacing: `margin-page: 16px`, `gutter: 16px`, `stack-md: 16px`, `stack-lg: 24px`. Font: `Inter` (kecuali Dashboard/Reports pake `Poppins`).
 
-### 4A — Dashboard & Core Layout
+### 4A — Dashboard & Core Layout (1 Screen — Beranda)
 
-| Action ID | Deskripsi | Scope | Status |
-|-----------|-----------|-------|--------|
-| ACT-61 | Dashboard domain — `DashboardSummaryUseCase` — hanya hitung transaksi `status = confirmed` untuk omzet/profit; hitung pending count terpisah | features/dashboard/domain/ | ⬜ Belum |
-| ACT-62 | Bento Box dashboard — full impl per PRD §12.2: full-width omzet, 2-kolom profit/modal, scroll horizontal stock alert, 5 transaksi terakhir dengan badge ganda | features/dashboard/presentation/ | ⬜ Belum |
-| ACT-63 | Pending banner — reactive via Riverpod, tap → buka Agent 3, badge count real-time | shared/widgets/ | ⬜ Belum |
-| ACT-64 | Status badge widget — badge input method (biru/hijau/abu) + badge status (hijau/kuning/merah) per PRD §12.5 | shared/widgets/ | ⬜ Belum |
+| Action ID | Deskripsi | Scope | Design Reference | Status |
+|-----------|-----------|-------|-----------------|--------|
+| ACT-61 | Dashboard domain — `DashboardSummaryUseCase` — hanya hitung transaksi `status = confirmed` untuk omzet/profit; hitung pending count terpisah | features/dashboard/domain/ | — (pure Dart) | ⬜ Belum |
+| ACT-62 | Bento Box dashboard — full implementation per `docs/design/Home - Dashboard with Transactions & Toast.html`. **TopAppBar**: `bg-surface`, `border-b-outline-variant`, icon `storefront` kiri, title "WarungPintar" `text-primary`, icon `smart_toy` kanan dengan green AI dot `bg-secondary w-[8px] h-[8px]`. **Error banner**: `bg-error-container border-error`, icon `warning`. **Greeting**: `headline-md-mobile`. **Bento Grid** `grid-cols-2 gap-gutter`: Omzet `col-span-2` (icon `payments text-primary`, value `headline-lg-mobile text-primary`), Profit `col-span-1` (icon `trending_up text-secondary`), Modal Keluar (icon `outbound text-error`). **Transaksi Terakhir**: list `bg-surface border-outline-variant rounded-lg`, setiap row `border-b`, icon lingkaran 40×40. Amount: `text-secondary` untuk sell, `text-error` untuk buy. | features/dashboard/presentation/ | `docs/design/Home - Dashboard with Transactions & Toast.html` | ⬜ Belum |
+| ACT-63 | Pending banner — reactive via Riverpod, tap → buka Agent 3, badge count real-time. Banner `bg-error-container border-error rounded-lg`, icon `warning`, text `"Perhatian: Stok Menipis (Beras, Telur)"` (contoh). Muncul hanya jika ada pending. | shared/widgets/ | `docs/design/Home - Dashboard with Transactions & Toast.html` (error container style) | ⬜ Belum |
+| ACT-64 | Status badge widget — badge input method: voice `bg-primary-container`, image `bg-secondary-container`, manual `bg-surface-variant`. Badge status: confirmed `bg-secondary-container text-on-secondary-container`, pending `bg-[#FAEEDA] text-[#BA7517]`, clarify `bg-error-container text-on-error-container`. Menggunakan `rounded-full`, `px-2 h-[24px]`, `font-label-md`. | shared/widgets/ | `docs/design/Master Data Barang - List View.html` (status badge pattern) | ⬜ Belum |
 
-### 4B — AI-Aware FAB & Banners (Section 16)
+### 4B — AI-Aware FAB & Banners (Section 16 — Integrasi ke Dashboard)
 
-| Action ID | Deskripsi | Scope | Status |
-|-----------|-----------|-------|--------|
-| ACT-65 | **[SEC16]** Buat `AiLoadingBanner` — tampil saat `AppInitModelLoading`, warna kuning `#FFF3CD`, teks + spinner kecil per PRD §16.2.2 | shared/widgets/ | ⬜ Belum |
-| ACT-66 | **[SEC16]** Buat `AiDegradedBanner` — tampil saat `AppInitAiDegraded`, warna `#FFEDED`, icon warning + teks + tombol "Coba Lagi" yang trigger `AppInitNotifier.initialize()` per PRD §16.6.2 | shared/widgets/ | ⬜ Belum |
-| ACT-67 | **[SEC16]** Buat `PermanentManualModeBanner` — tampil saat `AppInitModelFailed`, warna `#424242`, teks putih permanen per PRD §16.6.3 | shared/widgets/ | ⬜ Belum |
-| ACT-68 | **[SEC16]** Buat `AiAwareFab` — FAB ekspansi 3 sub-tombol; Suara dan Foto `onTap = null` + tooltip "AI sedang memuat..." jika `AppInitState` bukan `ModelReady`; Manual selalu aktif; dim overlay saat expand per PRD §12.3 + §16.2.2 | shared/widgets/ | ⬜ Belum |
-| ACT-69 | **[SEC16]** Integrasikan semua banner ke `DashboardPage` dalam urutan: `PermanentManualModeBanner` → `AiDegradedBanner` → `AiLoadingBanner` → pending banner → konten | features/dashboard/presentation/ | ⬜ Belum |
+| Action ID | Deskripsi | Scope | Design Reference | Status |
+|-----------|-----------|-------|-----------------|--------|
+| ACT-65 | **[SEC16]** Buat `AiLoadingBanner` — tampil saat `AppInitModelLoading`, warna kuning `#FFF3CD`, teks + spinner kecil per PRD §16.2.2 | shared/widgets/ | Pattern dari error banner di `Home - Dashboard with Transactions & Toast.html` | ⬜ Belum |
+| ACT-66 | **[SEC16]** Buat `AiDegradedBanner` — tampil saat `AppInitAiDegraded`, warna `#FFEDED`, icon warning + teks + tombol "Coba Lagi" yang trigger `AppInitNotifier.initialize()` per PRD §16.6.2 | shared/widgets/ | Pattern dari error banner di `Home - Dashboard with Transactions & Toast.html` | ⬜ Belum |
+| ACT-67 | **[SEC16]** Buat `PermanentManualModeBanner` — tampil saat `AppInitModelFailed`, warna `#424242` (inverse-surface), teks putih permanen per PRD §16.6.3 | shared/widgets/ | Pattern dari error banner di `Home - Dashboard with Transactions & Toast.html` | ⬜ Belum |
+| ACT-68 | **[SEC16]** Buat `AiAwareFab` — FAB ekspansi di Dashboard. Main FAB `w-[56px] h-[56px] bg-primary-container text-on-primary-container`. 3 sub-FAB: Suara (icon `mic`, tooltip "AI sedang memuat..."), Kamera (icon `photo_camera`), Manual (icon `edit_document`). Label tooltip `bg-surface border-outline-variant font-label-md`. Overlay `dim` saat expand. Bottom nav: 3 tab (Beranda/Riwayat/Setelan), active tab `text-primary font-bold`, inactive `text-on-surface-variant`. | shared/widgets/ | `docs/design/Home - Dashboard with Transactions & Toast.html` (FAB area + bottom nav) | ⬜ Belum |
+| ACT-69 | **[SEC16]** Integrasikan semua banner ke `DashboardPage` dalam urutan: `PermanentManualModeBanner` → `AiDegradedBanner` → `AiLoadingBanner` → pending/error banner → bento grid → daftar transaksi | features/dashboard/presentation/ | `docs/design/Home - Dashboard with Transactions & Toast.html` | ⬜ Belum |
+| **VERIFY-M4** | `flutter analyze` ✅, 16 screens match design ✅, no overflow di kedua ukuran ✅, `AiAwareFab` disabled saat model tidak ready ✅, semua banner muncul di state yang benar ✅ | — | — | ⬜ Belum |
 
 ### 4C — Shared Widgets & UX
 
-| Action ID | Deskripsi | Scope | Status |
-|-----------|-----------|-------|--------|
-| ACT-70 | Audit log drawer per PRD §9.4 — STT transcript, raw AI JSON, idempotency key, input method, timestamp chain | shared/widgets/ | ⬜ Belum |
-| ACT-71 | Toast system per PRD §12.8 — sukses auto-dismiss 3s, info 4s, warning manual, error manual (TIDAK pernah auto) | shared/widgets/ | ⬜ Belum |
-| ACT-72 | Haptic matrix per PRD §12.6 — 6 pola haptic berbeda via `vibration` package | core/utils/ | ⬜ Belum |
-| ACT-73 | Screen-by-screen UI verification terhadap design PNGs — 16 screens, no overflow di 360×800 dan 414×896 | all presentation/ | ⬜ Belum |
-| **VERIFY-M4** | `flutter analyze` ✅, 16 screens match design ✅, no overflow di kedua ukuran ✅, `AiAwareFab` disabled saat model tidak ready ✅, semua banner muncul di state yang benar ✅ | — | ⬜ Belum |
+| Action ID | Deskripsi | Scope | Design Reference | Status |
+|-----------|-----------|-------|-----------------|--------|
+| ACT-70 | Audit log drawer per PRD §9.4 — STT transcript, raw AI JSON, idempotency key, input method, timestamp chain. Tampil sebagai drawer (bukan page). Setiap entry: action label + timestamp + raw JSON dalam scrollable container. | shared/widgets/ | — (tidak ada di design HTML, implementasi dari PRD) | ⬜ Belum |
+| ACT-71 | Toast system — implementasi snackbar/toast. **Sukses**: auto-dismiss 3s, `bg-secondary`, `text-on-secondary`. **Info**: 4s, `bg-primary`, `text-on-primary`. **Warning**: manual dismiss, `bg-tertiary`, `text-on-tertiary`. **Error**: manual dismiss, `bg-error`, `text-on-error`. Toast muncul di bawah TopAppBar, bukan di bottom. | shared/widgets/ | Pattern dari error banner `bg-error-container` di `Home - Dashboard with Transactions & Toast.html` | ⬜ Belum |
+| ACT-72 | Haptic matrix per PRD §12.6 — 6 pola haptic via `vibration` package: parse sukses (1×50ms), masuk pending (2×30-50ms), ambigu (3× ringan cepat), bulk confirm (1×120ms), error (3× berat), delete (1×100ms). | core/utils/ | — (haptic, tidak visual) | ⬜ Belum |
+| ACT-73 | Screen-by-screen UI verification terhadap 16 design HTML/PNG di `docs/design/`. Setiap screen dicek: layout match, tidak overflow di 360×800 dan 414×896, tidak ada truncation, spacing sesuai token, warna cocok dengan HTML. | all presentation/ | Semua file di `docs/design/*.html` | ⬜ Belum |
 
 ---
 
@@ -375,12 +388,12 @@ Layer 6 — Deliverables (requires Layer 5)
 | M0: Foundation | 11 | 11 | 0 | ✅ COMPLETE |
 | M1: AI Core + Model Delivery | 16 | 16 | 0 | ✅ COMPLETE |
 | M2: Data Infrastructure | 16 | 16 | 0 | ✅ COMPLETE |
-| M3: Domain + Agents | 17 | 0 | 17 | ⬜ NEXT |
+| M3: Domain + Agents | 19 | 0 | 19 | ⬜ NEXT |
 | M4: Presentation / UI | 13 | 0 | 13 | ⬜ Pending |
 | M5: Testing & QA | 7 | 0 | 7 | ⬜ Pending |
 | M7: Section 16 QA | 32 | 0 | 32 | ⬜ Pending |
 | M6: Deliverables | 4 | 0 | 4 | ⬜ Pending |
-| **TOTAL** | **116** | **43** | **73** | **37% Complete** |
+| **TOTAL** | **118** | **43** | **75** | **36% Complete** |
 
 > **NOTE**: Penomoran action ID direset mulai ACT-19 untuk actions baru (lanjut dari ACT-18 yang terakhir ✅). M7 diberi nomor terpisah dari M5 sesuai instruksi — keduanya layer 5 (paralel) tapi M7 khusus Section 16. M6 adalah gate akhir yang hanya bisa dibuka setelah M5 + M7 keduanya selesai.
 
