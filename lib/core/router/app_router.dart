@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/dashboard/presentation/dashboard_screen.dart';
 import '../../features/onboarding/presentation/pages/model_download_screen.dart';
+import '../ai/app_init_notifier.dart';
+import '../ai/app_init_state.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey =
     GlobalKey<NavigatorState>(debugLabel: 'root');
@@ -14,6 +17,15 @@ final appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
   initialLocation: '/',
   redirect: (context, state) {
+    // Check app initialization state — redirect to model download if needed
+    final container = ProviderScope.containerOf(context, listen: false);
+    final appState = container.read(appInitProvider);
+
+    final isOnModelDownload = state.matchedLocation == '/model-download';
+    if (appState is AppInitModelDownloading && !isOnModelDownload) {
+      return '/model-download';
+    }
+
     // TODO: Check app_settings for first launch → redirect to /onboarding
     return null;
   },
@@ -68,7 +80,6 @@ final appRouter = GoRouter(
               ),
             ],
           ),
-          // TODO: Add expandable FAB in ACT-40
         );
       },
       branches: [
