@@ -1,17 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../features/dashboard/presentation/dashboard_screen.dart';
 
-final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
+final GlobalKey<NavigatorState> _rootNavigatorKey =
+    GlobalKey<NavigatorState>(debugLabel: 'root');
 
+/// GoRouter configuration per PRD §4.1.
+/// StatefulShellRoute for 4 bottom tabs with state preservation.
+/// Deep linking ready.
 final appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
   initialLocation: '/',
   redirect: (context, state) {
-    // Auth redirect stub (always allow for dev mode)
+    // TODO: Check app_settings for first launch → redirect to /onboarding
     return null;
   },
   routes: [
+    // ── Onboarding (first launch only, no bottom nav) ──
+    GoRoute(
+      path: '/onboarding',
+      builder: (context, state) => const Scaffold(
+        body: Center(child: Text('Onboarding — Agent 1')),
+      ),
+    ),
+
+    // ── Main Shell (4 bottom tabs) ──
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
         return Scaffold(
@@ -25,116 +39,101 @@ final appRouter = GoRouter(
               );
             },
             destinations: const [
-              NavigationDestination(icon: Icon(Icons.home), label: 'Beranda'),
-              NavigationDestination(icon: Icon(Icons.pending), label: 'Pending'),
-              NavigationDestination(icon: Icon(Icons.list), label: 'Katalog'),
-              NavigationDestination(icon: Icon(Icons.settings), label: 'Setelan'),
+              NavigationDestination(
+                icon: Icon(Icons.home_outlined),
+                selectedIcon: Icon(Icons.home),
+                label: 'Beranda',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.pending_actions_outlined),
+                selectedIcon: Icon(Icons.pending_actions),
+                label: 'Pending',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.inventory_2_outlined),
+                selectedIcon: Icon(Icons.inventory_2),
+                label: 'Katalog',
+              ),
+              NavigationDestination(
+                icon: Icon(Icons.settings_outlined),
+                selectedIcon: Icon(Icons.settings),
+                label: 'Setelan',
+              ),
             ],
           ),
+          // TODO: Add expandable FAB in ACT-40
         );
       },
       branches: [
+        // Tab 1: Beranda (Dashboard) — Path: /
         StatefulShellBranch(
           routes: [
             GoRoute(
-              name: 'Home - Dashboard with Transactions & Toast',
               path: '/',
               builder: (context, state) => const DashboardScreen(),
             ),
           ],
         ),
+        // Tab 2: Pending — Path: /pending
         StatefulShellBranch(
           routes: [
             GoRoute(
               path: '/pending',
-              builder: (context, state) => const Scaffold(body: Center(child: Text('Pending'))),
+              builder: (context, state) => const Scaffold(
+                body: Center(child: Text('Pending Review')),
+              ),
             ),
           ],
         ),
+        // Tab 3: Katalog — Path: /catalog
         StatefulShellBranch(
           routes: [
             GoRoute(
-              name: 'Master Data Barang - List View',
               path: '/catalog',
-              builder: (context, state) => const Scaffold(body: Center(child: Text('Katalog'))),
+              builder: (context, state) => const Scaffold(
+                body: Center(child: Text('Katalog Barang')),
+              ),
             ),
           ],
         ),
+        // Tab 4: Setelan — Path: /settings
         StatefulShellBranch(
           routes: [
             GoRoute(
-              name: 'Settings & Profil Usaha - Poppins Edition',
               path: '/settings',
-              builder: (context, state) => const Scaffold(body: Center(child: Text('Setelan'))),
+              builder: (context, state) => const Scaffold(
+                body: Center(child: Text('Setelan')),
+              ),
             ),
           ],
         ),
       ],
     ),
+
+    // ── Push routes (non-tab) ──
     GoRoute(
-      name: 'Guided Onboarding - Welcome',
-      path: '/guided-onboarding-welcome',
-      builder: (context, state) => const Scaffold(body: Center(child: Text('Guided Onboarding - Welcome'))),
+      path: '/item/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id']!;
+        return Scaffold(
+          body: Center(child: Text('Detail Barang: $id')),
+        );
+      },
     ),
     GoRoute(
-      name: 'Guided Onboarding - Profile Setup',
-      path: '/guided-onboarding-profile-setup',
-      builder: (context, state) => const Scaffold(body: Center(child: Text('Guided Onboarding - Profile Setup'))),
+      path: '/transaction/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id']!;
+        return Scaffold(
+          body: Center(child: Text('Detail Transaksi: $id')),
+        );
+      },
     ),
     GoRoute(
-      name: 'Guided Onboarding - Initial Stock',
-      path: '/guided-onboarding-initial-stock',
-      builder: (context, state) => const Scaffold(body: Center(child: Text('Guided Onboarding - Initial Stock'))),
-    ),
-    GoRoute(
-      name: 'Guided Onboarding - Confirmation',
-      path: '/guided-onboarding-confirmation',
-      builder: (context, state) => const Scaffold(body: Center(child: Text('Guided Onboarding - Confirmation'))),
-    ),
-    GoRoute(
-      name: 'Onboarding - AI Processing',
-      path: '/onboarding-ai-processing',
-      builder: (context, state) => const Scaffold(body: Center(child: Text('Onboarding - AI Processing'))),
-    ),
-    GoRoute(
-      name: 'Input Transaksi - Manual Default',
-      path: '/input-transaksi-manual-default',
-      builder: (context, state) => const Scaffold(body: Center(child: Text('Input Transaksi - Manual Default'))),
-    ),
-    GoRoute(
-      name: 'Input Transaksi - Modern Error State',
-      path: '/input-transaksi-modern-error-state',
-      builder: (context, state) => const Scaffold(body: Center(child: Text('Input Transaksi - Modern Error State'))),
-    ),
-    GoRoute(
-      name: 'Input Transaksi - Voice Mode',
-      path: '/input-transaksi-voice-mode',
-      builder: (context, state) => const Scaffold(body: Center(child: Text('Input Transaksi - Voice Mode'))),
-    ),
-    GoRoute(
-      name: 'Master Data - Tambah Barang Form',
-      path: '/master-data-tambah-barang-form',
-      builder: (context, state) => const Scaffold(body: Center(child: Text('Master Data - Tambah Barang Form'))),
-    ),
-    GoRoute(
-      name: 'Update Stok - Kamera Mode',
-      path: '/update-stok-kamera-mode',
-      builder: (context, state) => const Scaffold(body: Center(child: Text('Update Stok - Kamera Mode'))),
-    ),
-    GoRoute(
-      name: 'Update Stok - Manual Input',
-      path: '/update-stok-manual-input',
-      builder: (context, state) => const Scaffold(body: Center(child: Text('Update Stok - Manual Input'))),
-    ),
-    GoRoute(
-      name: 'Update Stok - Voice Confirmation',
-      path: '/update-stok-voice-confirmation',
-      builder: (context, state) => const Scaffold(body: Center(child: Text('Update Stok - Voice Confirmation'))),
-    ),
-    GoRoute(
-      name: 'WarungPintar History & Analytics',
-      path: '/warungpintar-history-analytics',
-      builder: (context, state) => const Scaffold(body: Center(child: Text('WarungPintar History & Analytics'))),
+      path: '/reports',
+      builder: (context, state) => const Scaffold(
+        body: Center(child: Text('Laporan & Histori')),
+      ),
     ),
   ],
 );
