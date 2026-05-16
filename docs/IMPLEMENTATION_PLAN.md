@@ -111,14 +111,14 @@ Layer 6 — Deliverables (requires Layer 5)
 | ACT-16 | Buat 5 system prompt files per PRD §6.3–6.7 | core/ai/prompts/ | ✅ Done |
 | ACT-17 | Unit tests untuk json_parser + tool_call_result | test/core/ai/ | ✅ Done |
 | ACT-18 | Run build_runner, wire DI GemmaAiService | core/di/ | ✅ Done |
-| ACT-19 | **[SEC16]** Buat `ModelStorage` — path ke `getApplicationDocumentsDirectory/models/`, SHA-256 verification via `crypto` | core/ai/ | ⬜ Belum |
-| ACT-20 | **[SEC16]** Buat `ModelDownloadConfig` — primaryUrl (Kaggle), fallbackUrl (GitHub Releases), `expectedFileSizeBytes` | core/ai/ | ⬜ Belum |
-| ACT-21 | **[SEC16]** Buat `ModelDownloadState` sealed class + `ModelDownloadNotifier` — Dio resume download, progress callback, SHA-256 post-download, retry ke fallbackUrl | core/ai/ | ⬜ Belum |
-| ACT-22 | **[SEC16]** Buat `AppInitState` sealed class — `ModelDownloading`, `ModelLoading`, `ModelReady`, `ModelFailed`, `AiDegraded` | core/ai/ | ⬜ Belum |
-| ACT-23 | **[SEC16]** Buat `AppInitNotifier` — state machine lengkap: cek model → download jika perlu → load → ready/failed | core/ai/ | ⬜ Belum |
-| ACT-24 | **[SEC16]** Wire `AppInitNotifier` + `ModelDownloadNotifier` ke GetIt; update `app_router.dart` — redirect ke `ModelDownloadScreen` jika state `ModelDownloading` | core/di/, core/router/ | ⬜ Belum |
-| ACT-25 | **[SEC16]** Buat `ModelDownloadScreen` — LinearProgressIndicator + persentase + ETA + retry button per PRD §16.1.4 | core/ai/ atau features/onboarding/presentation/ | ⬜ Belum |
-| **VERIFY-M1** | `flutter analyze` ✅, `flutter test test/core/ai/` ✅, `ModelStorage.isModelReady()` return bool ✅, `AppInitState` semua variant compile ✅ | — | ⬜ Belum |
+| ACT-19 | **[SEC16]** Buat `ModelStorage` — path ke `getApplicationDocumentsDirectory/models/`, SHA-256 verification via `crypto` | core/ai/ | ✅ Done |
+| ACT-20 | **[SEC16]** Buat `ModelDownloadConfig` — primaryUrl (Kaggle), fallbackUrl (GitHub Releases), `expectedFileSizeBytes` | core/ai/ | ✅ Done |
+| ACT-21 | **[SEC16]** Buat `ModelDownloadState` sealed class + `ModelDownloadNotifier` — Dio resume download, progress callback, SHA-256 post-download, retry ke fallbackUrl | core/ai/ | ✅ Done |
+| ACT-22 | **[SEC16]** Buat `AppInitState` sealed class — `ModelDownloading`, `ModelLoading`, `ModelReady`, `ModelFailed`, `AiDegraded` | core/ai/ | ✅ Done |
+| ACT-23 | **[SEC16]** Buat `AppInitNotifier` — state machine lengkap: cek model → download jika perlu → load → ready/failed | core/ai/ | ✅ Done |
+| ACT-24 | **[SEC16]** Wire `AppInitNotifier` + `ModelDownloadNotifier` ke GetIt; update `app_router.dart` — redirect ke `ModelDownloadScreen` jika state `ModelDownloading` | core/di/, core/router/ | ✅ Done |
+| ACT-25 | **[SEC16]** Buat `ModelDownloadScreen` — LinearProgressIndicator + persentase + ETA + retry button per PRD §16.1.4 | features/onboarding/presentation/ | ✅ Done |
+| **VERIFY-M1** | `flutter analyze` ✅, `flutter test test/core/ai/` ✅, `ModelStorage.isModelReady()` return bool ✅, `AppInitState` semua variant compile ✅ | — | ✅ Pass |
 
 **Dependency Note**: ACT-19–25 harus selesai sebelum M3 dimulai karena semua agent use case akan memanggil `InferenceRetry` yang bergantung pada `AppInitNotifier` state.
 
@@ -132,40 +132,40 @@ Layer 6 — Deliverables (requires Layer 5)
 
 | Action ID | Deskripsi | Scope | Status |
 |-----------|-----------|-------|--------|
-| ACT-26 | Implement full SQLite DDL di `database_service.dart` per PRD §11 — WAL mode, semua tabel, semua index, foreign keys ON | core/database/ | ⬜ Belum |
-| ACT-27 | Buat `AuditLogDatasource` — append-only insert, tidak ada UPDATE/DELETE, per PRD §9 | features/transaction/data/ | ⬜ Belum |
-| ACT-28 | Integration test: idempotency — duplicate `idempotency_key` = 1 row di DB | test/integration/ | ⬜ Belum |
-| ACT-29 | Integration test: price history isolation — update harga tidak mengubah `price_at_transaction_sen` lama | test/integration/ | ⬜ Belum |
+| ACT-26 | Implement full SQLite DDL di `database_service.dart` per PRD §11 — WAL mode, semua tabel, semua index, foreign keys ON | core/database/ | ✅ Done |
+| ACT-27 | Buat `AuditLogDatasource` — append-only insert, tidak ada UPDATE/DELETE, per PRD §9 | features/transaction/data/ | ✅ Done |
+| ACT-28 | Integration test: idempotency — duplicate `idempotency_key` = 1 row di DB | test/integration/ | ✅ Done |
+| ACT-29 | Integration test: price history isolation — update harga tidak mengubah `price_at_transaction_sen` lama | test/integration/ | ✅ Done |
 
 ### 2B — Voice Service & STT Offline
 
 | Action ID | Deskripsi | Scope | Status |
 |-----------|-----------|-------|--------|
-| ACT-30 | **[SEC16]** Buat `VoiceInitResult` sealed class — `VoiceInitSuccess`, `VoiceInitFailed`, `VoiceInitMissingPack` | core/voice/ | ⬜ Belum |
-| ACT-31 | **[SEC16]** Buat `VoiceConfig` — `vadSilenceThresholdMs=2000`, `localeId='id-ID'`, `maxListenDurationMs=30000`, `minConfidenceScore=0.5` | core/voice/ | ⬜ Belum |
-| ACT-32 | **[SEC16]** Buat `VoiceServiceImpl` — init `SpeechToText`, cek ketersediaan locale `id-ID`, start listening dengan VAD config dari `VoiceConfig` | core/voice/ | ⬜ Belum |
-| ACT-33 | **[SEC16]** Buat `LanguagePackDialog` — dialog + deep link ke Android Language Settings jika `id-ID` tidak tersedia, per PRD §16.4.2 | core/voice/ | ⬜ Belum |
-| ACT-34 | Wire `VoiceServiceImpl` ke GetIt; panggil `voiceService.initialize()` di `AppInitNotifier` setelah model ready | core/di/, core/ai/ | ⬜ Belum |
+| ACT-30 | **[SEC16]** Buat `VoiceInitResult` sealed class — `VoiceInitSuccess`, `VoiceInitFailed`, `VoiceInitMissingPack` | core/voice/ | ✅ Done |
+| ACT-31 | **[SEC16]** Buat `VoiceConfig` — `vadSilenceThresholdMs=2000`, `localeId='id-ID'`, `maxListenDurationMs=30000`, `minConfidenceScore=0.5` | core/voice/ | ✅ Done |
+| ACT-32 | **[SEC16]** Buat `VoiceServiceImpl` — init `SpeechToText`, cek ketersediaan locale `id-ID`, start listening dengan VAD config dari `VoiceConfig` | core/voice/ | ✅ Done |
+| ACT-33 | **[SEC16]** Buat `LanguagePackDialog` — dialog + deep link ke Android Language Settings jika `id-ID` tidak tersedia, per PRD §16.4.2 | core/voice/ | ✅ Done |
+| ACT-34 | Wire `VoiceServiceImpl` ke GetIt; panggil `voiceService.initialize()` di `AppInitNotifier` setelah model ready | core/di/, core/ai/ | ✅ Done |
 
 ### 2C — Vision Quality Gate
 
 | Action ID | Deskripsi | Scope | Status |
 |-----------|-----------|-------|--------|
-| ACT-35 | **[SEC16]** Buat `ImageQualityFailReason` enum — `fileTooSmall`, `resolutionTooLow`, `tooDark` | core/vision/ | ⬜ Belum |
-| ACT-36 | **[SEC16]** Buat `ImageQualityResult` sealed class + `ImageQualityGate` — validasi ukuran ≥10KB, resolusi ≥400×400, brightness sampling 100px rata-rata ≥40/255, per PRD §16.7.2 | core/vision/ | ⬜ Belum |
-| ACT-37 | **[SEC16]** Buat `ImageQualityFailDialog` — pesan spesifik per `ImageQualityFailReason`, tombol "Foto Ulang" + "Batal", per PRD §16.7.3 | core/vision/ | ⬜ Belum |
-| ACT-38 | Wire `ImageQualityGate` ke GetIt | core/di/ | ⬜ Belum |
+| ACT-35 | **[SEC16]** Buat `ImageQualityFailReason` enum — `fileTooSmall`, `resolutionTooLow`, `tooDark` | core/vision/ | ✅ Done |
+| ACT-36 | **[SEC16]** Buat `ImageQualityResult` sealed class + `ImageQualityGate` — validasi ukuran ≥10KB, resolusi ≥400×400, brightness sampling 100px rata-rata ≥40/255, per PRD §16.7.2 | core/vision/ | ✅ Done |
+| ACT-37 | **[SEC16]** Buat `ImageQualityFailDialog` — pesan spesifik per `ImageQualityFailReason`, tombol "Foto Ulang" + "Batal", per PRD §16.7.3 | core/vision/ | ✅ Done |
+| ACT-38 | Wire `ImageQualityGate` — static class, tidak perlu DI | core/di/ | ✅ Done |
 
 ### 2D — Inference Retry & Fallback Infrastructure
 
 | Action ID | Deskripsi | Scope | Status |
 |-----------|-----------|-------|--------|
-| ACT-39 | **[SEC16]** Buat `InferenceRetry.runWithRetry()` — voice timeout 30s, vision timeout 45s, max 2 retry, backoff 1s→3s, per PRD §16.5.3 | core/ai/ | ⬜ Belum |
-| ACT-40 | **[SEC16]** Buat `Level1JsonRepair.attempt()` — strip fence + retry inference 1x dengan reinforcement prompt suffix, per PRD §16.6.1 | core/ai/fallback/ | ⬜ Belum |
-| ACT-41 | **[SEC16]** Buat helper `AppInitNotifier.markAsDegraded(reason)` — transisi ke `AiDegraded` state; buat `AppInitNotifier.markAsFailed(reason)` — transisi ke `ModelFailed` (permanent) | core/ai/ | ⬜ Belum |
-| ACT-42 | Unit test: `InferenceRetry` — mock timeout → verify 2x retry → verify backoff → verify final Error return | test/core/ai/ | ⬜ Belum |
-| ACT-43 | Unit test: `Level1JsonRepair` — input malformed JSON → verify strip → verify retry call → verify fallback | test/core/ai/ | ⬜ Belum |
-| **VERIFY-M2** | `flutter analyze` ✅, `flutter test test/integration/` ✅, `flutter test test/core/ai/` (retry + repair) ✅, `VoiceConfig` semua konstanta defined ✅, `ImageQualityGate.validate()` return sealed class ✅ | — | ⬜ Belum |
+| ACT-39 | **[SEC16]** Buat `InferenceRetry.runWithRetry()` — voice timeout 30s, vision timeout 45s, max 2 retry, backoff 1s→3s, per PRD §16.5.3 | core/ai/ | ✅ Done |
+| ACT-40 | **[SEC16]** Buat `Level1JsonRepair.attempt()` — strip fence + retry inference 1x dengan reinforcement prompt suffix, per PRD §16.6.1 | core/ai/fallback/ | ✅ Done |
+| ACT-41 | **[SEC16]** Buat helper `AppInitNotifier.markAsDegraded(reason)` — transisi ke `AiDegraded` state; buat `AppInitNotifier.markAsFailed(reason)` — transisi ke `ModelFailed` (permanent) | core/ai/ | ✅ Done |
+| ACT-42 | Unit test: `InferenceRetry` — mock timeout → verify 2x retry → verify backoff → verify final Error return | test/core/ai/ | ✅ Done |
+| ACT-43 | Unit test: `Level1JsonRepair` — input malformed JSON → verify strip → verify retry call → verify fallback | test/core/ai/ | ✅ Done |
+| **VERIFY-M2** | `flutter analyze` 0 issues ✅, `flutter test` 34/34 pass ✅, `VoiceConfig` semua konstanta defined ✅, `ImageQualityGate.validate()` return sealed class ✅ | — | ✅ Pass |
 
 ---
 
@@ -373,14 +373,14 @@ Layer 6 — Deliverables (requires Layer 5)
 | Milestone | Total Actions | Selesai | Sisa | Status |
 |-----------|--------------|---------|------|--------|
 | M0: Foundation | 11 | 11 | 0 | ✅ COMPLETE |
-| M1: AI Core + Model Delivery | 16 | 8 | 8 | 🔄 IN PROGRESS |
-| M2: Data Infrastructure | 16 | 0 | 16 | ⬜ NEXT |
-| M3: Domain + Agents | 17 | 0 | 17 | ⬜ Pending |
+| M1: AI Core + Model Delivery | 16 | 16 | 0 | ✅ COMPLETE |
+| M2: Data Infrastructure | 16 | 16 | 0 | ✅ COMPLETE |
+| M3: Domain + Agents | 17 | 0 | 17 | ⬜ NEXT |
 | M4: Presentation / UI | 13 | 0 | 13 | ⬜ Pending |
 | M5: Testing & QA | 7 | 0 | 7 | ⬜ Pending |
 | M7: Section 16 QA | 32 | 0 | 32 | ⬜ Pending |
 | M6: Deliverables | 4 | 0 | 4 | ⬜ Pending |
-| **TOTAL** | **116** | **19** | **97** | **16% Complete** |
+| **TOTAL** | **116** | **43** | **73** | **37% Complete** |
 
 > **NOTE**: Penomoran action ID direset mulai ACT-19 untuk actions baru (lanjut dari ACT-18 yang terakhir ✅). M7 diberi nomor terpisah dari M5 sesuai instruksi — keduanya layer 5 (paralel) tapi M7 khusus Section 16. M6 adalah gate akhir yang hanya bisa dibuka setelah M5 + M7 keduanya selesai.
 
