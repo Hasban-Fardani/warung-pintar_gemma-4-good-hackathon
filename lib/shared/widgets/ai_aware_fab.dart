@@ -26,6 +26,7 @@ class _AiAwareFabState extends ConsumerState<AiAwareFab>
   bool _expanded = false;
   late AnimationController _animationController;
   late Animation<double> _expandAnimation;
+  late Animation<double> _rotationAnimation;
 
   @override
   void initState() {
@@ -38,6 +39,13 @@ class _AiAwareFabState extends ConsumerState<AiAwareFab>
       parent: _animationController,
       curve: Curves.easeInOut,
     );
+    _rotationAnimation = Tween<double>(
+      begin: 0,
+      end: 0.125,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    ));
   }
 
   @override
@@ -67,6 +75,7 @@ class _AiAwareFabState extends ConsumerState<AiAwareFab>
     final isAiReady = appState is AppInitModelReady;
 
     return Stack(
+      clipBehavior: Clip.none,
       alignment: Alignment.bottomRight,
       children: [
         if (_expanded)
@@ -81,10 +90,19 @@ class _AiAwareFabState extends ConsumerState<AiAwareFab>
         if (_expanded)
           Positioned(
             bottom: 88,
-            right: 16,
-            child: SizeTransition(
-              sizeFactor: _expandAnimation,
-              axisAlignment: -1,
+            right: 0,
+            child: AnimatedBuilder(
+              animation: _expandAnimation,
+              builder: (context, child) {
+                return Opacity(
+                  opacity: _expandAnimation.value,
+                  child: Transform.scale(
+                    scale: _expandAnimation.value,
+                    alignment: Alignment.bottomRight,
+                    child: child,
+                  ),
+                );
+              },
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.end,
@@ -123,21 +141,26 @@ class _AiAwareFabState extends ConsumerState<AiAwareFab>
             ),
           ),
 
-        SizedBox(
-          width: 56,
-          height: 56,
-          child: FloatingActionButton(
-            onPressed: _toggle,
-            backgroundColor: AppColors.primaryContainer,
-            foregroundColor: AppColors.onPrimaryContainer,
-            elevation: _expanded ? 8 : 4,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(28),
-              side: const BorderSide(color: AppColors.primaryFixedDim),
-            ),
-            child: AnimatedRotation(
-              turns: _expanded ? 0.125 : 0,
-              duration: const Duration(milliseconds: 200),
+        AnimatedBuilder(
+          animation: _rotationAnimation,
+          builder: (context, child) {
+            return RotationTransition(
+              turns: _rotationAnimation,
+              child: child,
+            );
+          },
+          child: SizedBox(
+            width: 56,
+            height: 56,
+            child: FloatingActionButton(
+              onPressed: _toggle,
+              backgroundColor: AppColors.primaryContainer,
+              foregroundColor: AppColors.onPrimaryContainer,
+              elevation: _expanded ? 8 : 4,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(28),
+                side: const BorderSide(color: AppColors.primaryFixedDim),
+              ),
               child: Icon(_expanded ? Icons.close : Icons.add),
             ),
           ),
