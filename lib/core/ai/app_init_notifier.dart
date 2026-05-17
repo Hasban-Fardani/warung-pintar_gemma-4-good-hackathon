@@ -49,7 +49,7 @@ class AppInitNotifier extends StateNotifier<AppInitState> {
         await FlutterGemma.installModel(
           modelType: ModelType.gemma4,
           fileType: ModelFileType.litertlm,
-        ).fromNetwork(_modelUrl, foreground: true).withProgress((progress) {
+        ).fromNetwork(_modelUrl).withProgress((progress) {
           _updateProgress(progress.toDouble());
         }).install();
       } catch (e) {
