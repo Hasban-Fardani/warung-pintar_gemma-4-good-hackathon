@@ -5,12 +5,26 @@ import 'package:warung_pintar_cimahi/core/ai/app_init_notifier.dart';
 import 'package:warung_pintar_cimahi/core/ai/app_init_state.dart';
 import 'package:warung_pintar_cimahi/core/constant/app_colors.dart';
 
-class ModelDownloadScreen extends ConsumerWidget {
+class ModelDownloadScreen extends ConsumerStatefulWidget {
   const ModelDownloadScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ModelDownloadScreen> createState() => _ModelDownloadScreenState();
+}
+
+class _ModelDownloadScreenState extends ConsumerState<ModelDownloadScreen>
+    with TickerProviderStateMixin {
+  DateTime? _downloadStartTime;
+  double _lastProgress = 0;
+  double _speedMBps = 0;
+
+  @override
+  Widget build(BuildContext context) {
     final initState = ref.watch(appInitProvider);
+
+    if (initState is AppInitModelDownloading) {
+      _updateSpeed(initState.progress);
+    }
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -20,8 +34,8 @@ class ModelDownloadScreen extends ConsumerWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _buildHeader(context),
-              const SizedBox(height: 40),
+              _buildHeader(context, initState),
+              const SizedBox(height: 48),
               _buildContent(context, ref, initState),
             ],
           ),
@@ -30,20 +44,57 @@ class ModelDownloadScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  void _updateSpeed(double progress) {
+    if (_lastProgress == 0 && progress > 0) {
+      _downloadStartTime = DateTime.now();
+    }
+    if (progress > _lastProgress && _downloadStartTime != null) {
+      final elapsed = DateTime.now().difference(_downloadStartTime!).inSeconds;
+      if (elapsed > 0) {
+        final downloadedMB = progress * 2594;
+        _speedMBps = downloadedMB / elapsed;
+      }
+    }
+    _lastProgress = progress;
+  }
+
+  String _formatEta(double progress) {
+    if (_speedMBps <= 0 || progress <= 0) return 'menghitung...';
+    final remainingMB = (1 - progress) * 2594;
+    final seconds = (remainingMB / _speedMBps).round();
+    if (seconds < 60) return '$seconds detik';
+    if (seconds < 3600) return '${seconds ~/ 60} menit';
+    final hours = seconds ~/ 3600;
+    final mins = (seconds % 3600) ~/ 60;
+    return '$hours jam $mins menit';
+  }
+
+  Widget _buildHeader(BuildContext context, AppInitState state) {
+    final isDownloading = state is AppInitModelDownloading;
+    final progress = isDownloading ? state.progress : 0.0;
+
     return Column(
       children: [
-        Container(
-          width: 80,
-          height: 80,
-          decoration: BoxDecoration(
-            color: AppColors.primaryContainer,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: const Icon(
-            Icons.smart_toy_outlined,
-            size: 40,
-            color: AppColors.onPrimary,
+        SizedBox(
+          width: 120,
+          height: 120,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              SizedBox(
+                width: 120,
+                height: 120,
+                child: CircularProgressIndicator(
+                  value: isDownloading ? progress : null,
+                  strokeWidth: 6,
+                  backgroundColor: AppColors.surfaceContainerHighest,
+                  valueColor: const AlwaysStoppedAnimation<Color>(
+                    AppColors.primary,
+                  ),
+                ),
+              ),
+              _AnimatedRobotIcon(isDownloading: isDownloading),
+            ],
           ),
         ),
         const SizedBox(height: 24),
@@ -56,8 +107,9 @@ class ModelDownloadScreen extends ConsumerWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          'Mengunduh model AI agar fitur suara dan foto bisa '
-          'digunakan tanpa internet',
+          isDownloading
+              ? 'Mengunduh model AI...'
+              : 'Memuat model AI...',
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: AppColors.onSurfaceVariant,
@@ -85,17 +137,11 @@ class ModelDownloadScreen extends ConsumerWidget {
   Widget _buildLoading(BuildContext context) {
     return Column(
       children: [
-        const SizedBox(
-          width: 80,
-          height: 80,
-          child: CircularProgressIndicator(),
-        ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 16),
         Text(
-          'Memuat model AI...',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: AppColors.onSurface,
+          'Mempersiapkan...',
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: AppColors.onSurfaceVariant,
               ),
         ),
       ],
@@ -104,40 +150,81 @@ class ModelDownloadScreen extends ConsumerWidget {
 
   Widget _buildDownloading(BuildContext context, double progress) {
     final percentText = '${(progress * 100).toStringAsFixed(1)}%';
+    final downloadedMB = (progress * 2594).toStringAsFixed(0);
+    final etaText = _formatEta(progress);
+    final speedText = _speedMBps > 0
+        ? '${_speedMBps.toStringAsFixed(1)} MB/s'
+        : 'menghitung...';
 
     return Column(
       children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: LinearProgressIndicator(
-            value: progress,
-            minHeight: 12,
-            backgroundColor: AppColors.surfaceContainerHighest,
-            valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
-          ),
-        ),
-        const SizedBox(height: 12),
         Text(
           percentText,
-          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+          style: Theme.of(context).textTheme.displaySmall?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: AppColors.primary,
               ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: AppColors.primaryContainer.withValues(alpha: 0.3),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.speed,
+                size: 16,
+                color: AppColors.primary,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                speedText,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
+              const SizedBox(width: 12),
+              Container(
+                width: 1,
+                height: 12,
+                color: AppColors.primary.withValues(alpha: 0.3),
+              ),
+              const SizedBox(width: 12),
+              const Icon(
+                Icons.access_time,
+                size: 16,
+                color: AppColors.primary,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                'Sisa: $etaText',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
         Text(
-          'Mengunduh model AI...',
-          style: Theme.of(
-            context,
-          ).textTheme.bodySmall?.copyWith(color: AppColors.onSurfaceVariant),
+          '$downloadedMB / 2594 MB',
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: AppColors.onSurfaceVariant,
+              ),
         ),
         const SizedBox(height: 8),
         Text(
-          'Proses berjalan di background — Anda bisa tutup layar ini',
+          'Jangan tutup aplikasi selama proses berlangsung',
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.onSurfaceVariant,
-                fontStyle: FontStyle.italic,
+                color: AppColors.error,
+                fontWeight: FontWeight.w600,
               ),
         ),
       ],
@@ -147,18 +234,27 @@ class ModelDownloadScreen extends ConsumerWidget {
   Widget _buildComplete(BuildContext context) {
     return Column(
       children: [
-        Container(
-          width: 80,
-          height: 80,
-          decoration: BoxDecoration(
-            color: AppColors.confirmed.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(40),
-          ),
-          child: const Icon(
-            Icons.check_circle,
-            size: 48,
-            color: AppColors.confirmed,
-          ),
+        TweenAnimationBuilder<double>(
+          tween: Tween(begin: 0, end: 1),
+          duration: const Duration(milliseconds: 500),
+          builder: (context, value, child) {
+            return Transform.scale(
+              scale: value,
+              child: Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: AppColors.confirmed.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(40),
+                ),
+                child: const Icon(
+                  Icons.check_circle,
+                  size: 48,
+                  color: AppColors.confirmed,
+                ),
+              ),
+            );
+          },
         ),
         const SizedBox(height: 24),
         Text(
@@ -218,6 +314,87 @@ class ModelDownloadScreen extends ConsumerWidget {
           ).textTheme.bodyMedium?.copyWith(color: Colors.orange),
         ),
       ],
+    );
+  }
+}
+
+class _AnimatedRobotIcon extends StatefulWidget {
+  final bool isDownloading;
+
+  const _AnimatedRobotIcon({required this.isDownloading});
+
+  @override
+  State<_AnimatedRobotIcon> createState() => _AnimatedRobotIconState();
+}
+
+class _AnimatedRobotIconState extends State<_AnimatedRobotIcon>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _pulseAnimation;
+  late Animation<double> _rotateAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    );
+
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.1).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+
+    _rotateAnimation = Tween<double>(begin: -0.05, end: 0.05).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+
+    if (widget.isDownloading) {
+      _controller.repeat(reverse: true);
+    }
+  }
+
+  @override
+  void didUpdateWidget(_AnimatedRobotIcon oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isDownloading && !_controller.isAnimating) {
+      _controller.repeat(reverse: true);
+    } else if (!widget.isDownloading && _controller.isAnimating) {
+      _controller.stop();
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Transform.scale(
+          scale: widget.isDownloading ? _pulseAnimation.value : 1.0,
+          child: Transform.rotate(
+            angle: widget.isDownloading ? _rotateAnimation.value : 0,
+            child: Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: AppColors.primaryContainer,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: const Icon(
+                Icons.smart_toy_outlined,
+                size: 40,
+                color: AppColors.onPrimary,
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

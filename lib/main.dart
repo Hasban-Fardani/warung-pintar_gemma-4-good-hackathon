@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_gemma/flutter_gemma.dart';
+
 import 'core/ai/app_init_notifier.dart';
 import 'core/database/database_service.dart';
 import 'core/di/injection.dart';
@@ -8,6 +10,8 @@ import 'core/theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await FlutterGemma.initialize();
 
   configureDependencies();
 
@@ -23,7 +27,7 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ref.listen(appInitProvider, (prev, next) {});
-    ref.read(appInitProvider.notifier).initialize();
+    Future.microtask(() => ref.read(appInitProvider.notifier).initialize());
 
     return MaterialApp.router(
       title: 'Warung Pintar',
