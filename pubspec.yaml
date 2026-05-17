@@ -69,6 +69,7 @@ dependencies:
   permission_handler: ^11.3.0
 
   # Networking (model download — Section 16) & Crypto (SHA-256 verification)
+  dio: ^5.4.0
   connectivity_plus: ^6.0.0
 
 dev_dependencies:

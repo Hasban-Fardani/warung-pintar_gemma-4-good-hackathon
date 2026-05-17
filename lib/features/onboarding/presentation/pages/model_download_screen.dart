@@ -14,17 +14,9 @@ class ModelDownloadScreen extends ConsumerStatefulWidget {
 
 class _ModelDownloadScreenState extends ConsumerState<ModelDownloadScreen>
     with TickerProviderStateMixin {
-  DateTime? _downloadStartTime;
-  double _lastProgress = 0;
-  double _speedMBps = 0;
-
   @override
   Widget build(BuildContext context) {
     final initState = ref.watch(appInitProvider);
-
-    if (initState is AppInitModelDownloading) {
-      _updateSpeed(initState.progress);
-    }
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -42,31 +34,6 @@ class _ModelDownloadScreenState extends ConsumerState<ModelDownloadScreen>
         ),
       ),
     );
-  }
-
-  void _updateSpeed(double progress) {
-    if (_lastProgress == 0 && progress > 0) {
-      _downloadStartTime = DateTime.now();
-    }
-    if (progress > _lastProgress && _downloadStartTime != null) {
-      final elapsed = DateTime.now().difference(_downloadStartTime!).inSeconds;
-      if (elapsed > 0) {
-        final downloadedMB = progress * 2594;
-        _speedMBps = downloadedMB / elapsed;
-      }
-    }
-    _lastProgress = progress;
-  }
-
-  String _formatEta(double progress) {
-    if (_speedMBps <= 0 || progress <= 0) return 'menghitung...';
-    final remainingMB = (1 - progress) * 2594;
-    final seconds = (remainingMB / _speedMBps).round();
-    if (seconds < 60) return '$seconds detik';
-    if (seconds < 3600) return '${seconds ~/ 60} menit';
-    final hours = seconds ~/ 3600;
-    final mins = (seconds % 3600) ~/ 60;
-    return '$hours jam $mins menit';
   }
 
   Widget _buildHeader(BuildContext context, AppInitState state) {
@@ -126,8 +93,8 @@ class _ModelDownloadScreenState extends ConsumerState<ModelDownloadScreen>
   ) {
     return switch (state) {
       AppInitLoading() => _buildLoading(context),
-      AppInitModelDownloading(:final progress) =>
-        _buildDownloading(context, progress),
+      AppInitModelDownloading(:final progress, :final speedMBps, :final eta) =>
+        _buildDownloading(context, progress, speedMBps, eta),
       AppInitModelReady() => _buildComplete(context),
       AppInitModelFailed(:final reason) => _buildFailed(context, reason),
       AppInitAiDegraded(:final reason) => _buildDegraded(context, reason),
@@ -148,12 +115,11 @@ class _ModelDownloadScreenState extends ConsumerState<ModelDownloadScreen>
     );
   }
 
-  Widget _buildDownloading(BuildContext context, double progress) {
+  Widget _buildDownloading(BuildContext context, double progress, double speedMBps, String eta) {
     final percentText = '${(progress * 100).toStringAsFixed(1)}%';
     final downloadedMB = (progress * 2594).toStringAsFixed(0);
-    final etaText = _formatEta(progress);
-    final speedText = _speedMBps > 0
-        ? '${_speedMBps.toStringAsFixed(1)} MB/s'
+    final speedText = speedMBps > 0
+        ? '${speedMBps.toStringAsFixed(1)} MB/s'
         : 'menghitung...';
 
     return Column(
@@ -202,7 +168,7 @@ class _ModelDownloadScreenState extends ConsumerState<ModelDownloadScreen>
               ),
               const SizedBox(width: 6),
               Text(
-                'Sisa: $etaText',
+                'Sisa: $eta',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: AppColors.primary,
                       fontWeight: FontWeight.w600,

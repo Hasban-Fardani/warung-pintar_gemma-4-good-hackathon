@@ -8,7 +8,13 @@ final class AppInitLoading extends AppInitState {
 
 final class AppInitModelDownloading extends AppInitState {
   final double progress;
-  const AppInitModelDownloading({this.progress = 0.0});
+  final double speedMBps;
+  final String eta;
+  const AppInitModelDownloading({
+    this.progress = 0.0,
+    this.speedMBps = 0.0,
+    this.eta = 'menghitung...',
+  });
 }
 
 final class AppInitModelReady extends AppInitState {
