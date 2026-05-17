@@ -19,9 +19,7 @@ abstract class DatabaseService {
 /// All tables, indexes, foreign keys, and constraints defined here.
 @LazySingleton(as: DatabaseService)
 class DatabaseServiceImpl implements DatabaseService {
-  static final _logger = Logger(
-    printer: PrettyPrinter(methodCount: 0),
-  );
+  static final _logger = Logger(printer: PrettyPrinter(methodCount: 0));
 
   Database? _db;
   static const int _dbVersion = 1;
@@ -30,9 +28,7 @@ class DatabaseServiceImpl implements DatabaseService {
   @override
   Database get db {
     if (_db == null) {
-      throw StateError(
-        'DatabaseService not initialized. Call init() first.',
-      );
+      throw StateError('DatabaseService not initialized. Call init() first.');
     }
     return _db!;
   }
@@ -58,9 +54,9 @@ class DatabaseServiceImpl implements DatabaseService {
 
   /// Enable WAL mode and foreign keys before any table creation.
   Future<void> _onConfigure(Database db) async {
-    await db.execute('PRAGMA journal_mode = WAL');
-    await db.execute('PRAGMA synchronous = NORMAL');
-    await db.execute('PRAGMA foreign_keys = ON');
+    await db.rawQuery('PRAGMA journal_mode = WAL');
+    await db.rawQuery('PRAGMA synchronous = NORMAL');
+    await db.rawQuery('PRAGMA foreign_keys = ON');
     _logger.d('DatabaseService: WAL mode + FK enabled');
   }
 
@@ -71,7 +67,7 @@ class DatabaseServiceImpl implements DatabaseService {
     final batch = db.batch();
 
     // ── Categories (must be first — referenced by stock FK) ──
-    batch.execute('''
+    batch.rawQuery('''
       CREATE TABLE categories (
         id         TEXT    PRIMARY KEY,
         name       TEXT    UNIQUE NOT NULL,
@@ -80,7 +76,7 @@ class DatabaseServiceImpl implements DatabaseService {
     ''');
 
     // ── Stock / Master Barang ──
-    batch.execute('''
+    batch.rawQuery('''
       CREATE TABLE stock (
         id                   TEXT    PRIMARY KEY,
         item_name            TEXT    UNIQUE NOT NULL,
@@ -94,7 +90,7 @@ class DatabaseServiceImpl implements DatabaseService {
     ''');
 
     // ── Transactions ──
-    batch.execute('''
+    batch.rawQuery('''
       CREATE TABLE transactions (
         id                       TEXT    PRIMARY KEY,
         idempotency_key          TEXT    UNIQUE NOT NULL,
@@ -116,21 +112,17 @@ class DatabaseServiceImpl implements DatabaseService {
     ''');
 
     // ── Transaction Indexes ──
-    batch.execute(
+    batch.rawQuery(
       'CREATE INDEX idx_tx_date   ON transactions(date(created_at))',
     );
-    batch.execute(
+    batch.rawQuery(
       'CREATE INDEX idx_tx_type   ON transactions(transaction_type)',
     );
-    batch.execute(
-      'CREATE INDEX idx_tx_status ON transactions(status)',
-    );
-    batch.execute(
-      'CREATE INDEX idx_tx_method ON transactions(input_method)',
-    );
+    batch.rawQuery('CREATE INDEX idx_tx_status ON transactions(status)');
+    batch.rawQuery('CREATE INDEX idx_tx_method ON transactions(input_method)');
 
     // ── Audit Logs — append-only, no UPDATE/DELETE (PRD §9) ──
-    batch.execute('''
+    batch.rawQuery('''
       CREATE TABLE audit_logs (
         id               TEXT    PRIMARY KEY,
         transaction_id   TEXT    NOT NULL REFERENCES transactions(id),
@@ -153,7 +145,7 @@ class DatabaseServiceImpl implements DatabaseService {
     ''');
 
     // ── Price History — append-only (PRD §10.6) ──
-    batch.execute('''
+    batch.rawQuery('''
       CREATE TABLE price_history (
         id             TEXT    PRIMARY KEY,
         stock_id       TEXT    NOT NULL REFERENCES stock(id),
@@ -164,7 +156,7 @@ class DatabaseServiceImpl implements DatabaseService {
     ''');
 
     // ── App Settings ──
-    batch.execute('''
+    batch.rawQuery('''
       CREATE TABLE app_settings (
         key        TEXT PRIMARY KEY,
         value      TEXT NOT NULL,

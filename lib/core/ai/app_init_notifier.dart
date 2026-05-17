@@ -10,8 +10,7 @@ import 'package:warung_pintar_cimahi/core/voice/voice_init_result.dart';
 import 'package:warung_pintar_cimahi/core/voice/voice_service_impl.dart';
 
 /// Riverpod provider for app initialization state.
-final appInitProvider =
-    StateNotifierProvider<AppInitNotifier, AppInitState>(
+final appInitProvider = StateNotifierProvider<AppInitNotifier, AppInitState>(
   (ref) => AppInitNotifier(ref),
 );
 
@@ -32,9 +31,7 @@ class AppInitNotifier extends StateNotifier<AppInitState> {
   final Ref _ref;
   bool _voiceInitialized = false;
 
-  static final _logger = Logger(
-    printer: PrettyPrinter(methodCount: 0),
-  );
+  static final _logger = Logger(printer: PrettyPrinter(methodCount: 0));
 
   /// Start the initialization sequence.
   ///

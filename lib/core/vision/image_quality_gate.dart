@@ -57,9 +57,7 @@ class ImageQualityGate {
   // ignore: unused_field — used when `package:image` is added for brightness sampling
   static const double _minBrightness = 40.0; // 0–255 scale
 
-  static final _logger = Logger(
-    printer: PrettyPrinter(methodCount: 0),
-  );
+  static final _logger = Logger(printer: PrettyPrinter(methodCount: 0));
 
   /// Validate image quality.
   ///
@@ -68,7 +66,9 @@ class ImageQualityGate {
     // 1. File size check (cheapest — no decode needed)
     final fileSize = await imageFile.length();
     if (fileSize < _minFileSizeBytes) {
-      _logger.w('ImageQualityGate: File too small (${fileSize}B < ${_minFileSizeBytes}B)');
+      _logger.w(
+        'ImageQualityGate: File too small (${fileSize}B < ${_minFileSizeBytes}B)',
+      );
       return const ImageQualityFail(ImageQualityFailReason.fileTooSmall);
     }
 
@@ -113,14 +113,10 @@ class ImageQualityGate {
         bytes[2] == 0x4E &&
         bytes[3] == 0x47) {
       // IHDR at byte 16: width (4 bytes BE) + height (4 bytes BE)
-      final width = (bytes[16] << 24) |
-          (bytes[17] << 16) |
-          (bytes[18] << 8) |
-          bytes[19];
-      final height = (bytes[20] << 24) |
-          (bytes[21] << 16) |
-          (bytes[22] << 8) |
-          bytes[23];
+      final width =
+          (bytes[16] << 24) | (bytes[17] << 16) | (bytes[18] << 8) | bytes[19];
+      final height =
+          (bytes[20] << 24) | (bytes[21] << 16) | (bytes[22] << 8) | bytes[23];
       return (width, height);
     }
 

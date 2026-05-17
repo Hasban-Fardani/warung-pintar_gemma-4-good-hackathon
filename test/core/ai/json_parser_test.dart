@@ -93,10 +93,7 @@ void main() {
       expect(result, isA<ToolCallSuccess>());
       final success = result as ToolCallSuccess;
       expect(success.name, 'setup_business');
-      expect(
-        success.arguments,
-        containsPair('categories', ['Sembako']),
-      );
+      expect(success.arguments, containsPair('categories', ['Sembako']));
     });
 
     test('returns ToolCallFallback when name field is missing', () {
@@ -163,15 +160,15 @@ void main() {
       final success = result as ToolCallSuccess;
       expect(success.name, 'record_transactions');
 
-      final transactions =
-          success.arguments['transactions'] as List<dynamic>;
+      final transactions = success.arguments['transactions'] as List<dynamic>;
       expect(transactions, hasLength(2));
       expect(transactions[0]['item_name'], 'Beras');
       expect(transactions[1]['item_name'], 'Kopi');
     });
 
     test('handles clarify tool call', () {
-      const raw = '{"name": "clarify", "arguments": {"question": "Harga berapa?"}}';
+      const raw =
+          '{"name": "clarify", "arguments": {"question": "Harga berapa?"}}';
       final result = JsonParser.parseToolCall(raw);
 
       expect(result, isA<ToolCallSuccess>());

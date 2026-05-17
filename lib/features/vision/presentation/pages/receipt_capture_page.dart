@@ -88,8 +88,8 @@ class _SegmentedControl extends StatelessWidget {
         color: AppColors.surfaceContainerLow,
         borderRadius: BorderRadius.circular(AppTheme.radiusLg),
       ),
-      child: Row(
-        children: const [
+      child: const Row(
+        children: [
           Expanded(child: _Segment(label: 'Manual', isActive: false)),
           Expanded(child: _Segment(label: 'Kamera', isActive: true)),
           Expanded(child: _Segment(label: 'Suara', isActive: false)),
@@ -173,7 +173,11 @@ class _CameraViewfinder extends StatelessWidget {
                     color: AppColors.primary,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.photo_camera, color: Colors.white, size: 36),
+                  child: const Icon(
+                    Icons.photo_camera,
+                    color: Colors.white,
+                    size: 36,
+                  ),
                 ),
               ),
             ),
@@ -244,9 +248,7 @@ class _InstructionOverlay extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(AppTheme.marginPage),
-      decoration: BoxDecoration(
-        color: AppColors.inverseSurface.withAlpha(230),
-      ),
+      decoration: BoxDecoration(color: AppColors.inverseSurface.withAlpha(230)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -312,10 +314,7 @@ class _AiParsingOverlay extends StatelessWidget {
   final VisionStateData visionState;
   final VoidCallback onReset;
 
-  const _AiParsingOverlay({
-    required this.visionState,
-    required this.onReset,
-  });
+  const _AiParsingOverlay({required this.visionState, required this.onReset});
 
   @override
   Widget build(BuildContext context) {
@@ -351,7 +350,11 @@ class _AiParsingOverlay extends StatelessWidget {
                   ),
                 ),
               ] else if (visionState.state == VisionState.success) ...[
-                const Icon(Icons.check_circle, color: AppColors.secondary, size: 48),
+                const Icon(
+                  Icons.check_circle,
+                  color: AppColors.secondary,
+                  size: 48,
+                ),
                 const SizedBox(height: AppTheme.stackMd),
                 Text(
                   'Struk Berhasil Dibaca',
@@ -379,7 +382,11 @@ class _AiParsingOverlay extends StatelessWidget {
                   ),
                 ),
               ] else if (visionState.state == VisionState.error) ...[
-                const Icon(Icons.error_outline, color: AppColors.error, size: 48),
+                const Icon(
+                  Icons.error_outline,
+                  color: AppColors.error,
+                  size: 48,
+                ),
                 const SizedBox(height: AppTheme.stackMd),
                 Text(
                   visionState.errorMessage ?? 'Gagal memproses',

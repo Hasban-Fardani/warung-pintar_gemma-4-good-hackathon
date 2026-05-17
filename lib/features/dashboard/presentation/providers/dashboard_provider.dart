@@ -56,7 +56,7 @@ class DashboardNotifier extends StateNotifier<DashboardState> {
   final CatalogRepository _catalogRepository;
 
   DashboardNotifier(this._transactionRepository, this._catalogRepository)
-      : super(const DashboardState());
+    : super(const DashboardState());
 
   static final _getIt = GetIt.instance;
 
@@ -70,7 +70,9 @@ class DashboardNotifier extends StateNotifier<DashboardState> {
   Future<void> loadSummary() async {
     state = state.copyWith(isLoading: true);
 
-    final recentResult = _transactionRepository.getRecentTransactions(limit: 50);
+    final recentResult = _transactionRepository.getRecentTransactions(
+      limit: 50,
+    );
     final pendingResult = _transactionRepository.getPendingTransactions();
     final lowStockResult = _catalogRepository.getLowStockItems();
 
@@ -92,10 +94,12 @@ class DashboardNotifier extends StateNotifier<DashboardState> {
     final now = DateTime.now();
     final todayStart = DateTime(now.year, now.month, now.day);
 
-    final todayConfirmed = recentTransactions.where((t) =>
-        t.status == TransactionStatus.confirmed &&
-        t.createdAt.isAfter(todayStart) &&
-        t.createdAt.isBefore(todayStart.add(const Duration(days: 1))));
+    final todayConfirmed = recentTransactions.where(
+      (t) =>
+          t.status == TransactionStatus.confirmed &&
+          t.createdAt.isAfter(todayStart) &&
+          t.createdAt.isBefore(todayStart.add(const Duration(days: 1))),
+    );
 
     int omzetSen = 0;
     int modalSen = 0;
@@ -119,6 +123,7 @@ class DashboardNotifier extends StateNotifier<DashboardState> {
   }
 }
 
-final dashboardProvider = StateNotifierProvider<DashboardNotifier, DashboardState>(
-  (ref) => DashboardNotifier.create(),
-);
+final dashboardProvider =
+    StateNotifierProvider<DashboardNotifier, DashboardState>(
+      (ref) => DashboardNotifier.create(),
+    );

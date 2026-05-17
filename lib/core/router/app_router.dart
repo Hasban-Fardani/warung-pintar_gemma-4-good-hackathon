@@ -14,8 +14,9 @@ import '../../features/vision/presentation/pages/product_capture_page.dart';
 import '../ai/app_init_notifier.dart';
 import '../ai/app_init_state.dart';
 
-final GlobalKey<NavigatorState> _rootNavigatorKey =
-    GlobalKey<NavigatorState>(debugLabel: 'root');
+final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
+  debugLabel: 'root',
+);
 
 final appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
@@ -30,8 +31,9 @@ final appRouter = GoRouter(
     }
 
     final isOnOnboarding = state.matchedLocation == '/onboarding';
-    if (appState is AppInitModelReady && !isOnOnboarding && !isOnModelDownload) {
-    }
+    if (appState is AppInitModelReady &&
+        !isOnOnboarding &&
+        !isOnModelDownload) {}
 
     return null;
   },
@@ -116,10 +118,7 @@ final appRouter = GoRouter(
         ),
       ],
     ),
-    GoRoute(
-      path: '/reports',
-      builder: (context, state) => const ReportsPage(),
-    ),
+    GoRoute(path: '/reports', builder: (context, state) => const ReportsPage()),
     GoRoute(
       path: '/receipt-capture',
       builder: (context, state) => const ReceiptCapturePage(),
@@ -132,18 +131,14 @@ final appRouter = GoRouter(
       path: '/item/:id',
       builder: (context, state) {
         final id = state.pathParameters['id']!;
-        return Scaffold(
-          body: Center(child: Text('Detail Barang: $id')),
-        );
+        return Scaffold(body: Center(child: Text('Detail Barang: $id')));
       },
     ),
     GoRoute(
       path: '/transaction/:id',
       builder: (context, state) {
         final id = state.pathParameters['id']!;
-        return Scaffold(
-          body: Center(child: Text('Detail Transaksi: $id')),
-        );
+        return Scaffold(body: Center(child: Text('Detail Transaksi: $id')));
       },
     ),
   ],

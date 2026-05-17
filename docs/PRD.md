@@ -18,7 +18,7 @@
 
 WarungPintar adalah aplikasi ERP agentic offline-first untuk pelaku UMKM mikro Indonesia. Proyek ini mengeksploitasi **tiga kapabilitas frontier Gemma 4 sekaligus**: native function calling, native multimodal vision, dan on-device reasoning — semuanya berjalan 100% tanpa koneksi internet.
 
-Ibu Warsih bisa mencatat transaksi lewat suara panjang (multi-item sekaligus), memfoto struk belanja agar AI membaca dan mencatatnya otomatis, menambah barang baru lewat foto kemasan, serta mengkonfirmasi transaksi pending via suara — semua tanpa satu form yang diisi manual.
+Ibu miski bisa mencatat transaksi lewat suara panjang (multi-item sekaligus), memfoto struk belanja agar AI membaca dan mencatatnya otomatis, menambah barang baru lewat foto kemasan, serta mengkonfirmasi transaksi pending via suara — semua tanpa satu form yang diisi manual.
 
 ### 1.1 Mapping ke Kriteria Penilaian Kaggle
 
@@ -42,7 +42,7 @@ Ibu Warsih bisa mencatat transaksi lewat suara panjang (multi-item sekaligus), m
 
 ## 2. Target User Personas
 
-### 2.1 Primary — Ibu Warsih (Pemilik Warung)
+### 2.1 Primary — Ibu miski (Pemilik Warung)
 -   **Demografis:** 45–60 tahun, Cimahi, Jawa Barat
 -   **Pendidikan:** SMP, literasi digital sangat rendah
 -   **Rutinitas:** Buka warung 06.00–20.00, jam ramai 07.00–09.00 dan 16.00–18.00
@@ -58,7 +58,7 @@ Ibu Warsih bisa mencatat transaksi lewat suara panjang (multi-item sekaligus), m
     -   Toleran noise suara ambien warung
 
 ### 2.2 Secondary — Pak Budi (Supplier)
-Mengantar barang dua kali seminggu dengan nota pengiriman. Ibu Warsih perlu catat stok masuk massal — via foto nota atau suara sambil berbicara dengan Pak Budi.
+Mengantar barang dua kali seminggu dengan nota pengiriman. Ibu miski perlu catat stok masuk massal — via foto nota atau suara sambil berbicara dengan Pak Budi.
 
 ### 2.3 Tertiary — Koperasi Mitra (Petugas Pinjaman)
 Membutuhkan laporan keuangan terstruktur untuk persetujuan kredit mikro. Mengonsumsi output PDF/CSV dari WarungPintar.
@@ -992,7 +992,7 @@ Section 9: Performance Benchmark
 
 ### 15.1 Kaggle Writeup (< 1.500 kata)
 
-1.  **Digital Equity Gap (200 kata):** Mengapa SaaS cloud dan form gagal untuk UMKM. Ibu Warsih saat jam ramai.
+1.  **Digital Equity Gap (200 kata):** Mengapa SaaS cloud dan form gagal untuk UMKM. Ibu miski saat jam ramai.
 2.  **Five Gemma 4 Agents (500 kata):** Onboarding, long-speech kasir, voice confirm pending, vision struk, vision kemasan.
 3.  **Enterprise Integrity at Edge (400 kata):** Price history immutable, pending non-blocking, UUIDv7, idempotency, audit log raw AI output.
 4.  **Bukti Teknis (200 kata):** Kaggle Notebook, Logcat, APK demo.
@@ -1002,19 +1002,19 @@ Section 9: Performance Benchmark
 ### 15.2 YouTube Video Storyboard (3:00)
 
 **[0:00–0:20] Hook**
-Warung ramai. Ibu Warsih melayani 3 pembeli sekaligus, buku catatan tertumpuk. Teks: *"Setiap hari, 64 juta warung mencatat transaksi... dengan cara ini."*
+Warung ramai. Ibu miski melayani 3 pembeli sekaligus, buku catatan tertumpuk. Teks: *"Setiap hari, 64 juta warung mencatat transaksi... dengan cara ini."*
 
 **[0:20–0:40] Problem**
 Teks besar: *"Software terlalu rumit. Internet tidak selalu ada. Jam ramai tidak ada waktu ketik."*
 
 **[0:40–1:05] Onboarding**
-Airplane Mode terlihat di status bar. App pertama buka. AI tanya. Ibu Warsih jawab natural. Dashboard populate. Teks: *"Zero form. Zero cloud."*
+Airplane Mode terlihat di status bar. App pertama buka. AI tanya. Ibu miski jawab natural. Dashboard populate. Teks: *"Zero form. Zero cloud."*
 
 **[1:05–1:35] Long-Speech Multi-Item**
-Ibu Warsih melayani 3 pembeli, tap mic sekali: *"Beras tiga kilo empat lima ribu, kopi dua saset tiga ribu, telur enam butir sembilan ribu, kerupuk setengah kilo delapan ribu."* FAB morph. Pending banner muncul: "4 transaksi pending". Timer: < 8 detik.
+Ibu miski melayani 3 pembeli, tap mic sekali: *"Beras tiga kilo empat lima ribu, kopi dua saset tiga ribu, telur enam butir sembilan ribu, kerupuk setengah kilo delapan ribu."* FAB morph. Pending banner muncul: "4 transaksi pending". Timer: < 8 detik.
 
 **[1:35–1:55] Voice Bulk Confirm**
-30 menit kemudian. Ibu Warsih tahan mic: *"Semua benar."* Pending badge hilang. Dashboard omzet naik. Teks: *"Konfirmasi 4 transaksi. Satu napas."*
+30 menit kemudian. Ibu miski tahan mic: *"Semua benar."* Pending badge hilang. Dashboard omzet naik. Teks: *"Konfirmasi 4 transaksi. Satu napas."*
 
 **[1:55–2:20] Vision Struk**
 Pak Budi datang dengan nota. Tap kamera → foto nota. Teks: *"Gemma 4 membaca struk..."* Preview card muncul. Konfirmasi. Semua masuk ledger. Teks: *"Foto struk → Tercatat."*
@@ -1023,7 +1023,7 @@ Pak Budi datang dengan nota. Tap kamera → foto nota. Teks: *"Gemma 4 membaca s
 Tambah barang baru. Foto kemasan Tepung Terigu. AI pre-fill nama. Tanya harga via suara. Masuk katalog. Split: app kiri, audit log kanan — raw JSON Gemma terlihat. Teks: *"Bukti nyata. Bukan demo palsu."*
 
 **[2:40–2:55] Impact**
-Akhir hari. Ibu Warsih tap export PDF. Laporan bersih. Buku tulis ditutup. Teks: *"Laba hari ini: Rp 287.000. Tanpa hitung manual."*
+Akhir hari. Ibu miski tap export PDF. Laporan bersih. Buku tulis ditutup. Teks: *"Laba hari ini: Rp 287.000. Tanpa hitung manual."*
 
 **[2:55–3:00] Outro**
 Logo + Gemma 4 Good badge. GitHub + APK link.
@@ -1810,7 +1810,7 @@ Estimasi token per item transaksi dalam output JSON:
 
 **Estimasi per item: ~30 token.**
 Dengan batas 512 token output: `512 / 30 ≈ 17 item per satu ucapan`.
-Dalam realita penggunaan Ibu Warsih, satu ucapan paling banyak 10–12 item — **512 token lebih dari cukup**.
+Dalam realita penggunaan Ibu miski, satu ucapan paling banyak 10–12 item — **512 token lebih dari cukup**.
 
 #### 16.3.3 Konfirmasi Multimodal Vision Support
 
@@ -1851,7 +1851,7 @@ class GemmaCapabilityCheck {
 
 - Tidak ada typing animation saat inference berlangsung
 - UI menampilkan `CircularProgressIndicator` selama inference
-- Untuk voice inference ~5–8 detik, ini acceptable untuk target user Ibu Warsih
+- Untuk voice inference ~5–8 detik, ini acceptable untuk target user Ibu miski
 - Streaming akan dipertimbangkan jika `flutter_gemma ^0.3.0` tersedia sebelum submission
 
 ---
@@ -1978,7 +1978,7 @@ class LanguagePackDialog extends StatelessWidget {
 // lib/core/voice/voice_config.dart
 class VoiceConfig {
   /// Berapa milidetik diam setelah ada suara sebelum STT dianggap selesai.
-  /// Nilai 2000ms dipilih untuk memberi ruang jeda alami Ibu Warsih
+  /// Nilai 2000ms dipilih untuk memberi ruang jeda alami Ibu miski
   /// saat menyebut daftar item panjang (mis. jeda pikir antar item).
   static const int vadSilenceThresholdMs = 2000;
 
@@ -2667,5 +2667,45 @@ VISION QUALITY GATE
 ```
 
 ---
+
+## Bootstrap Sequence Anti-Deadlock
+- Setiap layanan AI (STT, Model, Vision) diinisialisasi secara berurutan dengan timeout ketat
+- Jika satu layanan gagal, layanan tersebut ditandai sebagai `degraded`, bukan menyebabkan crash aplikasi
+- Timeout per langkah: 30 detik. Jika timeout, lewati dan lanjut ke langkah berikutnya untuk layanan non-critical
+- Seluruh proses bootstrap tidak memblokir UI utama; tampilkan progress bar linear dengan estimasi waktu
+- State machine per layanan: `notStarted → inProgress → success/failed`
+- Critical services (Model AI, Database) yang gagal akan mengaktifkan `Permanent Manual Mode`
+
+## Prinsip Prompt per Agent
+Setiap system prompt mengikuti struktur empat lapis yang konsisten:
+```
+[KONTEKS SISTEM]   ← Role dan batasan global agen, diulang setiap sesi
+[KONTEKS DATA]     ← Data aktual dari SQLite (stock_context, max 20 item terbaru)
+[INSTRUKSI KETAT]  ← Aturan output: format JSON, larangan menebak, fallback clarify
+[PERINTAH USER]    ← Transkrip suara atau deskripsi gambar dari input pengguna
+```
+Aturan wajib:
+- Spesifik: Setiap prompt hanya berisi instruksi untuk satu tugas tunggal
+- Batasan Output: Wajib menyebutkan "Output HANYA JSON valid sesuai skema {tool_name}"
+- Panduan Keamanan: "Jangan pernah menebak harga jika tidak ada di konteks" dan "Jangan menghasilkan data fiktif"
+- Fallback: "Jika informasi kurang, output: {\"name\": \"clarify\", \"arguments\": {\"question\": \"...\"}}"
+- Vision: "Jika gambar tidak terbaca, output: {\"error\": \"image_unreadable\"}"
+
+## Logging Performa Agent
+Setiap kali Agent menyelesaikan inferensi, catat metrik berikut di `audit_logs.state_snapshot`:
+```json
+{
+  "agent_name": "voice_transaction",
+  "inference_time_ms": 2847,
+  "time_to_first_token_ms": 412,
+  "total_tokens": 189,
+  "tokens_per_second": 12.4,
+  "model_name": "gemma-4-e2b-it-litertlm-Q4_K_M",
+  "device_ram_gb": 3.8,
+  "timestamp": "2026-05-17T08:23:41Z"
+}
+```
+Metrik ini ditampilkan di drawer audit log sebagai bukti performa on-device dan bahan benchmarking optimasi.
+
 
 **END OF PRODUCT REQUIREMENTS DOCUMENT v10.0.0**

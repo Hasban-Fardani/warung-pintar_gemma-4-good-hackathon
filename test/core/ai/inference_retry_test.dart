@@ -18,11 +18,13 @@ void main() {
 
   group('InferenceRetry.runWithRetry', () {
     test('returns Success on first attempt if inference succeeds', () async {
-      when(() => mockAiService.infer(
-            systemPrompt: any(named: 'systemPrompt'),
-            userInput: any(named: 'userInput'),
-            imageBase64: any(named: 'imageBase64'),
-          )).thenAnswer(
+      when(
+        () => mockAiService.infer(
+          systemPrompt: any(named: 'systemPrompt'),
+          userInput: any(named: 'userInput'),
+          imageBase64: any(named: 'imageBase64'),
+        ),
+      ).thenAnswer(
         (_) async => const Success(
           ToolCallSuccess(
             name: 'record_transactions',
@@ -38,21 +40,23 @@ void main() {
       );
 
       expect(result, isA<Success>());
-      verify(() => mockAiService.infer(
-            systemPrompt: any(named: 'systemPrompt'),
-            userInput: any(named: 'userInput'),
-            imageBase64: any(named: 'imageBase64'),
-          )).called(1); // Only 1 call, no retry
+      verify(
+        () => mockAiService.infer(
+          systemPrompt: any(named: 'systemPrompt'),
+          userInput: any(named: 'userInput'),
+          imageBase64: any(named: 'imageBase64'),
+        ),
+      ).called(1); // Only 1 call, no retry
     });
 
     test('retries up to 2 times on ModelNotLoadedFailure', () async {
-      when(() => mockAiService.infer(
-            systemPrompt: any(named: 'systemPrompt'),
-            userInput: any(named: 'userInput'),
-            imageBase64: any(named: 'imageBase64'),
-          )).thenAnswer(
-        (_) async => const Failure(ModelNotLoadedFailure()),
-      );
+      when(
+        () => mockAiService.infer(
+          systemPrompt: any(named: 'systemPrompt'),
+          userInput: any(named: 'userInput'),
+          imageBase64: any(named: 'imageBase64'),
+        ),
+      ).thenAnswer((_) async => const Failure(ModelNotLoadedFailure()));
 
       final result = await InferenceRetry.runWithRetry(
         aiService: mockAiService,
@@ -61,19 +65,23 @@ void main() {
       );
 
       expect(result, isA<Failure>());
-      verify(() => mockAiService.infer(
-            systemPrompt: any(named: 'systemPrompt'),
-            userInput: any(named: 'userInput'),
-            imageBase64: any(named: 'imageBase64'),
-          )).called(3); // 1 initial + 2 retries
+      verify(
+        () => mockAiService.infer(
+          systemPrompt: any(named: 'systemPrompt'),
+          userInput: any(named: 'userInput'),
+          imageBase64: any(named: 'imageBase64'),
+        ),
+      ).called(3); // 1 initial + 2 retries
     });
 
     test('does NOT retry on InvalidJsonOutputFailure', () async {
-      when(() => mockAiService.infer(
-            systemPrompt: any(named: 'systemPrompt'),
-            userInput: any(named: 'userInput'),
-            imageBase64: any(named: 'imageBase64'),
-          )).thenAnswer(
+      when(
+        () => mockAiService.infer(
+          systemPrompt: any(named: 'systemPrompt'),
+          userInput: any(named: 'userInput'),
+          imageBase64: any(named: 'imageBase64'),
+        ),
+      ).thenAnswer(
         (_) async => const Failure(InvalidJsonOutputFailure('bad json')),
       );
 
@@ -86,27 +94,29 @@ void main() {
       expect(result, isA<Failure>());
       final failure = (result as Failure).error;
       expect(failure, isA<InvalidJsonOutputFailure>());
-      verify(() => mockAiService.infer(
-            systemPrompt: any(named: 'systemPrompt'),
-            userInput: any(named: 'userInput'),
-            imageBase64: any(named: 'imageBase64'),
-          )).called(1); // No retry for JSON failures
+      verify(
+        () => mockAiService.infer(
+          systemPrompt: any(named: 'systemPrompt'),
+          userInput: any(named: 'userInput'),
+          imageBase64: any(named: 'imageBase64'),
+        ),
+      ).called(1); // No retry for JSON failures
     });
 
     test('returns Success if second attempt succeeds', () async {
       var callCount = 0;
-      when(() => mockAiService.infer(
-            systemPrompt: any(named: 'systemPrompt'),
-            userInput: any(named: 'userInput'),
-            imageBase64: any(named: 'imageBase64'),
-          )).thenAnswer((_) async {
+      when(
+        () => mockAiService.infer(
+          systemPrompt: any(named: 'systemPrompt'),
+          userInput: any(named: 'userInput'),
+          imageBase64: any(named: 'imageBase64'),
+        ),
+      ).thenAnswer((_) async {
         callCount++;
         if (callCount == 1) {
           return const Failure(ModelNotLoadedFailure());
         }
-        return const Success(
-          ToolCallSuccess(name: 'test', arguments: {}),
-        );
+        return const Success(ToolCallSuccess(name: 'test', arguments: {}));
       });
 
       final result = await InferenceRetry.runWithRetry(

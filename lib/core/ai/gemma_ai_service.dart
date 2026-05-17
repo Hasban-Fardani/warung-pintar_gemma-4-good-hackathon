@@ -14,9 +14,7 @@ import 'package:warung_pintar_cimahi/core/error/result.dart';
 ///
 /// Requires [GemmaIsolateService.init] to be called before first use.
 class GemmaAiService implements AiService {
-  final _logger = Logger(
-    printer: PrettyPrinter(methodCount: 0),
-  );
+  final _logger = Logger(printer: PrettyPrinter(methodCount: 0));
 
   @override
   Future<Result<ToolCallResult, AiFailure>> infer({
@@ -32,16 +30,17 @@ class GemmaAiService implements AiService {
     try {
       _logger.d('GemmaAiService: Starting inference...');
 
-      final raw = await GemmaIsolateService.infer(
-        systemPrompt,
-        userInput,
-        imageBase64,
-      ).timeout(
-        const Duration(seconds: 60),
-        onTimeout: () => throw const TimeoutException(
-          'Gemma inference exceeded 60s timeout',
-        ),
-      );
+      final raw =
+          await GemmaIsolateService.infer(
+            systemPrompt,
+            userInput,
+            imageBase64,
+          ).timeout(
+            const Duration(seconds: 60),
+            onTimeout: () => throw const TimeoutException(
+              'Gemma inference exceeded 60s timeout',
+            ),
+          );
 
       _logger.d('GemmaAiService: Raw output length: ${raw.length}');
 

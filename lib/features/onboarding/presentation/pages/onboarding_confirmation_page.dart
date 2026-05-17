@@ -55,9 +55,7 @@ class _TopAppBar extends StatelessWidget {
       height: AppTheme.touchTargetMin,
       decoration: const BoxDecoration(
         color: AppColors.surface,
-        border: Border(
-          bottom: BorderSide(color: AppColors.outlineVariant),
-        ),
+        border: Border(bottom: BorderSide(color: AppColors.outlineVariant)),
       ),
       child: Row(
         children: [
@@ -70,9 +68,9 @@ class _TopAppBar extends StatelessWidget {
             child: Text(
               'Langkah 3 dari 4',
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: AppColors.primary,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.headlineSmall?.copyWith(color: AppColors.primary),
             ),
           ),
           const SizedBox(width: AppTheme.touchTargetMin),
@@ -116,9 +114,9 @@ class _AiBubble extends StatelessWidget {
             ),
             child: Text(
               'Setup hampir selesai! Ini yang sudah Ibu atur:',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.onSurface,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: AppColors.onSurface),
             ),
           ),
         ),
@@ -150,12 +148,16 @@ class _SummaryCard extends ConsumerWidget {
             children: [
               Text(
                 'Ringkasan Pengaturan',
-                style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      color: AppColors.onSurface,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.labelLarge?.copyWith(color: AppColors.onSurface),
               ),
               IconButton(
-                icon: const Icon(Icons.edit, color: AppColors.primary, size: 20),
+                icon: const Icon(
+                  Icons.edit,
+                  color: AppColors.primary,
+                  size: 20,
+                ),
                 onPressed: () {},
                 constraints: const BoxConstraints(
                   minWidth: AppTheme.touchTargetMin,
@@ -185,17 +187,13 @@ class _SummaryItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const Icon(
-          Icons.check_circle,
-          color: AppColors.secondary,
-          size: 20,
-        ),
+        const Icon(Icons.check_circle, color: AppColors.secondary, size: 20),
         const SizedBox(width: AppTheme.stackSm),
         Text(
           text,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.onSurface,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: AppColors.onSurface),
         ),
       ],
     );
@@ -239,9 +237,9 @@ class _AiTipBubble extends StatelessWidget {
               children: [
                 Text(
                   'Sekarang Ibu sudah siap! Cobalah hal ini nanti:',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.onSurface,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(color: AppColors.onSurface),
                 ),
                 const SizedBox(height: AppTheme.stackSm),
                 Text(
@@ -249,8 +247,8 @@ class _AiTipBubble extends StatelessWidget {
                   '• Cek sisa stok barang\n'
                   '• Lihat laporan harian',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.onSurfaceVariant,
-                      ),
+                    color: AppColors.onSurfaceVariant,
+                  ),
                 ),
               ],
             ),
@@ -291,16 +289,16 @@ class _TipsCard extends StatelessWidget {
                 Text(
                   'Tips Pertama',
                   style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        color: AppColors.onSecondaryContainer,
-                      ),
+                    color: AppColors.onSecondaryContainer,
+                  ),
                 ),
                 const SizedBox(height: AppTheme.stackSm),
                 Text(
                   'Tekan tombol mikrofon nanti dan bilang:\n'
                   '"Laku mie ayam dua bungkus"',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.onSecondaryContainer,
-                      ),
+                    color: AppColors.onSecondaryContainer,
+                  ),
                 ),
               ],
             ),

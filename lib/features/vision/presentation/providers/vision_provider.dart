@@ -6,7 +6,14 @@ import 'package:warung_pintar_cimahi/core/di/injection.dart';
 import 'package:warung_pintar_cimahi/features/vision/domain/usecases/parse_product_usecase.dart';
 import 'package:warung_pintar_cimahi/features/vision/domain/usecases/parse_receipt_usecase.dart';
 
-enum VisionState { idle, capturing, qualityChecking, processing, success, error }
+enum VisionState {
+  idle,
+  capturing,
+  qualityChecking,
+  processing,
+  success,
+  error,
+}
 
 class VisionStateData {
   final VisionState state;
@@ -43,11 +50,11 @@ class VisionNotifier extends StateNotifier<VisionStateData> {
   VisionNotifier({
     ParseReceiptUseCase? parseReceiptUseCase,
     ParseProductUseCase? parseProductUseCase,
-  })  : _parseReceiptUseCase =
-            parseReceiptUseCase ?? getIt<ParseReceiptUseCase>(),
-        _parseProductUseCase =
-            parseProductUseCase ?? getIt<ParseProductUseCase>(),
-        super(const VisionStateData());
+  }) : _parseReceiptUseCase =
+           parseReceiptUseCase ?? getIt<ParseReceiptUseCase>(),
+       _parseProductUseCase =
+           parseProductUseCase ?? getIt<ParseProductUseCase>(),
+       super(const VisionStateData());
 
   Future<void> captureReceipt(File image) async {
     state = state.copyWith(
@@ -56,13 +63,9 @@ class VisionNotifier extends StateNotifier<VisionStateData> {
       errorMessage: null,
     );
 
-    state = state.copyWith(
-      state: VisionState.qualityChecking,
-    );
+    state = state.copyWith(state: VisionState.qualityChecking);
 
-    state = state.copyWith(
-      state: VisionState.processing,
-    );
+    state = state.copyWith(state: VisionState.processing);
 
     final result = await _parseReceiptUseCase.call(image);
 
@@ -89,13 +92,9 @@ class VisionNotifier extends StateNotifier<VisionStateData> {
       errorMessage: null,
     );
 
-    state = state.copyWith(
-      state: VisionState.qualityChecking,
-    );
+    state = state.copyWith(state: VisionState.qualityChecking);
 
-    state = state.copyWith(
-      state: VisionState.processing,
-    );
+    state = state.copyWith(state: VisionState.processing);
 
     final result = await _parseProductUseCase.call(image);
 
@@ -122,5 +121,5 @@ class VisionNotifier extends StateNotifier<VisionStateData> {
 
 final visionProvider =
     StateNotifierProvider.autoDispose<VisionNotifier, VisionStateData>(
-  (ref) => VisionNotifier(),
-);
+      (ref) => VisionNotifier(),
+    );

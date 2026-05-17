@@ -35,7 +35,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         child: Container(
           decoration: const BoxDecoration(
             color: AppColors.surface,
-            border: Border(bottom: BorderSide(color: AppColors.outlineVariant, width: 0.5)),
+            border: Border(
+              bottom: BorderSide(color: AppColors.outlineVariant, width: 0.5),
+            ),
           ),
           child: SafeArea(
             bottom: false,
@@ -50,8 +52,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       width: 48,
                       height: 48,
                       alignment: Alignment.center,
-                      child: Icon(Icons.storefront,
-                          color: AppColors.onSurfaceVariant, size: 24),
+                      child: const Icon(
+                        Icons.storefront,
+                        color: AppColors.onSurfaceVariant,
+                        size: 24,
+                      ),
                     ),
                   ),
                   const Spacer(),
@@ -71,8 +76,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                         width: 48,
                         height: 48,
                         alignment: Alignment.center,
-                        child: Icon(Icons.smart_toy,
-                            color: AppColors.onSurfaceVariant, size: 24),
+                        child: const Icon(
+                          Icons.smart_toy,
+                          color: AppColors.onSurfaceVariant,
+                          size: 24,
+                        ),
                       ),
                       Positioned(
                         top: 6,
@@ -121,10 +129,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   }
 
   Widget _buildLowStockBanner(DashboardState state) {
-    final names = state.lowStockItems
-        .take(3)
-        .map((e) => e.itemName)
-        .join(', ');
+    final names = state.lowStockItems.take(3).map((e) => e.itemName).join(', ');
     final suffix = state.lowStockItems.length > 3 ? ', ...' : '';
     return Container(
       padding: const EdgeInsets.all(8),
@@ -135,7 +140,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       ),
       child: Row(
         children: [
-          Icon(Icons.warning, color: AppColors.error, size: 20),
+          const Icon(Icons.warning, color: AppColors.error, size: 20),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -209,7 +214,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             children: [
               Row(
                 children: [
-                  Icon(Icons.payments, color: AppColors.primary, size: 20),
+                  const Icon(
+                    Icons.payments,
+                    color: AppColors.primary,
+                    size: 20,
+                  ),
                   const SizedBox(width: 8),
                   Text(
                     'OMZET HARI INI',
@@ -254,17 +263,24 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.trending_up,
-                            color: AppColors.secondary, size: 20),
+                        const Icon(
+                          Icons.trending_up,
+                          color: AppColors.secondary,
+                          size: 20,
+                        ),
                         const SizedBox(width: 8),
-                        Text(
-                          'PROFIT HARI INI',
-                          style: GoogleFonts.poppins(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            height: 18 / 14,
-                            letterSpacing: 0.28,
-                            color: AppColors.onSurfaceVariant,
+                        Expanded(
+                          child: Text(
+                            'PROFIT HARI INI',
+                            style: GoogleFonts.poppins(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              height: 18 / 14,
+                              letterSpacing: 0.28,
+                              color: AppColors.onSurfaceVariant,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
@@ -298,16 +314,24 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.outbound, color: AppColors.error, size: 20),
+                        const Icon(
+                          Icons.outbound,
+                          color: AppColors.error,
+                          size: 20,
+                        ),
                         const SizedBox(width: 8),
-                        Text(
-                          'MODAL KELUAR',
-                          style: GoogleFonts.poppins(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            height: 18 / 14,
-                            letterSpacing: 0.28,
-                            color: AppColors.onSurfaceVariant,
+                        Expanded(
+                          child: Text(
+                            'MODAL KELUAR',
+                            style: GoogleFonts.poppins(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              height: 18 / 14,
+                              letterSpacing: 0.28,
+                              color: AppColors.onSurfaceVariant,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
@@ -385,7 +409,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   Widget _transactionRow(TransactionEntity tx, bool isLast) {
     final isSell = tx.type is TransactionSell;
     final icon = isSell ? Icons.shopping_bag : Icons.receipt_long;
-    final color = isSell ? AppColors.primaryContainer : AppColors.errorContainer;
+    final color = isSell
+        ? AppColors.primaryContainer
+        : AppColors.errorContainer;
     final amountColor = isSell ? AppColors.secondary : AppColors.error;
     final sign = isSell ? '+' : '-';
 
@@ -404,7 +430,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        border: isLast ? null : const Border(bottom: BorderSide(color: AppColors.outlineVariant)),
+        border: isLast
+            ? null
+            : const Border(bottom: BorderSide(color: AppColors.outlineVariant)),
       ),
       child: Row(
         children: [
@@ -416,7 +444,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               shape: BoxShape.circle,
             ),
             alignment: Alignment.center,
-            child: Icon(icon, color: isSell ? AppColors.primary : AppColors.error, size: 20),
+            child: Icon(
+              icon,
+              color: isSell ? AppColors.primary : AppColors.error,
+              size: 20,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -486,7 +518,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           foregroundColor: AppColors.onPrimaryContainer,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(28),
-            side: BorderSide(color: AppColors.primaryFixedDim),
+            side: const BorderSide(color: AppColors.primaryFixedDim),
           ),
           child: Icon(_fabExpanded ? Icons.close : Icons.add),
         ),

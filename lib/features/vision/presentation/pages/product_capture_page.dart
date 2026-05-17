@@ -53,7 +53,8 @@ class _ProductCapturePageState extends ConsumerState<ProductCapturePage> {
           ),
           if (visionState.isProcessing)
             const _ProcessingOverlay()
-          else if (visionState.state == VisionState.success && visionState.result is ParseProductResult)
+          else if (visionState.state == VisionState.success &&
+              visionState.result is ParseProductResult)
             _AiResultConfirmation(
               result: visionState.result as ParseProductResult,
               onRetake: () {
@@ -192,9 +193,7 @@ class _InstructionOverlay extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(AppTheme.marginPage),
-      decoration: BoxDecoration(
-        color: AppColors.inverseSurface.withAlpha(230),
-      ),
+      decoration: BoxDecoration(color: AppColors.inverseSurface.withAlpha(230)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -268,10 +267,7 @@ class _AiResultConfirmation extends StatelessWidget {
   final ParseProductResult result;
   final VoidCallback onRetake;
 
-  const _AiResultConfirmation({
-    required this.result,
-    required this.onRetake,
-  });
+  const _AiResultConfirmation({required this.result, required this.onRetake});
 
   @override
   Widget build(BuildContext context) {
@@ -283,7 +279,9 @@ class _AiResultConfirmation extends StatelessWidget {
         padding: const EdgeInsets.all(AppTheme.marginPage),
         decoration: const BoxDecoration(
           color: AppColors.surface,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(AppTheme.radiusXl)),
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(AppTheme.radiusXl),
+          ),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -292,7 +290,10 @@ class _AiResultConfirmation extends StatelessWidget {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.secondaryContainer,
                     borderRadius: BorderRadius.circular(20),
@@ -454,10 +455,7 @@ class _ErrorOverlay extends StatelessWidget {
   final String message;
   final VoidCallback onRetake;
 
-  const _ErrorOverlay({
-    required this.message,
-    required this.onRetake,
-  });
+  const _ErrorOverlay({required this.message, required this.onRetake});
 
   @override
   Widget build(BuildContext context) {
@@ -479,10 +477,7 @@ class _ErrorOverlay extends StatelessWidget {
               Text(
                 message,
                 textAlign: TextAlign.center,
-                style: GoogleFonts.inter(
-                  fontSize: 14,
-                  color: AppColors.error,
-                ),
+                style: GoogleFonts.inter(fontSize: 14, color: AppColors.error),
               ),
               const SizedBox(height: AppTheme.stackMd),
               Row(

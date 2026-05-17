@@ -51,9 +51,7 @@ class _TopAppBar extends StatelessWidget {
       height: AppTheme.touchTargetMin,
       decoration: const BoxDecoration(
         color: AppColors.surface,
-        border: Border(
-          bottom: BorderSide(color: AppColors.outlineVariant),
-        ),
+        border: Border(bottom: BorderSide(color: AppColors.outlineVariant)),
       ),
       child: Row(
         children: [
@@ -66,9 +64,9 @@ class _TopAppBar extends StatelessWidget {
             child: Text(
               'Langkah 2 dari 4',
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: AppColors.onSurface,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.headlineSmall?.copyWith(color: AppColors.onSurface),
             ),
           ),
           const SizedBox(width: AppTheme.touchTargetMin),
@@ -110,9 +108,9 @@ class _AiGuideBubble extends StatelessWidget {
               padding: const EdgeInsets.only(top: 4),
               child: Text(
                 'Sekarang, barang apa yang Ibu jual?',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.onSurface,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: AppColors.onSurface),
               ),
             ),
           ),
@@ -125,21 +123,17 @@ class _AiGuideBubble extends StatelessWidget {
 class _ModeGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return const Column(
       children: [
-        const _ModeCard(
+        _ModeCard(
           icon: Icons.receipt_long,
           label: 'Foto Nota',
           highlighted: false,
         ),
-        const SizedBox(height: AppTheme.gutter),
-        const _ModeCard(
-          icon: Icons.mic,
-          label: 'Sebutkan Barang',
-          highlighted: true,
-        ),
-        const SizedBox(height: AppTheme.gutter),
-        const _ModeCard(
+        SizedBox(height: AppTheme.gutter),
+        _ModeCard(icon: Icons.mic, label: 'Sebutkan Barang', highlighted: true),
+        SizedBox(height: AppTheme.gutter),
+        _ModeCard(
           icon: Icons.edit_square,
           label: 'Tambah Manual',
           highlighted: false,
@@ -196,9 +190,9 @@ class _ModeCard extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 label,
-                style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      color: AppColors.onSurface,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.labelMedium?.copyWith(color: AppColors.onSurface),
               ),
             ],
           ),
@@ -237,16 +231,16 @@ class _EmptyState extends StatelessWidget {
           const SizedBox(height: AppTheme.stackMd),
           Text(
             'Daftar Barang Awal',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  color: AppColors.onSurface,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.headlineSmall?.copyWith(color: AppColors.onSurface),
           ),
           const SizedBox(height: AppTheme.stackSm),
           Text(
             'Belum ada barang yang ditambahkan.',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.onSurfaceVariant,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: AppColors.onSurfaceVariant),
           ),
           const SizedBox(height: 24),
           SizedBox(
@@ -286,18 +280,14 @@ class _InfoHint extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(
-            Icons.info_outline,
-            color: AppColors.secondary,
-            size: 20,
-          ),
+          const Icon(Icons.info_outline, color: AppColors.secondary, size: 20),
           const SizedBox(width: AppTheme.stackSm),
           Expanded(
             child: Text(
               'Stok tidak boleh minus. Tambah barang dulu agar transaksi akurat.',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.onSurfaceVariant,
-                  ),
+                color: AppColors.onSurfaceVariant,
+              ),
             ),
           ),
         ],
@@ -313,9 +303,7 @@ class _BottomBar extends StatelessWidget {
       padding: const EdgeInsets.all(AppTheme.marginPage),
       decoration: const BoxDecoration(
         color: AppColors.surface,
-        border: Border(
-          top: BorderSide(color: AppColors.outlineVariant),
-        ),
+        border: Border(top: BorderSide(color: AppColors.outlineVariant)),
       ),
       child: SizedBox(
         width: double.infinity,

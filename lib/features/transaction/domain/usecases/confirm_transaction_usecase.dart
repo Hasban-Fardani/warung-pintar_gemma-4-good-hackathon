@@ -30,13 +30,17 @@ Actions:
     String transcript,
     List<TransactionEntity> pendingItems,
   ) async {
-    final pendingJson = pendingItems.map((e) => {
-      'id': e.id,
-      'item_name': e.itemName,
-      'quantity': e.quantity,
-      'amount_sen': e.amountSen,
-      'transaction_type': e.type is TransactionSell ? 'sell' : 'buy',
-    }).toList();
+    final pendingJson = pendingItems
+        .map(
+          (e) => {
+            'id': e.id,
+            'item_name': e.itemName,
+            'quantity': e.quantity,
+            'amount_sen': e.amountSen,
+            'transaction_type': e.type is TransactionSell ? 'sell' : 'buy',
+          },
+        )
+        .toList();
 
     final userInput =
         'Pending items: ${pendingJson.length}\n'

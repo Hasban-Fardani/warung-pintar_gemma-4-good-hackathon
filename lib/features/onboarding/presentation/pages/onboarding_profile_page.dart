@@ -74,9 +74,7 @@ class _TopAppBar extends StatelessWidget {
       height: AppTheme.touchTargetMin,
       decoration: const BoxDecoration(
         color: AppColors.surface,
-        border: Border(
-          bottom: BorderSide(color: AppColors.outlineVariant),
-        ),
+        border: Border(bottom: BorderSide(color: AppColors.outlineVariant)),
       ),
       child: Row(
         children: [
@@ -89,9 +87,9 @@ class _TopAppBar extends StatelessWidget {
             child: Text(
               'Langkah 1 dari 4',
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: AppColors.primary,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.headlineSmall?.copyWith(color: AppColors.primary),
             ),
           ),
           const SizedBox(width: AppTheme.touchTargetMin),
@@ -109,16 +107,16 @@ class _HeaderSection extends StatelessWidget {
       children: [
         Text(
           'Profil Usaha',
-          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                color: AppColors.onSurface,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.headlineMedium?.copyWith(color: AppColors.onSurface),
         ),
         const SizedBox(height: AppTheme.stackSm),
         Text(
           'Lengkapi data dasar warung Ibu untuk memulai sistem kasir digital.',
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.onSurfaceVariant,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: AppColors.onSurfaceVariant),
         ),
       ],
     );
@@ -158,8 +156,8 @@ class _AiGuideBubble extends StatelessWidget {
               child: Text(
                 '"Sebelum mulai, saya perlu tahu sedikit tentang warung Ibu."',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.onPrimaryFixed,
-                    ),
+                  color: AppColors.onPrimaryFixed,
+                ),
               ),
             ),
           ),
@@ -195,15 +193,12 @@ class _NameField extends StatelessWidget {
           children: [
             Text(
               label,
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: AppColors.onSurface,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.labelLarge?.copyWith(color: AppColors.onSurface),
             ),
             if (required)
-              const Text(
-                ' *',
-                style: TextStyle(color: AppColors.error),
-              ),
+              const Text(' *', style: TextStyle(color: AppColors.error)),
           ],
         ),
         const SizedBox(height: AppTheme.stackSm),
@@ -220,8 +215,8 @@ class _NameField extends StatelessWidget {
             decoration: InputDecoration(
               hintText: hint,
               hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.onSurfaceVariant,
-                  ),
+                color: AppColors.onSurfaceVariant,
+              ),
               filled: true,
               fillColor: AppColors.surface,
               border: OutlineInputBorder(
@@ -234,7 +229,10 @@ class _NameField extends StatelessWidget {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(AppTheme.radiusDefault),
-                borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                borderSide: const BorderSide(
+                  color: AppColors.primary,
+                  width: 2,
+                ),
               ),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: AppTheme.marginPage,
@@ -247,8 +245,8 @@ class _NameField extends StatelessWidget {
           Text(
             helperText!,
             style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: AppColors.onSurfaceVariant,
-                ),
+              color: AppColors.onSurfaceVariant,
+            ),
           ),
         ],
       ],
@@ -269,18 +267,14 @@ class _ContextualHint extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(
-            Icons.lightbulb,
-            color: AppColors.tertiary,
-            size: 20,
-          ),
+          const Icon(Icons.lightbulb, color: AppColors.tertiary, size: 20),
           const SizedBox(width: AppTheme.stackSm),
           Expanded(
             child: Text(
               'Tips: Gunakan nama yang mudah diingat warga sekitar.',
               style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: AppColors.onSurfaceVariant,
-                  ),
+                color: AppColors.onSurfaceVariant,
+              ),
             ),
           ),
         ],
@@ -303,9 +297,7 @@ class _BottomBar extends ConsumerWidget {
       padding: const EdgeInsets.all(AppTheme.marginPage),
       decoration: const BoxDecoration(
         color: AppColors.surface,
-        border: Border(
-          top: BorderSide(color: AppColors.outlineVariant),
-        ),
+        border: Border(top: BorderSide(color: AppColors.outlineVariant)),
       ),
       child: Row(
         children: [
@@ -339,8 +331,9 @@ class _BottomBar extends ConsumerWidget {
                   backgroundColor: isValid
                       ? AppColors.primary
                       : AppColors.surfaceVariant,
-                  foregroundColor:
-                      isValid ? AppColors.onPrimary : AppColors.onSurfaceVariant,
+                  foregroundColor: isValid
+                      ? AppColors.onPrimary
+                      : AppColors.onSurfaceVariant,
                   disabledBackgroundColor: AppColors.surfaceVariant,
                   disabledForegroundColor: AppColors.onSurfaceVariant,
                   shape: RoundedRectangleBorder(

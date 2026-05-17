@@ -9,20 +9,18 @@ class TransactionListTile extends StatelessWidget {
   final TransactionEntity transaction;
   final VoidCallback? onTap;
 
-  const TransactionListTile({
-    super.key,
-    required this.transaction,
-    this.onTap,
-  });
+  const TransactionListTile({super.key, required this.transaction, this.onTap});
 
   @override
   Widget build(BuildContext context) {
     final isSell = transaction.type is TransactionSell;
-    final iconBackground =
-        isSell ? AppColors.primaryContainer : AppColors.errorContainer;
-    final amountColor =
-        isSell ? AppColors.secondary : AppColors.error;
-    final icon = isSell ? Icons.shopping_cart_outlined : Icons.shopping_bag_outlined;
+    final iconBackground = isSell
+        ? AppColors.primaryContainer
+        : AppColors.errorContainer;
+    final amountColor = isSell ? AppColors.secondary : AppColors.error;
+    final icon = isSell
+        ? Icons.shopping_cart_outlined
+        : Icons.shopping_bag_outlined;
     final timeText = DateFormat('HH:mm', 'id').format(transaction.createdAt);
 
     return InkWell(
@@ -56,8 +54,8 @@ class TransactionListTile extends StatelessWidget {
                   Text(
                     timeText,
                     style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                          color: AppColors.onSurfaceVariant,
-                        ),
+                      color: AppColors.onSurfaceVariant,
+                    ),
                   ),
                 ],
               ),
@@ -66,9 +64,9 @@ class TransactionListTile extends StatelessWidget {
             Text(
               MoneyFormatter.senToDisplay(transaction.amountSen),
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: amountColor,
-                    fontFeatures: const [FontFeature.tabularFigures()],
-                  ),
+                color: amountColor,
+                fontFeatures: const [FontFeature.tabularFigures()],
+              ),
             ),
           ],
         ),

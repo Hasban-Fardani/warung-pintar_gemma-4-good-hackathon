@@ -70,8 +70,7 @@ class InferenceRetry {
 
       // Backoff before retry
       if (attempt < _maxRetries) {
-        final backoffMs =
-            attempt == 0 ? _firstBackoffMs : _secondBackoffMs;
+        final backoffMs = attempt == 0 ? _firstBackoffMs : _secondBackoffMs;
         await Future.delayed(Duration(milliseconds: backoffMs));
       }
 

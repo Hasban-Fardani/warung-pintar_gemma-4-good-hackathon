@@ -50,9 +50,7 @@ void main() {
           name: 'test',
           arguments: {},
         );
-        const ToolCallResult fallback = ToolCallFallback(
-          reason: 'error',
-        );
+        const ToolCallResult fallback = ToolCallFallback(reason: 'error');
 
         // Exhaustive switch — compile error if case missing
         final successMessage = switch (success) {

@@ -21,10 +21,7 @@ final class ToolCallSuccess extends ToolCallResult {
   /// Parsed JSON arguments matching Appendix A schema.
   final Map<String, dynamic> arguments;
 
-  const ToolCallSuccess({
-    required this.name,
-    required this.arguments,
-  });
+  const ToolCallSuccess({required this.name, required this.arguments});
 
   @override
   String toString() => 'ToolCallSuccess(name: $name, arguments: $arguments)';

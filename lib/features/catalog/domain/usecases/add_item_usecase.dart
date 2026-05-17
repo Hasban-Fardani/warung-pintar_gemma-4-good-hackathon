@@ -11,11 +11,10 @@ class AddItemUseCase {
     int defaultPriceSen = 0,
     int currentQty = 0,
     String? categoryId,
-  }) =>
-      _repository.addItem(
-        itemName: itemName,
-        defaultPriceSen: defaultPriceSen,
-        currentQty: currentQty,
-        categoryId: categoryId,
-      );
+  }) => _repository.addItem(
+    itemName: itemName,
+    defaultPriceSen: defaultPriceSen,
+    currentQty: currentQty,
+    categoryId: categoryId,
+  );
 }

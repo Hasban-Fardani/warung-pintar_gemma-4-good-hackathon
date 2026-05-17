@@ -86,9 +86,7 @@ class AppTheme {
           minimumSize: const Size(touchTargetMin, touchTargetMin),
         ),
       ),
-      checkboxTheme: const CheckboxThemeData(
-        splashRadius: 24,
-      ),
+      checkboxTheme: const CheckboxThemeData(splashRadius: 24),
       inputDecorationTheme: InputDecorationTheme(
         contentPadding: const EdgeInsets.all(marginPage),
         border: OutlineInputBorder(
@@ -121,9 +119,7 @@ class AppTheme {
       ),
       bottomSheetTheme: const BottomSheetThemeData(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            top: Radius.circular(radiusXl),
-          ),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(radiusXl)),
         ),
         backgroundColor: AppColors.surfaceContainerLowest,
       ),

@@ -28,10 +28,7 @@ void main() {
       'updating stock price does not change old transaction prices',
       () async {
         // Setup: create category + stock
-        await db.insert('categories', {
-          'id': 'cat-001',
-          'name': 'Sembako',
-        });
+        await db.insert('categories', {'id': 'cat-001', 'name': 'Sembako'});
 
         await db.insert('stock', {
           'id': 'stock-001',
@@ -108,41 +105,40 @@ void main() {
       },
     );
 
-    test('price_history is append-only — multiple entries accumulate',
-        () async {
-      await db.insert('categories', {
-        'id': 'cat-002',
-        'name': 'Minuman',
-      });
+    test(
+      'price_history is append-only — multiple entries accumulate',
+      () async {
+        await db.insert('categories', {'id': 'cat-002', 'name': 'Minuman'});
 
-      await db.insert('stock', {
-        'id': 'stock-002',
-        'item_name': 'Teh Botol',
-        'current_qty': 100,
-        'default_price_sen': 400000,
-        'category_id': 'cat-002',
-      });
-
-      // Three price changes
-      for (var i = 1; i <= 3; i++) {
-        await db.insert('price_history', {
-          'id': 'ph-tea-$i',
-          'stock_id': 'stock-002',
-          'price_sen': 400000 + (i * 50000),
-          'reason': 'Perubahan ke-$i',
+        await db.insert('stock', {
+          'id': 'stock-002',
+          'item_name': 'Teh Botol',
+          'current_qty': 100,
+          'default_price_sen': 400000,
+          'category_id': 'cat-002',
         });
-      }
 
-      final history = await db.query(
-        'price_history',
-        where: 'stock_id = ?',
-        whereArgs: ['stock-002'],
-        orderBy: 'effective_from ASC',
-      );
-      expect(history.length, 3);
-      expect(history[0]['price_sen'], 450000);
-      expect(history[1]['price_sen'], 500000);
-      expect(history[2]['price_sen'], 550000);
-    });
+        // Three price changes
+        for (var i = 1; i <= 3; i++) {
+          await db.insert('price_history', {
+            'id': 'ph-tea-$i',
+            'stock_id': 'stock-002',
+            'price_sen': 400000 + (i * 50000),
+            'reason': 'Perubahan ke-$i',
+          });
+        }
+
+        final history = await db.query(
+          'price_history',
+          where: 'stock_id = ?',
+          whereArgs: ['stock-002'],
+          orderBy: 'effective_from ASC',
+        );
+        expect(history.length, 3);
+        expect(history[0]['price_sen'], 450000);
+        expect(history[1]['price_sen'], 500000);
+        expect(history[2]['price_sen'], 550000);
+      },
+    );
   });
 }

@@ -17,7 +17,8 @@ void main() {
 
   group('Level1JsonRepair.attempt', () {
     test('succeeds when fence stripping produces valid JSON', () async {
-      const malformed = '```json\n'
+      const malformed =
+          '```json\n'
           '{"name": "record_transactions", "arguments": {"qty": 1}}\n'
           '```';
 
@@ -34,21 +35,25 @@ void main() {
       expect(toolCall.name, 'record_transactions');
 
       // AiService should NOT be called — strip was enough
-      verifyNever(() => mockAiService.infer(
-            systemPrompt: any(named: 'systemPrompt'),
-            userInput: any(named: 'userInput'),
-            imageBase64: any(named: 'imageBase64'),
-          ));
+      verifyNever(
+        () => mockAiService.infer(
+          systemPrompt: any(named: 'systemPrompt'),
+          userInput: any(named: 'userInput'),
+          imageBase64: any(named: 'imageBase64'),
+        ),
+      );
     });
 
     test('retries inference when strip fails', () async {
       const totallyBroken = 'Sure! Here is the result: not json at all';
 
-      when(() => mockAiService.infer(
-            systemPrompt: any(named: 'systemPrompt'),
-            userInput: any(named: 'userInput'),
-            imageBase64: any(named: 'imageBase64'),
-          )).thenAnswer(
+      when(
+        () => mockAiService.infer(
+          systemPrompt: any(named: 'systemPrompt'),
+          userInput: any(named: 'userInput'),
+          imageBase64: any(named: 'imageBase64'),
+        ),
+      ).thenAnswer(
         (_) async => const Success(
           ToolCallSuccess(
             name: 'record_transactions',
@@ -66,11 +71,13 @@ void main() {
 
       expect(result, isA<Success>());
       // Verify inference was retried with reinforcement prompt
-      verify(() => mockAiService.infer(
-            systemPrompt: any(named: 'systemPrompt'),
-            userInput: any(named: 'userInput'),
-            imageBase64: any(named: 'imageBase64'),
-          )).called(1);
+      verify(
+        () => mockAiService.infer(
+          systemPrompt: any(named: 'systemPrompt'),
+          userInput: any(named: 'userInput'),
+          imageBase64: any(named: 'imageBase64'),
+        ),
+      ).called(1);
     });
 
     test('handles JSON with trailing text after valid object', () async {

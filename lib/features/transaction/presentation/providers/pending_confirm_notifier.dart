@@ -24,8 +24,8 @@ class PendingConfirmState {
 
   TransactionEntity? get currentItem =>
       items.isNotEmpty && currentItemIndex < items.length
-          ? items[currentItemIndex]
-          : null;
+      ? items[currentItemIndex]
+      : null;
 
   PendingConfirmState copyWith({
     List<TransactionEntity>? items,
@@ -46,10 +46,10 @@ class PendingConfirmState {
 
 class PendingConfirmNotifier extends StateNotifier<PendingConfirmState> {
   PendingConfirmNotifier()
-      : _getPendingTransactions = getIt<GetPendingTransactionsUseCase>(),
-        _confirmTransaction = getIt<ConfirmTransactionUseCase>(),
-        _repository = getIt<TransactionRepository>(),
-        super(const PendingConfirmState());
+    : _getPendingTransactions = getIt<GetPendingTransactionsUseCase>(),
+      _confirmTransaction = getIt<ConfirmTransactionUseCase>(),
+      _repository = getIt<TransactionRepository>(),
+      super(const PendingConfirmState());
 
   final GetPendingTransactionsUseCase _getPendingTransactions;
   final ConfirmTransactionUseCase _confirmTransaction;
@@ -68,10 +68,7 @@ class PendingConfirmNotifier extends StateNotifier<PendingConfirmState> {
           isProcessing: false,
         );
       case Failure(:final error):
-        state = state.copyWith(
-          isProcessing: false,
-          error: error,
-        );
+        state = state.copyWith(isProcessing: false, error: error);
     }
   }
 
@@ -89,10 +86,7 @@ class PendingConfirmNotifier extends StateNotifier<PendingConfirmState> {
           resultMessage: data,
         );
       case Failure(:final error):
-        state = state.copyWith(
-          isProcessing: false,
-          error: error,
-        );
+        state = state.copyWith(isProcessing: false, error: error);
     }
   }
 
@@ -103,8 +97,9 @@ class PendingConfirmNotifier extends StateNotifier<PendingConfirmState> {
 
     switch (result) {
       case Success():
-        final updatedItems =
-            state.items.where((item) => item.id != id).toList();
+        final updatedItems = state.items
+            .where((item) => item.id != id)
+            .toList();
         state = state.copyWith(
           items: updatedItems,
           currentItemIndex: _clampIndex(updatedItems),
@@ -123,8 +118,9 @@ class PendingConfirmNotifier extends StateNotifier<PendingConfirmState> {
 
     switch (result) {
       case Success():
-        final updatedItems =
-            state.items.where((item) => item.id != id).toList();
+        final updatedItems = state.items
+            .where((item) => item.id != id)
+            .toList();
         state = state.copyWith(
           items: updatedItems,
           currentItemIndex: _clampIndex(updatedItems),
@@ -163,5 +159,5 @@ class PendingConfirmNotifier extends StateNotifier<PendingConfirmState> {
 
 final pendingConfirmProvider =
     StateNotifierProvider<PendingConfirmNotifier, PendingConfirmState>(
-  (_) => PendingConfirmNotifier(),
-);
+      (_) => PendingConfirmNotifier(),
+    );

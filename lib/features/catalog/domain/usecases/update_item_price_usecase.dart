@@ -10,10 +10,9 @@ class UpdateItemPriceUseCase {
     required String stockId,
     required int newPriceSen,
     String? reason,
-  }) =>
-      _repository.updateItemPrice(
-        stockId: stockId,
-        newPriceSen: newPriceSen,
-        reason: reason,
-      );
+  }) => _repository.updateItemPrice(
+    stockId: stockId,
+    newPriceSen: newPriceSen,
+    reason: reason,
+  );
 }

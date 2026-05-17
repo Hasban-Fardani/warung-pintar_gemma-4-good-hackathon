@@ -21,7 +21,7 @@ final class InferenceTimeoutFailure extends AiFailure {
 final class InvalidJsonOutputFailure extends AiFailure {
   final String rawOutput;
   const InvalidJsonOutputFailure(this.rawOutput)
-      : super('Output AI bukan JSON valid');
+    : super('Output AI bukan JSON valid');
 }
 
 /// Image provided to vision agent is unreadable.

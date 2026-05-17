@@ -56,16 +56,21 @@ class _AddItemPageState extends ConsumerState<AddItemPage> {
     setState(() => _isSubmitting = true);
 
     final nama = _namaController.text.trim();
-    final hargaText = _hargaController.text.trim().replaceAll('.', '').replaceAll(',', '');
+    final hargaText = _hargaController.text
+        .trim()
+        .replaceAll('.', '')
+        .replaceAll(',', '');
     final harga = int.tryParse(hargaText) ?? 0;
     final hargaSen = harga * 100;
 
-    final error = await ref.read(catalogProvider.notifier).addItem(
-      name: nama,
-      price: hargaSen,
-      categoryId: _selectedCategoryId,
-      qty: 0,
-    );
+    final error = await ref
+        .read(catalogProvider.notifier)
+        .addItem(
+          name: nama,
+          price: hargaSen,
+          categoryId: _selectedCategoryId,
+          qty: 0,
+        );
 
     if (!mounted) return;
     setState(() => _isSubmitting = false);
@@ -97,7 +102,12 @@ class _AddItemPageState extends ConsumerState<AddItemPage> {
             ),
             title: Text(
               'Tambah Barang Baru',
-              style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w700, height: 28 / 20, color: AppColors.onSurface),
+              style: GoogleFonts.inter(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                height: 28 / 20,
+                color: AppColors.onSurface,
+              ),
             ),
             backgroundColor: AppColors.surface,
             surfaceTintColor: AppColors.surface,
@@ -108,7 +118,10 @@ class _AddItemPageState extends ConsumerState<AddItemPage> {
               width: 48,
               height: 4,
               margin: const EdgeInsets.only(top: 12, bottom: 8),
-              decoration: BoxDecoration(color: AppColors.outlineVariant, borderRadius: BorderRadius.circular(2)),
+              decoration: BoxDecoration(
+                color: AppColors.outlineVariant,
+                borderRadius: BorderRadius.circular(2),
+              ),
             ),
           ),
           Padding(
@@ -118,7 +131,12 @@ class _AddItemPageState extends ConsumerState<AddItemPage> {
                 Expanded(
                   child: Text(
                     'Tambah Barang Baru',
-                    style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w700, height: 28 / 20, color: AppColors.onSurface),
+                    style: GoogleFonts.inter(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      height: 28 / 20,
+                      color: AppColors.onSurface,
+                    ),
                   ),
                 ),
                 GestureDetector(
@@ -127,7 +145,10 @@ class _AddItemPageState extends ConsumerState<AddItemPage> {
                     width: 48,
                     height: 48,
                     alignment: Alignment.center,
-                    child: const Icon(Icons.close, color: AppColors.onSurfaceVariant),
+                    child: const Icon(
+                      Icons.close,
+                      color: AppColors.onSurfaceVariant,
+                    ),
                   ),
                 ),
               ],
@@ -143,9 +164,19 @@ class _AddItemPageState extends ConsumerState<AddItemPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildField('Nama Barang', _namaController, isRequired: true, hint: 'Contoh: Mie Ayam'),
+                  _buildField(
+                    'Nama Barang',
+                    _namaController,
+                    isRequired: true,
+                    hint: 'Contoh: Mie Ayam',
+                  ),
                   const SizedBox(height: 16),
-                  _buildField('Kode Barang (SKU)', _skuController, isRequired: false, hint: 'Otomatis dibuat'),
+                  _buildField(
+                    'Kode Barang (SKU)',
+                    _skuController,
+                    isRequired: false,
+                    hint: 'Otomatis dibuat',
+                  ),
                   const SizedBox(height: 16),
                   _buildKategoriDropdown(state),
                   const SizedBox(height: 16),
@@ -174,11 +205,19 @@ class _AddItemPageState extends ConsumerState<AddItemPage> {
                       onPressed: _isSubmitting ? null : _batalkan,
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: AppColors.primary),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4),
+                        ),
                       ),
                       child: Text(
                         'Batal',
-                        style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600, height: 20 / 16, letterSpacing: 0.16, color: AppColors.primary),
+                        style: GoogleFonts.inter(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          height: 20 / 16,
+                          letterSpacing: 0.16,
+                          color: AppColors.primary,
+                        ),
                       ),
                     ),
                   ),
@@ -192,13 +231,27 @@ class _AddItemPageState extends ConsumerState<AddItemPage> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primaryContainer,
                         foregroundColor: AppColors.onPrimaryContainer,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4),
+                        ),
                       ),
                       child: _isSubmitting
-                          ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
                           : Text(
                               'Simpan Barang',
-                              style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600, height: 20 / 16, letterSpacing: 0.16),
+                              style: GoogleFonts.inter(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                height: 20 / 16,
+                                letterSpacing: 0.16,
+                              ),
                             ),
                     ),
                   ),
@@ -223,30 +276,67 @@ class _AddItemPageState extends ConsumerState<AddItemPage> {
     );
   }
 
-  Widget _buildField(String label, TextEditingController controller, {bool isRequired = false, String? hint}) {
+  Widget _buildField(
+    String label,
+    TextEditingController controller, {
+    bool isRequired = false,
+    String? hint,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            Text(label, style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600, height: 20 / 16, letterSpacing: 0.16, color: AppColors.onSurface)),
-            if (isRequired) Text(' *', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.error)),
+            Text(
+              label,
+              style: GoogleFonts.inter(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                height: 20 / 16,
+                letterSpacing: 0.16,
+                color: AppColors.onSurface,
+              ),
+            ),
+            if (isRequired)
+              Text(
+                ' *',
+                style: GoogleFonts.inter(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.error,
+                ),
+              ),
           ],
         ),
         const SizedBox(height: 8),
         Container(
           height: 48,
-          decoration: BoxDecoration(border: Border.all(color: AppColors.outlineVariant), borderRadius: BorderRadius.circular(4)),
+          decoration: BoxDecoration(
+            border: Border.all(color: AppColors.outlineVariant),
+            borderRadius: BorderRadius.circular(4),
+          ),
           child: TextFormField(
             controller: controller,
-            validator: isRequired ? (v) => (v == null || v.trim().isEmpty) ? 'Wajib diisi' : null : null,
+            validator: isRequired
+                ? (v) => (v == null || v.trim().isEmpty) ? 'Wajib diisi' : null
+                : null,
             decoration: InputDecoration(
               hintText: hint,
-              hintStyle: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w400, height: 24 / 16, color: AppColors.onSurfaceVariant),
+              hintStyle: GoogleFonts.inter(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                height: 24 / 16,
+                color: AppColors.onSurfaceVariant,
+              ),
               border: InputBorder.none,
               contentPadding: const EdgeInsets.symmetric(horizontal: 16),
             ),
-            style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w400, height: 24 / 16, color: AppColors.onSurface),
+            style: GoogleFonts.inter(
+              fontSize: 16,
+              fontWeight: FontWeight.w400,
+              height: 24 / 16,
+              color: AppColors.onSurface,
+            ),
           ),
         ),
       ],
@@ -259,25 +349,59 @@ class _AddItemPageState extends ConsumerState<AddItemPage> {
       children: [
         Row(
           children: [
-            Text('Kategori', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600, height: 20 / 16, letterSpacing: 0.16, color: AppColors.onSurface)),
-            Text(' *', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.error)),
+            Text(
+              'Kategori',
+              style: GoogleFonts.inter(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                height: 20 / 16,
+                letterSpacing: 0.16,
+                color: AppColors.onSurface,
+              ),
+            ),
+            Text(
+              ' *',
+              style: GoogleFonts.inter(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: AppColors.error,
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 8),
-          Container(
-            height: 48,
-            decoration: BoxDecoration(border: Border.all(color: AppColors.outlineVariant), borderRadius: BorderRadius.circular(4)),
-            child: DropdownButtonFormField<String>(
-              initialValue: _selectedCategoryId,
+        Container(
+          height: 48,
+          decoration: BoxDecoration(
+            border: Border.all(color: AppColors.outlineVariant),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: DropdownButtonFormField<String>(
+            initialValue: _selectedCategoryId,
             isExpanded: true,
             decoration: const InputDecoration(
               border: InputBorder.none,
               contentPadding: EdgeInsets.symmetric(horizontal: 16),
             ),
-            hint: Text('Pilih kategori', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w400, color: AppColors.onSurfaceVariant)),
+            hint: Text(
+              'Pilih kategori',
+              style: GoogleFonts.inter(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                color: AppColors.onSurfaceVariant,
+              ),
+            ),
             validator: (v) => v == null ? 'Wajib dipilih' : null,
-            style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w400, height: 24 / 16, color: AppColors.onSurface),
-            icon: const Icon(Icons.arrow_drop_down, color: AppColors.onSurfaceVariant),
+            style: GoogleFonts.inter(
+              fontSize: 16,
+              fontWeight: FontWeight.w400,
+              height: 24 / 16,
+              color: AppColors.onSurface,
+            ),
+            icon: const Icon(
+              Icons.arrow_drop_down,
+              color: AppColors.onSurfaceVariant,
+            ),
             items: state.categories.map((cat) {
               final id = cat['id'] as String;
               final name = cat['name'] as String;
@@ -296,25 +420,54 @@ class _AddItemPageState extends ConsumerState<AddItemPage> {
       children: [
         Row(
           children: [
-            Text('Satuan', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600, height: 20 / 16, letterSpacing: 0.16, color: AppColors.onSurface)),
-            Text(' *', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.error)),
+            Text(
+              'Satuan',
+              style: GoogleFonts.inter(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                height: 20 / 16,
+                letterSpacing: 0.16,
+                color: AppColors.onSurface,
+              ),
+            ),
+            Text(
+              ' *',
+              style: GoogleFonts.inter(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: AppColors.error,
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 8),
-          Container(
-            height: 48,
-            decoration: BoxDecoration(border: Border.all(color: AppColors.outlineVariant), borderRadius: BorderRadius.circular(4)),
-            child: DropdownButtonFormField<String>(
-              initialValue: _selectedSatuan,
+        Container(
+          height: 48,
+          decoration: BoxDecoration(
+            border: Border.all(color: AppColors.outlineVariant),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: DropdownButtonFormField<String>(
+            initialValue: _selectedSatuan,
             isExpanded: true,
             decoration: const InputDecoration(
               border: InputBorder.none,
               contentPadding: EdgeInsets.symmetric(horizontal: 16),
             ),
             validator: (v) => v == null ? 'Wajib dipilih' : null,
-            style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w400, height: 24 / 16, color: AppColors.onSurface),
-            icon: const Icon(Icons.arrow_drop_down, color: AppColors.onSurfaceVariant),
-            items: _satuanOptions.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
+            style: GoogleFonts.inter(
+              fontSize: 16,
+              fontWeight: FontWeight.w400,
+              height: 24 / 16,
+              color: AppColors.onSurface,
+            ),
+            icon: const Icon(
+              Icons.arrow_drop_down,
+              color: AppColors.onSurfaceVariant,
+            ),
+            items: _satuanOptions
+                .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+                .toList(),
             onChanged: (v) {
               if (v != null) setState(() => _selectedSatuan = v);
             },
@@ -328,21 +481,40 @@ class _AddItemPageState extends ConsumerState<AddItemPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Harga Jual per Satuan', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600, height: 20 / 16, letterSpacing: 0.16, color: AppColors.onSurface)),
+        Text(
+          'Harga Jual per Satuan',
+          style: GoogleFonts.inter(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            height: 20 / 16,
+            letterSpacing: 0.16,
+            color: AppColors.onSurface,
+          ),
+        ),
         const SizedBox(height: 8),
         Container(
           height: 48,
-          decoration: BoxDecoration(border: Border.all(color: AppColors.outlineVariant), borderRadius: BorderRadius.circular(4)),
+          decoration: BoxDecoration(
+            border: Border.all(color: AppColors.outlineVariant),
+            borderRadius: BorderRadius.circular(4),
+          ),
           child: Row(
             children: [
               Container(
                 height: 48,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 alignment: Alignment.center,
-                decoration: const BoxDecoration(color: AppColors.surfaceContainerLow),
+                decoration: const BoxDecoration(
+                  color: AppColors.surfaceContainerLow,
+                ),
                 child: Text(
                   AppStrings.currencyPrefix.trim(),
-                  style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w400, height: 24 / 16, color: AppColors.onSurfaceVariant),
+                  style: GoogleFonts.inter(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    height: 24 / 16,
+                    color: AppColors.onSurfaceVariant,
+                  ),
                 ),
               ),
               Expanded(
@@ -352,11 +524,21 @@ class _AddItemPageState extends ConsumerState<AddItemPage> {
                   textAlign: TextAlign.right,
                   decoration: InputDecoration(
                     hintText: '0',
-                    hintStyle: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w400, height: 24 / 16, color: AppColors.onSurfaceVariant),
+                    hintStyle: GoogleFonts.inter(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      height: 24 / 16,
+                      color: AppColors.onSurfaceVariant,
+                    ),
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16),
                   ),
-                  style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w400, height: 24 / 16, color: AppColors.onSurface),
+                  style: GoogleFonts.inter(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    height: 24 / 16,
+                    color: AppColors.onSurface,
+                  ),
                 ),
               ),
             ],

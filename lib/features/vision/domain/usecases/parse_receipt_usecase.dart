@@ -82,8 +82,7 @@ Jika gambar tidak terbaca, output: {"error": "image_unreadable"}.
           itemName: tx['item_name']?.toString() ?? '',
           quantity: (tx['quantity'] as num?)?.toInt() ?? 1,
           amountSen: (tx['total_price_sen'] as num?)?.toInt() ?? 0,
-          priceAtTransactionSen:
-              (tx['total_price_sen'] as num?)?.toInt() ?? 0,
+          priceAtTransactionSen: (tx['total_price_sen'] as num?)?.toInt() ?? 0,
           transactionType: 'buy',
           inputMethod: 'image',
           rawInputSource: imagePath,

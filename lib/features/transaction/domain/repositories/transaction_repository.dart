@@ -25,5 +25,7 @@ abstract class TransactionRepository {
 
   Future<Result<List<TransactionEntity>, String>> getPendingTransactions();
 
-  Future<Result<List<TransactionEntity>, String>> getRecentTransactions({int limit = 5});
+  Future<Result<List<TransactionEntity>, String>> getRecentTransactions({
+    int limit = 5,
+  });
 }

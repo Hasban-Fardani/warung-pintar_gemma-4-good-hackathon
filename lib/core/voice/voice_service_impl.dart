@@ -20,9 +20,7 @@ class VoiceServiceImpl implements VoiceService {
   final SpeechToText _stt = SpeechToText();
   bool _isInitialized = false;
 
-  static final _logger = Logger(
-    printer: PrettyPrinter(methodCount: 0),
-  );
+  static final _logger = Logger(printer: PrettyPrinter(methodCount: 0));
 
   @override
   bool get isListening => _stt.isListening;
@@ -36,9 +34,7 @@ class VoiceServiceImpl implements VoiceService {
 
     if (!_isInitialized) {
       _logger.e('VoiceService: STT engine not available');
-      return const VoiceInitFailed(
-        'STT engine tidak tersedia di device ini',
-      );
+      return const VoiceInitFailed('STT engine tidak tersedia di device ini');
     }
 
     // Check id-ID locale availability
@@ -65,12 +61,8 @@ class VoiceServiceImpl implements VoiceService {
 
     await _stt.listen(
       localeId: VoiceConfig.localeId,
-      listenFor: const Duration(
-        milliseconds: VoiceConfig.maxListenDurationMs,
-      ),
-      pauseFor: const Duration(
-        milliseconds: VoiceConfig.vadSilenceThresholdMs,
-      ),
+      listenFor: const Duration(milliseconds: VoiceConfig.maxListenDurationMs),
+      pauseFor: const Duration(milliseconds: VoiceConfig.vadSilenceThresholdMs),
       onResult: (result) {
         if (result.finalResult &&
             result.confidence >= VoiceConfig.minConfidenceScore) {

@@ -42,9 +42,9 @@ class ModelDownloadScreen extends ConsumerWidget {
               Text(
                 'Menyiapkan AI Pintar',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.onSurface,
-                    ),
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.onSurface,
+                ),
               ),
               const SizedBox(height: 8),
               Text(
@@ -52,8 +52,8 @@ class ModelDownloadScreen extends ConsumerWidget {
                 'digunakan tanpa internet',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.onSurfaceVariant,
-                    ),
+                  color: AppColors.onSurfaceVariant,
+                ),
               ),
               const SizedBox(height: 40),
 
@@ -83,14 +83,18 @@ class ModelDownloadScreen extends ConsumerWidget {
   Widget _buildStartButton(BuildContext context, WidgetRef ref) {
     return Column(
       children: [
-        const Icon(Icons.cloud_download_outlined, size: 48, color: AppColors.primary),
+        const Icon(
+          Icons.cloud_download_outlined,
+          size: 48,
+          color: AppColors.primary,
+        ),
         const SizedBox(height: 16),
         Text(
           'Ukuran: ~2.5 GB\nDisarankan menggunakan WiFi',
           textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.onSurfaceVariant,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: AppColors.onSurfaceVariant),
         ),
         const SizedBox(height: 24),
         SizedBox(
@@ -108,12 +112,11 @@ class ModelDownloadScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildProgressIndicator(
-    BuildContext context,
-    DownloadProgress state,
-  ) {
+  Widget _buildProgressIndicator(BuildContext context, DownloadProgress state) {
     final percentText = '${(state.percent * 100).toStringAsFixed(1)}%';
-    final mbDownloaded = (state.downloadedBytes / 1024 / 1024).toStringAsFixed(0);
+    final mbDownloaded = (state.downloadedBytes / 1024 / 1024).toStringAsFixed(
+      0,
+    );
     final mbTotal = (state.totalBytes / 1024 / 1024).toStringAsFixed(0);
     final etaText = _formatEta(state.estimatedSecondsRemaining);
 
@@ -132,32 +135,32 @@ class ModelDownloadScreen extends ConsumerWidget {
         Text(
           percentText,
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.w700,
-                color: AppColors.primary,
-              ),
+            fontWeight: FontWeight.w700,
+            color: AppColors.primary,
+          ),
         ),
         const SizedBox(height: 4),
         Text(
           '$mbDownloaded MB / $mbTotal MB',
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.onSurfaceVariant,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: AppColors.onSurfaceVariant),
         ),
         const SizedBox(height: 4),
         Text(
           'Estimasi: $etaText',
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.onSurfaceVariant,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: AppColors.onSurfaceVariant),
         ),
         const SizedBox(height: 16),
         Text(
           'Proses berjalan di background — Anda bisa tutup layar ini',
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.onSurfaceVariant,
-                fontStyle: FontStyle.italic,
-              ),
+            color: AppColors.onSurfaceVariant,
+            fontStyle: FontStyle.italic,
+          ),
         ),
       ],
     );
@@ -177,9 +180,9 @@ class ModelDownloadScreen extends ConsumerWidget {
         const SizedBox(height: 16),
         Text(
           'Memverifikasi integritas file...',
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.onSurfaceVariant,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: AppColors.onSurfaceVariant),
         ),
       ],
     );
@@ -193,9 +196,9 @@ class ModelDownloadScreen extends ConsumerWidget {
         Text(
           'AI siap digunakan!',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: AppColors.confirmed,
-                fontWeight: FontWeight.w600,
-              ),
+            color: AppColors.confirmed,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ],
     );
@@ -209,9 +212,9 @@ class ModelDownloadScreen extends ConsumerWidget {
         Text(
           reason,
           textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.error,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: AppColors.error),
         ),
         const SizedBox(height: 24),
         SizedBox(

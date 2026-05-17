@@ -52,10 +52,7 @@ class TransactionDatasource {
   Future<void> confirmTransaction(String transactionId) async {
     await _db.db.update(
       'transactions',
-      {
-        'status': 'confirmed',
-        'confirmed_at': DateTime.now().toIso8601String(),
-      },
+      {'status': 'confirmed', 'confirmed_at': DateTime.now().toIso8601String()},
       where: 'id = ? AND status = ?',
       whereArgs: [transactionId, 'pending'],
     );

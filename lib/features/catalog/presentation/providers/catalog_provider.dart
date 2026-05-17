@@ -58,7 +58,8 @@ class CatalogNotifier extends StateNotifier<CatalogState> {
   final CatalogRepository _repository;
   final CatalogDatasource _datasource;
 
-  CatalogNotifier(this._repository, this._datasource) : super(const CatalogState());
+  CatalogNotifier(this._repository, this._datasource)
+    : super(const CatalogState());
 
   static final _getIt = GetIt.instance;
 
@@ -70,7 +71,11 @@ class CatalogNotifier extends StateNotifier<CatalogState> {
   }
 
   Future<void> loadCatalog({String? categoryId}) async {
-    state = state.copyWith(isLoading: true, selectedCategory: categoryId, clearError: true);
+    state = state.copyWith(
+      isLoading: true,
+      selectedCategory: categoryId,
+      clearError: true,
+    );
 
     final catalogResult = await _repository.getCatalog(categoryId: categoryId);
     final lowStockResult = await _repository.getLowStockItems();
@@ -111,7 +116,11 @@ class CatalogNotifier extends StateNotifier<CatalogState> {
     };
   }
 
-  Future<String?> updatePrice(String stockId, int newPriceSen, {String? reason}) async {
+  Future<String?> updatePrice(
+    String stockId,
+    int newPriceSen, {
+    String? reason,
+  }) async {
     final result = await _repository.updateItemPrice(
       stockId: stockId,
       newPriceSen: newPriceSen,

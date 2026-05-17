@@ -54,9 +54,7 @@ class JsonParser {
       final map = jsonDecode(clean) as Map<String, dynamic>;
 
       if (!map.containsKey('name')) {
-        return const ToolCallFallback(
-          reason: 'Missing required field: name',
-        );
+        return const ToolCallFallback(reason: 'Missing required field: name');
       }
       if (!map.containsKey('arguments')) {
         return const ToolCallFallback(

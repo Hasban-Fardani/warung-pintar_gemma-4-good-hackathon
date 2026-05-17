@@ -10,9 +10,7 @@ import 'package:logger/logger.dart';
 class GemmaIsolateService {
   GemmaIsolateService._();
 
-  static final _logger = Logger(
-    printer: PrettyPrinter(methodCount: 0),
-  );
+  static final _logger = Logger(printer: PrettyPrinter(methodCount: 0));
 
   static SendPort? _sendPort;
   static Isolate? _isolate;
@@ -34,10 +32,10 @@ class GemmaIsolateService {
 
     try {
       final receivePort = ReceivePort();
-      _isolate = await Isolate.spawn(
-        _gemmaWorker,
-        (receivePort.sendPort, modelPath),
-      );
+      _isolate = await Isolate.spawn(_gemmaWorker, (
+        receivePort.sendPort,
+        modelPath,
+      ));
 
       // First message from worker is its SendPort
       _sendPort = await receivePort.first as SendPort;
@@ -96,7 +94,8 @@ class GemmaIsolateService {
   /// Delegates to [initialize] with a default path.
   static Future<void> init() async {
     if (_isInitialized) return;
-    final defaultPath = _modelPath ?? 'models/gemma-4-E2B-it-litertlm-Q4_K_M.litertlm';
+    final defaultPath =
+        _modelPath ?? 'models/gemma-4-E2B-it-litertlm-Q4_K_M.litertlm';
     await initialize(modelPath: defaultPath);
   }
 

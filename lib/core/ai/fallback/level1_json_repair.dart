@@ -17,9 +17,7 @@ import 'package:warung_pintar_cimahi/core/error/result.dart';
 class Level1JsonRepair {
   Level1JsonRepair._();
 
-  static final _logger = Logger(
-    printer: PrettyPrinter(methodCount: 0),
-  );
+  static final _logger = Logger(printer: PrettyPrinter(methodCount: 0));
 
   /// Reinforcement suffix appended to system prompt on repair retry.
   static const _jsonRepairSuffix =

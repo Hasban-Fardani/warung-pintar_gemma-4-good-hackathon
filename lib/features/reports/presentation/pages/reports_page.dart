@@ -99,13 +99,18 @@ class _PeriodToggle extends StatelessWidget {
                 height: AppTheme.touchTargetMin,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: isActive ? AppColors.surfaceVariant : Colors.transparent,
+                  color: isActive
+                      ? AppColors.surfaceVariant
+                      : Colors.transparent,
                   borderRadius: BorderRadius.circular(AppTheme.radiusLg),
                 ),
                 foregroundDecoration: isActive
                     ? const BoxDecoration(
                         border: Border(
-                          bottom: BorderSide(color: AppColors.primary, width: 2),
+                          bottom: BorderSide(
+                            color: AppColors.primary,
+                            width: 2,
+                          ),
                         ),
                       )
                     : null,
@@ -114,7 +119,9 @@ class _PeriodToggle extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
-                    color: isActive ? AppColors.primary : AppColors.onSurfaceVariant,
+                    color: isActive
+                        ? AppColors.primary
+                        : AppColors.onSurfaceVariant,
                   ),
                 ),
               ),
@@ -148,10 +155,7 @@ class _RevenueChart extends StatelessWidget {
         children: [
           Text(
             'Pendapatan',
-            style: GoogleFonts.inter(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-            ),
+            style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: AppTheme.stackMd),
           SizedBox(
@@ -276,19 +280,17 @@ class _QuickStats extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Expanded(child: _StatItem(label: 'Produk Terlaris', value: 'Mie Instant')),
-          Container(
-            width: 1,
-            height: 48,
-            color: AppColors.outlineVariant,
+          const Expanded(
+            child: _StatItem(label: 'Produk Terlaris', value: 'Mie Instant'),
           ),
-          const Expanded(child: _StatItem(label: 'Rata-rata Transaksi', value: 'Rp 45.000')),
-          Container(
-            width: 1,
-            height: 48,
-            color: AppColors.outlineVariant,
+          Container(width: 1, height: 48, color: AppColors.outlineVariant),
+          const Expanded(
+            child: _StatItem(label: 'Rata-rata Transaksi', value: 'Rp 45.000'),
           ),
-          const Expanded(child: _StatItem(label: 'Total Transaksi', value: '128')),
+          Container(width: 1, height: 48, color: AppColors.outlineVariant),
+          const Expanded(
+            child: _StatItem(label: 'Total Transaksi', value: '128'),
+          ),
         ],
       ),
     );
@@ -349,7 +351,10 @@ class _SearchAndFilter extends StatelessWidget {
           controller: searchController,
           decoration: InputDecoration(
             hintText: 'Cari transaksi...',
-            prefixIcon: const Icon(Icons.search, color: AppColors.onSurfaceVariant),
+            prefixIcon: const Icon(
+              Icons.search,
+              color: AppColors.onSurfaceVariant,
+            ),
             border: OutlineInputBorder(
               borderSide: const BorderSide(color: AppColors.outlineVariant),
               borderRadius: BorderRadius.circular(AppTheme.radiusDefault),
@@ -378,9 +383,13 @@ class _SearchAndFilter extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: isActive ? AppColors.primaryContainer : Colors.transparent,
+                    color: isActive
+                        ? AppColors.primaryContainer
+                        : Colors.transparent,
                     border: Border.all(
-                      color: isActive ? AppColors.primaryContainer : AppColors.outlineVariant,
+                      color: isActive
+                          ? AppColors.primaryContainer
+                          : AppColors.outlineVariant,
                     ),
                     borderRadius: BorderRadius.circular(20),
                   ),
@@ -389,7 +398,9 @@ class _SearchAndFilter extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 13,
                       fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
-                      color: isActive ? AppColors.onPrimaryContainer : AppColors.onSurfaceVariant,
+                      color: isActive
+                          ? AppColors.onPrimaryContainer
+                          : AppColors.onSurfaceVariant,
                     ),
                   ),
                 ),
@@ -490,8 +501,12 @@ class _TransactionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isSell = data.type is TransactionSell;
     final amountColor = isSell ? AppColors.secondary : AppColors.error;
-    final badgeColor = isSell ? const Color(0xFFE8F5E9) : const Color(0xFFFFEBEE);
-    final badgeTextColor = isSell ? const Color(0xFF2E7D32) : const Color(0xFFC62828);
+    final badgeColor = isSell
+        ? const Color(0xFFE8F5E9)
+        : const Color(0xFFFFEBEE);
+    final badgeTextColor = isSell
+        ? const Color(0xFF2E7D32)
+        : const Color(0xFFC62828);
     final badgeLabel = isSell ? 'Jual' : 'Beli';
 
     return Container(
@@ -526,7 +541,10 @@ class _TransactionCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: badgeColor,
                         borderRadius: BorderRadius.circular(10),

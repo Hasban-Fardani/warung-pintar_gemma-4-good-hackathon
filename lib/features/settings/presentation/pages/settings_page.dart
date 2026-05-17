@@ -26,7 +26,14 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   );
   final _noTeleponController = TextEditingController(text: '081234567890');
 
-  final _kategoriList = ['Sembako', 'Minuman', 'Snack', 'Rokok', 'Alat Tulis', 'Obat'];
+  final _kategoriList = [
+    'Sembako',
+    'Minuman',
+    'Snack',
+    'Rokok',
+    'Alat Tulis',
+    'Obat',
+  ];
 
   @override
   void dispose() {
@@ -95,7 +102,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             aiConfidence: _aiConfidence,
             onAiConfidenceChanged: (v) => setState(() => _aiConfidence = v),
             voiceSensitivity: _voiceSensitivity,
-            onVoiceSensitivityChanged: (v) => setState(() => _voiceSensitivity = v),
+            onVoiceSensitivityChanged: (v) =>
+                setState(() => _voiceSensitivity = v),
           ),
           const SizedBox(height: AppTheme.stackMd),
           const _DataBackupSection(),
@@ -127,10 +135,7 @@ class _SettingsCard extends StatelessWidget {
         children: [
           Text(
             title,
-            style: GoogleFonts.inter(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-            ),
+            style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: AppTheme.stackMd),
           child,
@@ -269,7 +274,10 @@ class _PengaturanStokSection extends StatelessWidget {
                     : null,
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   border: Border.all(color: AppColors.outlineVariant),
                   borderRadius: BorderRadius.circular(AppTheme.radiusDefault),
@@ -309,11 +317,18 @@ class _PengaturanStokSection extends StatelessWidget {
               return GestureDetector(
                 onTap: () => onCategoryToggled(cat),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
-                    color: isSelected ? AppColors.primaryContainer : Colors.transparent,
+                    color: isSelected
+                        ? AppColors.primaryContainer
+                        : Colors.transparent,
                     border: Border.all(
-                      color: isSelected ? AppColors.primaryContainer : AppColors.outlineVariant,
+                      color: isSelected
+                          ? AppColors.primaryContainer
+                          : AppColors.outlineVariant,
                     ),
                     borderRadius: BorderRadius.circular(20),
                   ),
@@ -322,7 +337,9 @@ class _PengaturanStokSection extends StatelessWidget {
                     style: GoogleFonts.inter(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
-                      color: isSelected ? AppColors.onPrimaryContainer : AppColors.onSurfaceVariant,
+                      color: isSelected
+                          ? AppColors.onPrimaryContainer
+                          : AppColors.onSurfaceVariant,
                     ),
                   ),
                 ),
@@ -378,15 +395,21 @@ class _TampilanSection extends StatelessWidget {
                       height: AppTheme.touchTargetMin,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: isActive ? AppColors.surfaceVariant : Colors.transparent,
+                        color: isActive
+                            ? AppColors.surfaceVariant
+                            : Colors.transparent,
                         borderRadius: BorderRadius.circular(AppTheme.radiusLg),
                       ),
                       child: Text(
                         labels[i],
                         style: GoogleFonts.inter(
                           fontSize: 14,
-                          fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
-                          color: isActive ? AppColors.primary : AppColors.onSurfaceVariant,
+                          fontWeight: isActive
+                              ? FontWeight.w600
+                              : FontWeight.w400,
+                          color: isActive
+                              ? AppColors.primary
+                              : AppColors.onSurfaceVariant,
                         ),
                       ),
                     ),
@@ -547,11 +570,23 @@ class _DataBackupSection extends StatelessWidget {
       title: 'Data & Backup',
       child: Column(
         children: [
-          _ActionRow(icon: Icons.file_download_outlined, label: 'Ekspor CSV', onTap: () {}),
+          _ActionRow(
+            icon: Icons.file_download_outlined,
+            label: 'Ekspor CSV',
+            onTap: () {},
+          ),
           const Divider(color: AppColors.outlineVariant),
-          _ActionRow(icon: Icons.cloud_upload_outlined, label: 'Backup', onTap: () {}),
+          _ActionRow(
+            icon: Icons.cloud_upload_outlined,
+            label: 'Backup',
+            onTap: () {},
+          ),
           const Divider(color: AppColors.outlineVariant),
-          _ActionRow(icon: Icons.cloud_download_outlined, label: 'Pulihkan', onTap: () {}),
+          _ActionRow(
+            icon: Icons.cloud_download_outlined,
+            label: 'Pulihkan',
+            onTap: () {},
+          ),
           const Divider(color: AppColors.outlineVariant),
           _ActionRow(
             icon: Icons.delete_forever_outlined,
@@ -589,7 +624,11 @@ class _ActionRow extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: AppTheme.stackSm),
         child: Row(
           children: [
-            Icon(icon, color: iconColor ?? AppColors.onSurfaceVariant, size: 22),
+            Icon(
+              icon,
+              color: iconColor ?? AppColors.onSurfaceVariant,
+              size: 22,
+            ),
             const SizedBox(width: AppTheme.stackMd),
             Text(
               label,
@@ -654,10 +693,7 @@ class _InfoRow extends StatelessWidget {
         ),
         Text(
           value,
-          style: GoogleFonts.inter(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-          ),
+          style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600),
         ),
       ],
     );

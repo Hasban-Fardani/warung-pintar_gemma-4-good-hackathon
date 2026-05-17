@@ -11,32 +11,29 @@ class ImageQualityFailDialog extends StatelessWidget {
   const ImageQualityFailDialog({super.key, required this.reason});
 
   String get _message => switch (reason) {
-        ImageQualityFailReason.fileTooSmall =>
-          'Foto tidak terbaca — mungkin terlalu buram atau tidak tertangkap '
-              'kamera. Coba ambil foto lagi.',
-        ImageQualityFailReason.resolutionTooLow =>
-          'Foto terlalu kecil. Pastikan struk atau kemasan mengisi '
-              'sebagian besar layar kamera.',
-        ImageQualityFailReason.tooDark =>
-          'Foto terlalu gelap. Coba lagi dengan cahaya lebih baik — '
-              'dekat jendela atau nyalakan lampu.',
-      };
+    ImageQualityFailReason.fileTooSmall =>
+      'Foto tidak terbaca — mungkin terlalu buram atau tidak tertangkap '
+          'kamera. Coba ambil foto lagi.',
+    ImageQualityFailReason.resolutionTooLow =>
+      'Foto terlalu kecil. Pastikan struk atau kemasan mengisi '
+          'sebagian besar layar kamera.',
+    ImageQualityFailReason.tooDark =>
+      'Foto terlalu gelap. Coba lagi dengan cahaya lebih baik — '
+          'dekat jendela atau nyalakan lampu.',
+  };
 
   String get _title => switch (reason) {
-        ImageQualityFailReason.fileTooSmall => 'Foto Tidak Terdeteksi',
-        ImageQualityFailReason.resolutionTooLow => 'Foto Terlalu Kecil',
-        ImageQualityFailReason.tooDark => 'Foto Terlalu Gelap',
-      };
+    ImageQualityFailReason.fileTooSmall => 'Foto Tidak Terdeteksi',
+    ImageQualityFailReason.resolutionTooLow => 'Foto Terlalu Kecil',
+    ImageQualityFailReason.tooDark => 'Foto Terlalu Gelap',
+  };
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Row(
         children: [
-          const Icon(
-            Icons.camera_alt_outlined,
-            color: AppColors.pendingText,
-          ),
+          const Icon(Icons.camera_alt_outlined, color: AppColors.pendingText),
           const SizedBox(width: 8),
           Text(_title),
         ],

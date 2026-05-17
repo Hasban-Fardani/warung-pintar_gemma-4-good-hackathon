@@ -44,9 +44,9 @@ class VoiceTransactionState {
 
 class VoiceTransactionNotifier extends StateNotifier<VoiceTransactionState> {
   VoiceTransactionNotifier()
-      : _voiceService = getIt<VoiceService>(),
-        _recordVoiceTransaction = getIt<RecordVoiceTransactionUseCase>(),
-        super(const VoiceTransactionState());
+    : _voiceService = getIt<VoiceService>(),
+      _recordVoiceTransaction = getIt<RecordVoiceTransactionUseCase>(),
+      super(const VoiceTransactionState());
 
   final VoiceService _voiceService;
   final RecordVoiceTransactionUseCase _recordVoiceTransaction;
@@ -84,10 +84,7 @@ class VoiceTransactionNotifier extends StateNotifier<VoiceTransactionState> {
           transactions: const AsyncValue.data([]),
         );
       case Failure(:final error):
-        state = state.copyWith(
-          isProcessing: false,
-          resultMessage: error,
-        );
+        state = state.copyWith(isProcessing: false, resultMessage: error);
     }
   }
 
@@ -111,5 +108,5 @@ class VoiceTransactionNotifier extends StateNotifier<VoiceTransactionState> {
 
 final voiceTransactionProvider =
     StateNotifierProvider<VoiceTransactionNotifier, VoiceTransactionState>(
-  (_) => VoiceTransactionNotifier(),
-);
+      (_) => VoiceTransactionNotifier(),
+    );

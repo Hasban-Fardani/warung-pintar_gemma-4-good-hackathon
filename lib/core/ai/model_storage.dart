@@ -11,18 +11,19 @@ import 'package:path_provider/path_provider.dart';
 class ModelStorage {
   ModelStorage._();
 
-  static final _logger = Logger(
-    printer: PrettyPrinter(methodCount: 0),
-  );
+  static final _logger = Logger(printer: PrettyPrinter(methodCount: 0));
 
   static const String _modelFileName =
       'gemma-4-E2B-it-litertlm-Q4_K_M.litertlm';
 
   /// Placeholder SHA-256 — replace with official hash when model file
   /// is publicly available from Kaggle.
-  static const String _modelSha256 =
-      'a3f8c2d1e9b047f6a1c3e5d7b9f2a4c6'
-      'e8d0b2f4a6c8e0d2b4f6a8c0e2d4b6f8';
+  static const String _modelSha256 = String.fromEnvironment(
+    'MODEL_SHA256',
+    defaultValue:
+        'a3f8c2d1e9b047f6a1c3e5d7b9f2a4c6'
+        'e8d0b2f4a6c8e0d2b4f6a8c0e2d4b6f8',
+  );
 
   /// Full path to model file in app internal storage.
   static Future<String> get modelPath async {

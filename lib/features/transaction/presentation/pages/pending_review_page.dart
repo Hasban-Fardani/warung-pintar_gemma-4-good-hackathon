@@ -16,14 +16,16 @@ class PendingReviewPage extends ConsumerWidget {
     final state = ref.watch(pendingConfirmProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Pending Review'),
-      ),
+      appBar: AppBar(title: const Text('Pending Review')),
       body: switch (state) {
         PendingConfirmState(isProcessing: true, items: []) => const Center(
-            child: CircularProgressIndicator(),
-          ),
-        PendingConfirmState(error: final error?) => _buildError(context, ref, error),
+          child: CircularProgressIndicator(),
+        ),
+        PendingConfirmState(error: final error?) => _buildError(
+          context,
+          ref,
+          error,
+        ),
         PendingConfirmState(items: []) => _buildEmpty(context),
         _ => _buildList(context, ref, state),
       },
@@ -51,9 +53,9 @@ class PendingReviewPage extends ConsumerWidget {
             Text(
               error,
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.error,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: AppColors.error),
             ),
             const SizedBox(height: 24),
             FilledButton.icon(
@@ -82,9 +84,9 @@ class PendingReviewPage extends ConsumerWidget {
           const SizedBox(height: 16),
           Text(
             'Tidak ada transaksi pending',
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: AppColors.onSurfaceVariant,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyLarge?.copyWith(color: AppColors.onSurfaceVariant),
           ),
         ],
       ),
@@ -108,25 +110,23 @@ class PendingReviewPage extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: const BoxDecoration(
             color: AppColors.pendingBackground,
-            border: Border(
-              bottom: BorderSide(color: AppColors.cardBorder),
-            ),
+            border: Border(bottom: BorderSide(color: AppColors.cardBorder)),
           ),
           child: Row(
             children: [
               Text(
                 '${state.items.length} transaksi pending',
-                style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      color: AppColors.pendingText,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.labelLarge?.copyWith(color: AppColors.pendingText),
               ),
               const Spacer(),
               Text(
                 MoneyFormatter.senToPendingDisplay(totalPending),
                 style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      color: AppColors.pendingText,
-                      fontFeatures: const [FontFeature.tabularFigures()],
-                    ),
+                  color: AppColors.pendingText,
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                ),
               ),
             ],
           ),
@@ -134,9 +134,7 @@ class PendingReviewPage extends ConsumerWidget {
         Expanded(
           child: ListView.separated(
             itemCount: state.items.length,
-            separatorBuilder: (_, _) => const Divider(
-              height: 1,
-            ),
+            separatorBuilder: (_, _) => const Divider(height: 1),
             itemBuilder: (context, index) {
               final item = state.items[index];
               return _PendingTransactionItem(item: item);
@@ -169,11 +167,15 @@ class _PendingTransactionItem extends StatelessWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: isSell ? AppColors.primaryContainer : AppColors.errorContainer,
+                color: isSell
+                    ? AppColors.primaryContainer
+                    : AppColors.errorContainer,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
-                isSell ? Icons.shopping_cart_outlined : Icons.shopping_bag_outlined,
+                isSell
+                    ? Icons.shopping_cart_outlined
+                    : Icons.shopping_bag_outlined,
                 size: 20,
                 color: AppColors.onPrimary,
               ),
@@ -207,9 +209,8 @@ class _PendingTransactionItem extends StatelessWidget {
                         const SizedBox(width: 8),
                         Text(
                           '${item.quantity}x',
-                          style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                                color: AppColors.onSurfaceVariant,
-                              ),
+                          style: Theme.of(context).textTheme.labelMedium
+                              ?.copyWith(color: AppColors.onSurfaceVariant),
                         ),
                       ],
                     ],
@@ -224,16 +225,16 @@ class _PendingTransactionItem extends StatelessWidget {
                 Text(
                   MoneyFormatter.senToPendingDisplay(item.amountSen),
                   style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        color: isSell ? AppColors.secondary : AppColors.error,
-                        fontFeatures: const [FontFeature.tabularFigures()],
-                      ),
+                    color: isSell ? AppColors.secondary : AppColors.error,
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                  ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   DateFormat('HH:mm', 'id').format(item.createdAt),
                   style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                        color: AppColors.onSurfaceVariant,
-                      ),
+                    color: AppColors.onSurfaceVariant,
+                  ),
                 ),
               ],
             ),
@@ -254,19 +255,17 @@ class _TypeBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: isSell
-            ? AppColors.secondaryContainer
-            : AppColors.errorContainer,
+        color: isSell ? AppColors.secondaryContainer : AppColors.errorContainer,
         borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
         isSell ? 'Jual' : 'Beli',
         style: Theme.of(context).textTheme.labelMedium?.copyWith(
-              fontSize: 11,
-              color: isSell
-                  ? AppColors.onSecondaryContainer
-                  : AppColors.onErrorContainer,
-            ),
+          fontSize: 11,
+          color: isSell
+              ? AppColors.onSecondaryContainer
+              : AppColors.onErrorContainer,
+        ),
       ),
     );
   }
@@ -280,9 +279,13 @@ class _StatusBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isClarify = item.needsClarification;
-    final bgColor = isClarify ? AppColors.errorContainer : AppColors.pendingBackground;
+    final bgColor = isClarify
+        ? AppColors.errorContainer
+        : AppColors.pendingBackground;
     final textColor = isClarify ? AppColors.error : AppColors.pendingText;
-    final label = isClarify ? AppStrings.needsClarification : AppStrings.pending;
+    final label = isClarify
+        ? AppStrings.needsClarification
+        : AppStrings.pending;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -301,10 +304,9 @@ class _StatusBadge extends StatelessWidget {
           const SizedBox(width: 4),
           Text(
             label,
-            style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  fontSize: 11,
-                  color: textColor,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.labelMedium?.copyWith(fontSize: 11, color: textColor),
           ),
         ],
       ),
@@ -347,9 +349,9 @@ class _MethodBadge extends StatelessWidget {
           Text(
             label,
             style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  fontSize: 11,
-                  color: AppColors.onSurfaceVariant,
-                ),
+              fontSize: 11,
+              color: AppColors.onSurfaceVariant,
+            ),
           ),
         ],
       ),

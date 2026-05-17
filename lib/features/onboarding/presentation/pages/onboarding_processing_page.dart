@@ -49,9 +49,9 @@ class _OnboardingProcessingPageState
               const SizedBox(height: AppTheme.stackLg),
               Text(
                 'Saya sedang mengatur...',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      color: AppColors.onSurface,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.headlineSmall?.copyWith(color: AppColors.onSurface),
               ),
               const SizedBox(height: AppTheme.stackMd),
               _ProcessingSteps(),
@@ -61,8 +61,8 @@ class _OnboardingProcessingPageState
               Text(
                 'Ini memakan waktu 3-5 detik',
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      color: AppColors.onSurfaceVariant,
-                    ),
+                  color: AppColors.onSurfaceVariant,
+                ),
               ),
             ],
           ),
@@ -111,11 +111,7 @@ class _SpinningIconState extends State<_SpinningIcon>
           angle: _controller.value * 3.14159 * 2,
           child: child,
         ),
-        child: const Icon(
-          Icons.sync,
-          size: 32,
-          color: AppColors.primary,
-        ),
+        child: const Icon(Icons.sync, size: 32, color: AppColors.primary),
       ),
     );
   }
@@ -132,21 +128,21 @@ class _ProcessingSteps extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppTheme.radiusLg),
         border: Border.all(color: AppColors.outlineVariant),
       ),
-      child: Column(
+      child: const Column(
         children: [
-          const _StepItem(
+          _StepItem(
             icon: Icons.check_circle,
             iconColor: AppColors.primary,
             text: 'Membuat kategori: Sembako',
           ),
-          const SizedBox(height: AppTheme.stackSm),
-          const _StepItem(
+          SizedBox(height: AppTheme.stackSm),
+          _StepItem(
             icon: Icons.check_circle,
             iconColor: AppColors.primary,
             text: 'Menambahkan: Beras, Telur',
           ),
-          const SizedBox(height: AppTheme.stackSm),
-          const _StepItem(
+          SizedBox(height: AppTheme.stackSm),
+          _StepItem(
             icon: Icons.hourglass_empty,
             iconColor: AppColors.outline,
             text: 'Menyiapkan dashboard...',
@@ -180,8 +176,8 @@ class _StepItem extends StatelessWidget {
         Text(
           text,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: textColor ?? AppColors.onSurface,
-              ),
+            color: textColor ?? AppColors.onSurface,
+          ),
         ),
       ],
     );
@@ -199,9 +195,7 @@ class _ProgressBar extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.surfaceVariant,
           borderRadius: BorderRadius.circular(999),
-          border: Border.all(
-            color: AppColors.outlineVariant.withAlpha(77),
-          ),
+          border: Border.all(color: AppColors.outlineVariant.withAlpha(77)),
         ),
         child: FractionallySizedBox(
           alignment: Alignment.centerLeft,

@@ -51,9 +51,7 @@ class _TopAppBar extends StatelessWidget {
       height: AppTheme.touchTargetMin,
       decoration: const BoxDecoration(
         color: AppColors.surface,
-        border: Border(
-          bottom: BorderSide(color: AppColors.outlineVariant),
-        ),
+        border: Border(bottom: BorderSide(color: AppColors.outlineVariant)),
       ),
       child: Row(
         children: [
@@ -62,16 +60,16 @@ class _TopAppBar extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             'WarungPintar',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  color: AppColors.primary,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.headlineSmall?.copyWith(color: AppColors.primary),
           ),
           const Spacer(),
           Text(
             '1/4',
             style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: AppColors.onSurfaceVariant,
-                ),
+              color: AppColors.onSurfaceVariant,
+            ),
           ),
           const SizedBox(width: AppTheme.marginPage),
         ],
@@ -85,9 +83,11 @@ class _HeroIllustration extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      height: ((MediaQuery.of(context).size.width - AppTheme.marginPage * 2) *
-              9 / 16)
-          .clamp(180, 280),
+      height:
+          ((MediaQuery.of(context).size.width - AppTheme.marginPage * 2) *
+                  9 /
+                  16)
+              .clamp(180, 280),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLow,
         borderRadius: BorderRadius.circular(AppTheme.radiusXl),
@@ -111,17 +111,17 @@ class _HeadlineSection extends StatelessWidget {
       children: [
         Text(
           'Halo!',
-          style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                color: AppColors.onSurface,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.headlineLarge?.copyWith(color: AppColors.onSurface),
         ),
         const SizedBox(height: AppTheme.stackSm),
         Text(
           'Mari mulai kelola warung lebih mudah dan pintar.',
           textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.onSurfaceVariant,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: AppColors.onSurfaceVariant),
         ),
       ],
     );
@@ -131,25 +131,27 @@ class _HeadlineSection extends StatelessWidget {
 class _BenefitsGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return const Column(
       children: [
-            const _BenefitCard(
+        _BenefitCard(
           icon: Icons.mic,
           iconBg: AppColors.primaryContainer,
           iconColor: AppColors.onPrimaryContainer,
           title: 'Catat dengan Suara',
-          subtitle: 'Tidak perlu mengetik panjang lebar. Cukup bicarakan transaksi Anda.',
+          subtitle:
+              'Tidak perlu mengetik panjang lebar. Cukup bicarakan transaksi Anda.',
         ),
-        const SizedBox(height: AppTheme.gutter),
-        const _BenefitCard(
+        SizedBox(height: AppTheme.gutter),
+        _BenefitCard(
           icon: Icons.inventory_2,
           iconBg: AppColors.secondaryContainer,
           iconColor: AppColors.onSecondaryContainer,
           title: 'Pantau Stok Akurat',
-          subtitle: 'Ketahui sisa barang secara real-time untuk mencegah kehabisan stok.',
+          subtitle:
+              'Ketahui sisa barang secara real-time untuk mencegah kehabisan stok.',
         ),
-        const SizedBox(height: AppTheme.gutter),
-        const _BenefitCard(
+        SizedBox(height: AppTheme.gutter),
+        _BenefitCard(
           icon: Icons.trending_up,
           iconBg: AppColors.tertiaryContainer,
           iconColor: AppColors.onTertiaryContainer,
@@ -191,10 +193,7 @@ class _BenefitCard extends StatelessWidget {
           Container(
             width: 48,
             height: 48,
-            decoration: BoxDecoration(
-              color: iconBg,
-              shape: BoxShape.circle,
-            ),
+            decoration: BoxDecoration(color: iconBg, shape: BoxShape.circle),
             child: Icon(icon, color: iconColor, size: 24),
           ),
           const SizedBox(width: AppTheme.stackSm),
@@ -204,16 +203,16 @@ class _BenefitCard extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        color: AppColors.onSurface,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.labelLarge?.copyWith(color: AppColors.onSurface),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   subtitle,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.onSurfaceVariant,
-                      ),
+                    color: AppColors.onSurfaceVariant,
+                  ),
                 ),
               ],
             ),
@@ -232,26 +231,20 @@ class _AiBubble extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFFF3E8FF),
         borderRadius: BorderRadius.circular(AppTheme.radiusLg),
-        border: Border.all(
-          color: const Color(0xFF6B21A8).withAlpha(51),
-        ),
+        border: Border.all(color: const Color(0xFF6B21A8).withAlpha(51)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(
-            Icons.auto_awesome,
-            color: Color(0xFF6B21A8),
-            size: 20,
-          ),
+          const Icon(Icons.auto_awesome, color: Color(0xFF6B21A8), size: 20),
           const SizedBox(width: AppTheme.stackSm),
           Expanded(
             child: Text(
               'Semua berjalan offline, tanpa internet, aman.',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: const Color(0xFF6B21A8),
-                    fontWeight: FontWeight.w500,
-                  ),
+                color: const Color(0xFF6B21A8),
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
         ],
@@ -276,9 +269,7 @@ class _BottomAction extends ConsumerWidget {
       ),
       decoration: const BoxDecoration(
         color: AppColors.surface,
-        border: Border(
-          top: BorderSide(color: AppColors.outlineVariant),
-        ),
+        border: Border(top: BorderSide(color: AppColors.outlineVariant)),
       ),
       child: SizedBox(
         width: double.infinity,

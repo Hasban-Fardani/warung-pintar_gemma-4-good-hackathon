@@ -42,8 +42,8 @@ class TransactionRepositoryImpl implements TransactionRepository {
         action: inputMethod == 'voice'
             ? 'CREATED_BY_AI_VOICE'
             : inputMethod == 'image'
-                ? 'CREATED_BY_AI_IMAGE'
-                : 'CREATED_MANUAL',
+            ? 'CREATED_BY_AI_IMAGE'
+            : 'CREATED_MANUAL',
         stateSnapshot: {
           'item_name': itemName,
           'quantity': quantity,
@@ -62,9 +62,7 @@ class TransactionRepositoryImpl implements TransactionRepository {
   }
 
   @override
-  Future<Result<void, String>> confirmTransaction(
-    String transactionId,
-  ) async {
+  Future<Result<void, String>> confirmTransaction(String transactionId) async {
     try {
       await _datasource.confirmTransaction(transactionId);
       await _datasource.insertAuditLog(
@@ -123,7 +121,8 @@ class TransactionRepositoryImpl implements TransactionRepository {
   }
 
   @override
-  Future<Result<List<TransactionEntity>, String>> getPendingTransactions() async {
+  Future<Result<List<TransactionEntity>, String>>
+  getPendingTransactions() async {
     try {
       final models = await _datasource.getPending();
       return Success(models.map((m) => m.toEntity()).toList());

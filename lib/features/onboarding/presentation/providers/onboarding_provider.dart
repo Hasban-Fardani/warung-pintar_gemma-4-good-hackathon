@@ -83,5 +83,5 @@ class OnboardingNotifier extends StateNotifier<OnboardingState> {
 
 final onboardingProvider =
     StateNotifierProvider<OnboardingNotifier, OnboardingState>(
-  (_) => OnboardingNotifier(),
-);
+      (_) => OnboardingNotifier(),
+    );

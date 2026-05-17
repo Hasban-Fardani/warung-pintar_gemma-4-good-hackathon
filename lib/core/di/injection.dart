@@ -11,6 +11,7 @@ import 'package:warung_pintar_cimahi/features/transaction/data/datasources/audit
 import 'package:warung_pintar_cimahi/features/transaction/data/datasources/transaction_datasource.dart';
 import 'package:warung_pintar_cimahi/features/transaction/data/repositories/transaction_repository_impl.dart';
 import 'package:warung_pintar_cimahi/features/transaction/domain/repositories/transaction_repository.dart';
+import 'package:warung_pintar_cimahi/features/transaction/domain/usecases/get_pending_transactions_usecase.dart';
 
 final getIt = GetIt.instance;
 
@@ -23,9 +24,7 @@ void configureDependencies() {
     getIt.registerLazySingleton<VoiceService>(() => VoiceServiceImpl());
   }
   if (!getIt.isRegistered<DatabaseService>()) {
-    getIt.registerLazySingleton<DatabaseService>(
-      () => DatabaseServiceImpl(),
-    );
+    getIt.registerLazySingleton<DatabaseService>(() => DatabaseServiceImpl());
   }
 
   // Datasources
@@ -54,6 +53,13 @@ void configureDependencies() {
   if (!getIt.isRegistered<CatalogRepository>()) {
     getIt.registerLazySingleton<CatalogRepository>(
       () => CatalogRepositoryImpl(getIt<CatalogDatasource>()),
+    );
+  }
+
+  // UseCases
+  if (!getIt.isRegistered<GetPendingTransactionsUseCase>()) {
+    getIt.registerLazySingleton<GetPendingTransactionsUseCase>(
+      () => GetPendingTransactionsUseCase(getIt<TransactionRepository>()),
     );
   }
 }

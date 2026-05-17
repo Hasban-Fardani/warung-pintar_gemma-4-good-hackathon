@@ -12,7 +12,9 @@ import 'package:warung_pintar_cimahi/features/transaction/domain/entities/transa
 import 'package:warung_pintar_cimahi/features/transaction/domain/repositories/transaction_repository.dart';
 
 class MockTransactionRepository extends Mock implements TransactionRepository {}
+
 class MockCatalogRepository extends Mock implements CatalogRepository {}
+
 class MockDatabaseService extends Mock implements DatabaseService {}
 
 void main() {
@@ -35,22 +37,22 @@ void main() {
       getIt.registerLazySingleton<DatabaseService>(() => mockDb);
     }
 
-    when(() => mockTxRepo.getRecentTransactions(limit: any(named: 'limit')))
-        .thenAnswer((_) async => const Success(<TransactionEntity>[]));
-    when(() => mockTxRepo.getPendingTransactions())
-        .thenAnswer((_) async => const Success(<TransactionEntity>[]));
-    when(() => mockCatalogRepo.getLowStockItems())
-        .thenAnswer((_) async => const Success(<StockEntity>[]));
+    when(
+      () => mockTxRepo.getRecentTransactions(limit: any(named: 'limit')),
+    ).thenAnswer((_) async => const Success(<TransactionEntity>[]));
+    when(
+      () => mockTxRepo.getPendingTransactions(),
+    ).thenAnswer((_) async => const Success(<TransactionEntity>[]));
+    when(
+      () => mockCatalogRepo.getLowStockItems(),
+    ).thenAnswer((_) async => const Success(<StockEntity>[]));
   });
 
-  testWidgets('DashboardScreen renders WarungPintar title',
-      (WidgetTester tester) async {
+  testWidgets('DashboardScreen renders WarungPintar title', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
-      const ProviderScope(
-        child: MaterialApp(
-          home: DashboardScreen(),
-        ),
-      ),
+      const ProviderScope(child: MaterialApp(home: DashboardScreen())),
     );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));

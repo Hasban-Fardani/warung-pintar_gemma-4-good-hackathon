@@ -98,17 +98,26 @@ class _CatalogListPageState extends ConsumerState<CatalogListPage> {
       body: state.isLoading
           ? const Center(child: CircularProgressIndicator())
           : state.error != null
-              ? Center(
-                  child: Text(state.error!, style: GoogleFonts.inter(fontSize: 16, color: AppColors.error)),
-                )
-              : _buildContent(state),
+          ? Center(
+              child: Text(
+                state.error!,
+                style: GoogleFonts.inter(fontSize: 16, color: AppColors.error),
+              ),
+            )
+          : _buildContent(state),
     );
   }
 
   Widget _buildContent(CatalogState state) {
     final filtered = _searchQuery.isEmpty
         ? state.items
-        : state.items.where((e) => e.itemName.toLowerCase().contains(_searchQuery.toLowerCase())).toList();
+        : state.items
+              .where(
+                (e) => e.itemName.toLowerCase().contains(
+                  _searchQuery.toLowerCase(),
+                ),
+              )
+              .toList();
 
     return Column(
       children: [
@@ -143,9 +152,17 @@ class _CatalogListPageState extends ConsumerState<CatalogListPage> {
           children: [
             _statCard(itemWidth, 'Total Barang', '${state.totalItems} item'),
             const SizedBox(width: 8),
-            _statCard(itemWidth, 'Kategori Aktif', '${state.activeCategoryCount} kategori'),
+            _statCard(
+              itemWidth,
+              'Kategori Aktif',
+              '${state.activeCategoryCount} kategori',
+            ),
             const SizedBox(width: 8),
-            _statCard(itemWidth, 'Barang Tanpa Stok', '${state.outOfStockCount} item'),
+            _statCard(
+              itemWidth,
+              'Barang Tanpa Stok',
+              '${state.outOfStockCount} item',
+            ),
           ],
         );
       },
@@ -164,9 +181,26 @@ class _CatalogListPageState extends ConsumerState<CatalogListPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w500, height: 18 / 14, letterSpacing: 0.28, color: AppColors.onSurfaceVariant)),
+          Text(
+            label,
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              height: 18 / 14,
+              letterSpacing: 0.28,
+              color: AppColors.onSurfaceVariant,
+            ),
+          ),
           const SizedBox(height: 8),
-          Text(value, style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w700, height: 28 / 20, color: AppColors.onSurface)),
+          Text(
+            value,
+            style: GoogleFonts.inter(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              height: 28 / 20,
+              color: AppColors.onSurface,
+            ),
+          ),
         ],
       ),
     );
@@ -175,7 +209,11 @@ class _CatalogListPageState extends ConsumerState<CatalogListPage> {
   Widget _buildSearchBar() {
     return Container(
       height: 48,
-      decoration: BoxDecoration(border: Border.all(color: AppColors.outlineVariant), borderRadius: BorderRadius.circular(4), color: AppColors.surface),
+      decoration: BoxDecoration(
+        border: Border.all(color: AppColors.outlineVariant),
+        borderRadius: BorderRadius.circular(4),
+        color: AppColors.surface,
+      ),
       child: Row(
         children: [
           const SizedBox(width: 16),
@@ -187,12 +225,22 @@ class _CatalogListPageState extends ConsumerState<CatalogListPage> {
               onChanged: (v) => setState(() => _searchQuery = v),
               decoration: InputDecoration(
                 hintText: 'Cari nama barang...',
-                hintStyle: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w400, height: 24 / 16, color: AppColors.onSurfaceVariant),
+                hintStyle: GoogleFonts.inter(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                  height: 24 / 16,
+                  color: AppColors.onSurfaceVariant,
+                ),
                 border: InputBorder.none,
                 isDense: true,
                 contentPadding: EdgeInsets.zero,
               ),
-              style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w400, height: 24 / 16, color: AppColors.onSurface),
+              style: GoogleFonts.inter(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                height: 24 / 16,
+                color: AppColors.onSurface,
+              ),
             ),
           ),
         ],
@@ -203,14 +251,17 @@ class _CatalogListPageState extends ConsumerState<CatalogListPage> {
   Widget _buildCategoryChips(CatalogState state) {
     return SizedBox(
       height: 48,
-      child: ListView(scrollDirection: Axis.horizontal, children: [
-        _categoryChip('Semua', state.selectedCategory == null, null),
-        ...state.categories.map((cat) {
-          final id = cat['id'] as String;
-          final name = cat['name'] as String;
-          return _categoryChip(name, state.selectedCategory == id, id);
-        }),
-      ]),
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        children: [
+          _categoryChip('Semua', state.selectedCategory == null, null),
+          ...state.categories.map((cat) {
+            final id = cat['id'] as String;
+            final name = cat['name'] as String;
+            return _categoryChip(name, state.selectedCategory == id, id);
+          }),
+        ],
+      ),
     );
   }
 
@@ -218,17 +269,32 @@ class _CatalogListPageState extends ConsumerState<CatalogListPage> {
     return Padding(
       padding: const EdgeInsets.only(right: 8),
       child: GestureDetector(
-        onTap: () => ref.read(catalogProvider.notifier).loadCatalog(categoryId: categoryId),
+        onTap: () => ref
+            .read(catalogProvider.notifier)
+            .loadCatalog(categoryId: categoryId),
         child: Container(
           height: 48,
           padding: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
             color: isActive ? AppColors.primaryFixed : AppColors.surface,
-            border: Border.all(color: isActive ? AppColors.primary : AppColors.outlineVariant),
+            border: Border.all(
+              color: isActive ? AppColors.primary : AppColors.outlineVariant,
+            ),
             borderRadius: BorderRadius.circular(4),
           ),
           alignment: Alignment.center,
-          child: Text(label, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w500, height: 18 / 14, letterSpacing: 0.28, color: isActive ? AppColors.onPrimaryFixed : AppColors.onSurfaceVariant)),
+          child: Text(
+            label,
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              height: 18 / 14,
+              letterSpacing: 0.28,
+              color: isActive
+                  ? AppColors.onPrimaryFixed
+                  : AppColors.onSurfaceVariant,
+            ),
+          ),
         ),
       ),
     );
@@ -236,7 +302,11 @@ class _CatalogListPageState extends ConsumerState<CatalogListPage> {
 
   Widget _buildTable(List<StockEntity> items, CatalogState state) {
     return Container(
-      decoration: BoxDecoration(border: Border.all(color: AppColors.outlineVariant), borderRadius: BorderRadius.circular(4), color: AppColors.surface),
+      decoration: BoxDecoration(
+        border: Border.all(color: AppColors.outlineVariant),
+        borderRadius: BorderRadius.circular(4),
+        color: AppColors.surface,
+      ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(4),
         child: SingleChildScrollView(
@@ -245,29 +315,142 @@ class _CatalogListPageState extends ConsumerState<CatalogListPage> {
             headingRowHeight: 48,
             dataRowMinHeight: 56,
             dataRowMaxHeight: 56,
-            headingRowColor: WidgetStateProperty.all(AppColors.surfaceContainerLow),
-            border: TableBorder(horizontalInside: BorderSide(color: AppColors.outlineVariant, width: 0.5)),
+            headingRowColor: WidgetStateProperty.all(
+              AppColors.surfaceContainerLow,
+            ),
+            border: const TableBorder(
+              horizontalInside: BorderSide(
+                color: AppColors.outlineVariant,
+                width: 0.5,
+              ),
+            ),
             columnSpacing: 24,
             columns: [
-              DataColumn(label: Text('Nama Barang', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w500, height: 18 / 14, letterSpacing: 0.28, color: AppColors.onSurfaceVariant))),
-              DataColumn(label: Text('Kategori', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w500, height: 18 / 14, letterSpacing: 0.28, color: AppColors.onSurfaceVariant))),
-              DataColumn(label: Text('Satuan', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w500, height: 18 / 14, letterSpacing: 0.28, color: AppColors.onSurfaceVariant))),
-              DataColumn(label: Text('Harga', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w500, height: 18 / 14, letterSpacing: 0.28, color: AppColors.onSurfaceVariant)), numeric: true),
-              DataColumn(label: Text('Status', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w500, height: 18 / 14, letterSpacing: 0.28, color: AppColors.onSurfaceVariant))),
+              DataColumn(
+                label: Text(
+                  'Nama Barang',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    height: 18 / 14,
+                    letterSpacing: 0.28,
+                    color: AppColors.onSurfaceVariant,
+                  ),
+                ),
+              ),
+              DataColumn(
+                label: Text(
+                  'Kategori',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    height: 18 / 14,
+                    letterSpacing: 0.28,
+                    color: AppColors.onSurfaceVariant,
+                  ),
+                ),
+              ),
+              DataColumn(
+                label: Text(
+                  'Satuan',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    height: 18 / 14,
+                    letterSpacing: 0.28,
+                    color: AppColors.onSurfaceVariant,
+                  ),
+                ),
+              ),
+              DataColumn(
+                label: Text(
+                  'Harga',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    height: 18 / 14,
+                    letterSpacing: 0.28,
+                    color: AppColors.onSurfaceVariant,
+                  ),
+                ),
+                numeric: true,
+              ),
+              DataColumn(
+                label: Text(
+                  'Status',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    height: 18 / 14,
+                    letterSpacing: 0.28,
+                    color: AppColors.onSurfaceVariant,
+                  ),
+                ),
+              ),
             ],
             rows: items.map((item) {
-              final categoryName = state.categories.where((c) => c['id'] == item.categoryId).map((c) => c['name'] as String).firstOrNull ?? '-';
+              final categoryName =
+                  state.categories
+                      .where((c) => c['id'] == item.categoryId)
+                      .map((c) => c['name'] as String)
+                      .firstOrNull ??
+                  '-';
               return DataRow(
-                color: WidgetStateProperty.resolveWith((states) => states.contains(WidgetState.hovered) ? AppColors.surfaceContainerLowest : null),
+                color: WidgetStateProperty.resolveWith(
+                  (states) => states.contains(WidgetState.hovered)
+                      ? AppColors.surfaceContainerLowest
+                      : null,
+                ),
                 cells: [
-                  DataCell(Text(item.itemName, style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600, height: 20 / 16, letterSpacing: 0.16, color: AppColors.onSurface))),
-                  DataCell(Text(categoryName, style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w400, height: 24 / 16, color: AppColors.onSurface))),
-                  DataCell(Text('-', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w400, height: 24 / 16, color: AppColors.onSurface))),
-                  DataCell(Text(
-                    NumberFormat.decimalPattern('id').format(item.defaultPriceSen ~/ 100),
-                    style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w400, height: 24 / 16, color: AppColors.onSurface, fontFeatures: const [FontFeature.tabularFigures()]),
-                    textAlign: TextAlign.right,
-                  )),
+                  DataCell(
+                    Text(
+                      item.itemName,
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        height: 20 / 16,
+                        letterSpacing: 0.16,
+                        color: AppColors.onSurface,
+                      ),
+                    ),
+                  ),
+                  DataCell(
+                    Text(
+                      categoryName,
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        height: 24 / 16,
+                        color: AppColors.onSurface,
+                      ),
+                    ),
+                  ),
+                  DataCell(
+                    Text(
+                      '-',
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        height: 24 / 16,
+                        color: AppColors.onSurface,
+                      ),
+                    ),
+                  ),
+                  DataCell(
+                    Text(
+                      NumberFormat.decimalPattern(
+                        'id',
+                      ).format(item.defaultPriceSen ~/ 100),
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        height: 24 / 16,
+                        color: AppColors.onSurface,
+                        fontFeatures: const [FontFeature.tabularFigures()],
+                      ),
+                      textAlign: TextAlign.right,
+                    ),
+                  ),
                   DataCell(_statusBadge(item)),
                 ],
               );
@@ -284,30 +467,48 @@ class _CatalogListPageState extends ConsumerState<CatalogListPage> {
       height: 24,
       padding: const EdgeInsets.symmetric(horizontal: 8),
       decoration: BoxDecoration(
-        color: isActive ? AppColors.secondaryContainer : AppColors.errorContainer,
-        border: Border.all(color: isActive ? AppColors.secondaryFixedDim : AppColors.error),
+        color: isActive
+            ? AppColors.secondaryContainer
+            : AppColors.errorContainer,
+        border: Border.all(
+          color: isActive ? AppColors.secondaryFixedDim : AppColors.error,
+        ),
         borderRadius: BorderRadius.circular(4),
       ),
       alignment: Alignment.center,
       child: Text(
         isActive ? 'Aktif' : (item.isOutOfStock ? 'Habis' : 'Menipis'),
-        style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w500, height: 18 / 14, letterSpacing: 0.28, color: isActive ? AppColors.onSecondaryContainer : AppColors.onErrorContainer),
+        style: GoogleFonts.inter(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          height: 18 / 14,
+          letterSpacing: 0.28,
+          color: isActive
+              ? AppColors.onSecondaryContainer
+              : AppColors.onErrorContainer,
+        ),
       ),
     );
   }
 
   Widget _buildBottomNav(BuildContext context, CatalogState state) {
     return Container(
-      decoration: const BoxDecoration(color: AppColors.surface, border: Border(top: BorderSide(color: AppColors.outlineVariant))),
+      decoration: const BoxDecoration(
+        color: AppColors.surface,
+        border: Border(top: BorderSide(color: AppColors.outlineVariant)),
+      ),
       child: SafeArea(
         top: false,
         child: SizedBox(
           height: 64,
-          child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-            _navItem(Icons.home, 'Home', false),
-            _navItem(Icons.history, 'Riwayat', false),
-            _navItem(Icons.settings, 'Pengaturan', false),
-          ]),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _navItem(Icons.home, 'Home', false),
+              _navItem(Icons.history, 'Riwayat', false),
+              _navItem(Icons.settings, 'Pengaturan', false),
+            ],
+          ),
         ),
       ),
     );
@@ -318,11 +519,23 @@ class _CatalogListPageState extends ConsumerState<CatalogListPage> {
     return SizedBox(
       width: 80,
       height: 64,
-      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        Icon(icon, size: 24, color: color),
-        const SizedBox(height: 4),
-        Text(label, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w500, height: 18 / 14, letterSpacing: 0.28, color: color)),
-      ]),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 24, color: color),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              height: 18 / 14,
+              letterSpacing: 0.28,
+              color: color,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

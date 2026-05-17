@@ -28,9 +28,7 @@ class LanguagePackDialog extends StatelessWidget {
             // url_launcher is added in a future milestone.
             Navigator.of(context).pop();
           },
-          style: FilledButton.styleFrom(
-            backgroundColor: AppColors.primary,
-          ),
+          style: FilledButton.styleFrom(backgroundColor: AppColors.primary),
           child: const Text('Buka Pengaturan'),
         ),
       ],
