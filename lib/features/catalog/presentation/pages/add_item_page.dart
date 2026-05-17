@@ -20,6 +20,7 @@ class _AddItemPageState extends ConsumerState<AddItemPage> {
   final _namaController = TextEditingController();
   final _skuController = TextEditingController();
   final _hargaController = TextEditingController();
+  final _stokController = TextEditingController(text: '0');
 
   String? _selectedCategoryId;
   String _selectedSatuan = 'pcs';
@@ -39,6 +40,7 @@ class _AddItemPageState extends ConsumerState<AddItemPage> {
     _namaController.dispose();
     _skuController.dispose();
     _hargaController.dispose();
+    _stokController.dispose();
     super.dispose();
   }
 
@@ -62,6 +64,8 @@ class _AddItemPageState extends ConsumerState<AddItemPage> {
         .replaceAll(',', '');
     final harga = int.tryParse(hargaText) ?? 0;
     final hargaSen = harga * 100;
+    final stokText = _stokController.text.trim();
+    final stokAwal = int.tryParse(stokText) ?? 0;
 
     final error = await ref
         .read(catalogProvider.notifier)
@@ -69,7 +73,7 @@ class _AddItemPageState extends ConsumerState<AddItemPage> {
           name: nama,
           price: hargaSen,
           categoryId: _selectedCategoryId,
-          qty: 0,
+          qty: stokAwal,
         );
 
     if (!mounted) return;
@@ -96,21 +100,25 @@ class _AddItemPageState extends ConsumerState<AddItemPage> {
       children: [
         if (!widget.asBottomSheet) ...[
           AppBar(
+            centerTitle: true,
             leading: IconButton(
               icon: const Icon(Icons.close),
               onPressed: _batalkan,
             ),
             title: Text(
               'Tambah Barang Baru',
-              style: GoogleFonts.inter(
+              style: GoogleFonts.poppins(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
-                height: 28 / 20,
-                color: AppColors.onSurface,
+                color: AppColors.primary,
               ),
             ),
-            backgroundColor: AppColors.surface,
-            surfaceTintColor: AppColors.surface,
+            backgroundColor: Colors.white,
+            elevation: 0,
+            bottom: PreferredSize(
+              preferredSize: const Size.fromHeight(1),
+              child: Container(color: AppColors.outlineVariant, height: 1),
+            ),
           ),
         ] else ...[
           Center(
@@ -183,6 +191,8 @@ class _AddItemPageState extends ConsumerState<AddItemPage> {
                   _buildSatuanDropdown(),
                   const SizedBox(height: 16),
                   _buildHargaField(),
+                  const SizedBox(height: 16),
+                  _buildStokAwalField(),
                 ],
               ),
             ),
@@ -542,6 +552,53 @@ class _AddItemPageState extends ConsumerState<AddItemPage> {
                 ),
               ),
             ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStokAwalField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Stok Awal',
+          style: GoogleFonts.inter(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            height: 20 / 16,
+            letterSpacing: 0.16,
+            color: AppColors.onSurface,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          height: 48,
+          decoration: BoxDecoration(
+            border: Border.all(color: AppColors.outlineVariant),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: TextFormField(
+            controller: _stokController,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+              hintText: '0',
+              hintStyle: GoogleFonts.inter(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                height: 24 / 16,
+                color: AppColors.onSurfaceVariant,
+              ),
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+            ),
+            style: GoogleFonts.inter(
+              fontSize: 16,
+              fontWeight: FontWeight.w400,
+              height: 24 / 16,
+              color: AppColors.onSurface,
+            ),
           ),
         ),
       ],

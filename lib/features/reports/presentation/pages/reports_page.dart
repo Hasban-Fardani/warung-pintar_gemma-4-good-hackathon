@@ -7,6 +7,7 @@ import 'package:warung_pintar_cimahi/core/constant/app_colors.dart';
 import 'package:warung_pintar_cimahi/core/theme/app_theme.dart';
 import 'package:warung_pintar_cimahi/core/utils/money_formatter.dart';
 import 'package:warung_pintar_cimahi/features/transaction/domain/entities/transaction_entity.dart';
+import 'package:warung_pintar_cimahi/shared/widgets/app_top_bar.dart';
 
 class ReportsPage extends ConsumerStatefulWidget {
   const ReportsPage({super.key});
@@ -33,16 +34,7 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Riwayat & Analisis'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.file_download_outlined),
-            onPressed: () {},
-            tooltip: 'Ekspor',
-          ),
-        ],
-      ),
+      appBar: const AppTopBar(title: 'Riwayat & Analisis'),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(
           AppTheme.marginPage,

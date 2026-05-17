@@ -11,9 +11,11 @@ import 'package:warung_pintar_cimahi/core/constant/app_strings.dart';
 import 'package:warung_pintar_cimahi/features/catalog/presentation/pages/add_item_page.dart';
 import 'package:warung_pintar_cimahi/features/dashboard/presentation/providers/dashboard_provider.dart';
 import 'package:warung_pintar_cimahi/features/transaction/domain/entities/transaction_entity.dart';
+import 'package:warung_pintar_cimahi/features/catalog/presentation/pages/category_management_page.dart';
 import 'package:warung_pintar_cimahi/shared/widgets/ai_aware_fab.dart';
 import 'package:warung_pintar_cimahi/shared/widgets/ai_degraded_banner.dart';
 import 'package:warung_pintar_cimahi/shared/widgets/ai_loading_banner.dart';
+import 'package:warung_pintar_cimahi/shared/widgets/app_top_bar.dart';
 import 'package:warung_pintar_cimahi/shared/widgets/pending_banner.dart';
 import 'package:warung_pintar_cimahi/shared/widgets/permanent_manual_mode_banner.dart';
 import 'package:warung_pintar_cimahi/shared/widgets/status_badge.dart';
@@ -50,7 +52,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: _buildAppBar(appState),
+      appBar: const AppTopBar(title: AppStrings.appName),
       body: state.isLoading
           ? const Center(child: CircularProgressIndicator())
           : _buildContent(state, appState),
@@ -87,99 +89,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  PreferredSizeWidget _buildAppBar(AppInitState appState) {
-    final isAiReady = appState is AppInitModelReady;
-    final isAiDegraded = appState is AppInitAiDegraded;
-    final isAiFailed = appState is AppInitModelFailed;
-
-    // AI status dot color
-    Color dotColor;
-    if (isAiReady) {
-      dotColor = AppColors.secondary; // Green — ready
-    } else if (isAiDegraded || isAiFailed) {
-      dotColor = AppColors.error; // Red — failed/degraded
-    } else {
-      dotColor = AppColors.pendingText; // Yellow — loading
-    }
-
-    return PreferredSize(
-      preferredSize: const Size.fromHeight(64),
-      child: Container(
-        decoration: const BoxDecoration(
-          color: AppColors.surface,
-          border: Border(
-            bottom: BorderSide(color: AppColors.outlineVariant, width: 0.5),
-          ),
-        ),
-        child: SafeArea(
-          bottom: false,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                GestureDetector(
-                  onTap: () =>
-                      ref.read(dashboardProvider.notifier).loadSummary(),
-                  child: Container(
-                    width: 48,
-                    height: 48,
-                    alignment: Alignment.center,
-                    child: const Icon(
-                      Icons.storefront,
-                      color: AppColors.onSurfaceVariant,
-                      size: 24,
-                    ),
-                  ),
-                ),
-                const Spacer(),
-                Text(
-                  AppStrings.appName,
-                  style: GoogleFonts.poppins(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                    height: 28 / 20,
-                    color: AppColors.primary,
-                  ),
-                ),
-                const Spacer(),
-                Stack(
-                  children: [
-                    Container(
-                      width: 48,
-                      height: 48,
-                      alignment: Alignment.center,
-                      child: const Icon(
-                        Icons.smart_toy,
-                        color: AppColors.onSurfaceVariant,
-                        size: 24,
-                      ),
-                    ),
-                    Positioned(
-                      top: 6,
-                      right: 6,
-                      child: Container(
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          color: dotColor,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: AppColors.surface,
-                            width: 1.5,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildContent(DashboardState state, AppInitState appState) {
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
@@ -206,11 +115,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           ],
 
           // Greeting
-          _buildGreeting(),
+          _buildGreeting(state),
           const SizedBox(height: 24),
 
           // Bento grid
           _buildBentoGrid(state),
+          const SizedBox(height: 24),
+
+          // Master Data navigation
+          _buildMasterDataNav(),
           const SizedBox(height: 24),
 
           // Recent transactions
@@ -274,7 +187,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  Widget _buildGreeting() {
+  Widget _buildGreeting(DashboardState state) {
     final hour = DateTime.now().hour;
     String greeting;
     if (hour < 10) {
@@ -286,11 +199,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     } else {
       greeting = 'Selamat Malam';
     }
+    final displayName = state.ownerName.isNotEmpty ? state.ownerName : 'Ibu';
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '$greeting, Ibu Warsih',
+          '$greeting, $displayName',
           style: GoogleFonts.poppins(
             fontSize: 20,
             fontWeight: FontWeight.w700,
@@ -307,6 +221,49 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             height: 24 / 16,
             color: AppColors.onSurfaceVariant,
           ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMasterDataNav() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Master Data',
+          style: GoogleFonts.poppins(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            height: 24 / 18,
+            color: AppColors.onSurface,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: _NavCard(
+                icon: Icons.inventory_2,
+                label: 'Produk',
+                onTap: () => context.push('/catalog'),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _NavCard(
+                icon: Icons.category,
+                label: 'Kategori',
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const CategoryManagementPage(),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -653,5 +610,48 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       return 'Rp${juta.toStringAsFixed(juta == juta.roundToDouble() ? 0 : 1)}jt';
     }
     return 'Rp${NumberFormat.decimalPattern('id').format(rupiah)}';
+  }
+}
+
+class _NavCard extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  const _NavCard({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          border: Border.all(color: AppColors.outlineVariant),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: AppColors.primary, size: 32),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                height: 18 / 14,
+                color: AppColors.onSurface,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

@@ -102,13 +102,74 @@ class CatalogDatasource {
     return rows.map((r) => StockModel.fromMap(r)).toList();
   }
 
-  Future<List<Map<String, dynamic>>> getCategories() async {
+  Future<List<Map<String, dynamic>>> getAllCategories() async {
     return _db.db.query('categories', orderBy: 'name ASC');
   }
 
-  Future<String> insertCategory(String name) async {
+  Future<List<Map<String, dynamic>>> getCategories({String? parentId}) async {
+    if (parentId != null) {
+      return _db.db.query(
+        'categories',
+        where: 'parent_id = ?',
+        whereArgs: [parentId],
+        orderBy: 'name ASC',
+      );
+    }
+    return _db.db.query(
+      'categories',
+      where: 'parent_id IS NULL',
+      orderBy: 'name ASC',
+    );
+  }
+
+  Future<Map<String, dynamic>> getCategoryById(String id) async {
+    final rows = await _db.db.query(
+      'categories',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    return rows.first;
+  }
+
+  Future<String> insertCategory(String name, {String? parentId}) async {
     final id = UuidHelper.generateId();
-    await _db.db.insert('categories', {'id': id, 'name': name});
+    await _db.db.insert('categories', {
+      'id': id,
+      'name': name,
+      'parent_id': parentId,
+    });
     return id;
+  }
+
+  Future<void> updateCategory(String id, String name, {String? parentId}) async {
+    await _db.db.update(
+      'categories',
+      {
+        'name': name,
+        'parent_id': parentId,
+      },
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<void> deleteCategory(String id) async {
+    await _db.db.delete('categories', where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<int> getItemCountByCategory(String categoryId) async {
+    final result = await _db.db.rawQuery(
+      'SELECT COUNT(*) as count FROM stock WHERE category_id = ? AND is_deleted = 0',
+      [categoryId],
+    );
+    return (result.first['count'] as int?) ?? 0;
+  }
+
+  Future<int> getSubCategoryCount(String categoryId) async {
+    final result = await _db.db.rawQuery(
+      'SELECT COUNT(*) as count FROM categories WHERE parent_id = ?',
+      [categoryId],
+    );
+    return (result.first['count'] as int?) ?? 0;
   }
 }

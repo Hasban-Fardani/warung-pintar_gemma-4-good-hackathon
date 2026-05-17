@@ -115,7 +115,6 @@ class AppInitNotifier extends StateNotifier<AppInitState> {
       _logger.i('AppInitNotifier: Voice service init result: $result');
     } catch (e) {
       _logger.w('AppInitNotifier: Voice service init failed: $e');
-      // Non-fatal — app works without voice
     }
   }
 

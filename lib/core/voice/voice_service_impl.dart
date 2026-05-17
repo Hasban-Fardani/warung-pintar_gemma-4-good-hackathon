@@ -21,6 +21,7 @@ abstract class VoiceService {
 class VoiceServiceImpl implements VoiceService {
   final SpeechToText _stt = SpeechToText();
   bool _isInitialized = false;
+  String? _localeOverride;
 
   static final _logger = Logger(printer: PrettyPrinter(methodCount: 0));
 
@@ -62,10 +63,18 @@ class VoiceServiceImpl implements VoiceService {
 
     if (!hasIndonesian) {
       _logger.w('VoiceService: id-ID language pack not installed');
-      return const VoiceInitMissingPack();
+      final systemLocale = await _stt.systemLocale();
+      if (systemLocale != null) {
+        _localeOverride = systemLocale.localeId;
+        _logger.i('VoiceService: Initialized with fallback locale: ${systemLocale.localeId}');
+      } else {
+        _logger.w('VoiceService: No system locale available');
+        return const VoiceInitMissingPack();
+      }
+    } else {
+      _logger.i('VoiceService: Initialized with id-ID support');
     }
 
-    _logger.i('VoiceService: Initialized with id-ID support');
     return const VoiceInitSuccess();
   }
 
@@ -77,7 +86,7 @@ class VoiceServiceImpl implements VoiceService {
     }
 
     await _stt.listen(
-      localeId: VoiceConfig.localeId,
+      localeId: _localeOverride ?? VoiceConfig.localeId,
       listenFor: const Duration(milliseconds: VoiceConfig.maxListenDurationMs),
       pauseFor: const Duration(milliseconds: VoiceConfig.vadSilenceThresholdMs),
       onResult: (result) {

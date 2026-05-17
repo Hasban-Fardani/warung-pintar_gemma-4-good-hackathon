@@ -216,7 +216,7 @@ Layer 6 — Deliverables (requires Layer 5)
 | ACT-58 | Catalog data — `StockModel`, `PriceHistoryModel`, `CatalogDatasource`, `CatalogRepositoryImpl` | features/catalog/data/ | — (data layer) | ✅ Done |
 | ACT-59 | Catalog presentation — **List View**: stats row (Total Barang/Kategori Aktif/Barang Tanpa Stok), search, filter chips, DataTable with status badges. **Add Item form**: nama, SKU, kategori dropdown, satuan dropdown, harga. | features/catalog/presentation/ | `docs/design/Master Data Barang - List View.html`<br>`docs/design/Master Data - Tambah Barang Form.html` | ✅ Done |
 | ACT-60 | Unit test: `UpdateItemPriceUseCase` — verify insert ke `price_history`, BUKAN update kolom di `stock.default_price_sen` langsung; verify transaksi lama tidak berubah | test/features/catalog/ | — (test) | ⬜ Belum (M5) |
-| **VERIFY-M3** | `flutter analyze` 0 errors ✅, `flutter test` 34/34 pass ✅, semua agent use cases compile ✅, camera permissions declared ✅ | — | — | ✅ Pass |
+| **VERIFY-M3** | `flutter analyze` 0 errors ✅, `flutter test` 34/34 pass ✅, semua agent use cases compile ✅, camera permissions declared ✅ | — | — | 🚧 Partial (4 Test Belum) |
 
 ### 3F — Settings & Reports (2 Screens — tambahan dari design HTML)
 
@@ -264,9 +264,10 @@ Layer 6 — Deliverables (requires Layer 5)
 
 ---
 
-## Milestone 5: Testing & QA — Domain/Data Coverage ✅ COMPLETE
+## Milestone 5: Testing & QA — Domain/Data Coverage 🚧 IN PROGRESS
 
 > **Layer 5A** — Unit dan integration tests untuk domain/data layer. Dapat dimulai incremental sejak M3 selesai.
+> **PENTING**: M5 belum selesai sepenuhnya karena ada 4 Unit Test dari M3 (ACT-46, ACT-51, ACT-56, ACT-60) yang masih tertunda dan harus dikerjakan di fase ini.
 
 | Action ID | Deskripsi | Scope | Status |
 |-----------|-----------|-------|--------|
@@ -277,7 +278,7 @@ Layer 6 — Deliverables (requires Layer 5)
 | ACT-78 | Widget test: `AuditLogDrawer` — STT transcript + raw JSON tampil | test/features/transaction/ | ✅ Done |
 | ACT-79 | Integration test: idempotency — duplicate `idempotency_key` = 1 row (in-memory SQLite) | test/integration/ | ✅ Done (ACT-28) |
 | ACT-80 | Integration test: price history isolation — update harga → `price_history` bertambah 1 row, `price_at_transaction_sen` transaksi lama tidak berubah | test/integration/ | ✅ Done (ACT-29) |
-| **VERIFY-M5** | `flutter test` 71/71 pass ✅, `flutter analyze` 0 issues ✅, zero network call di semua tests ✅ | — | ✅ Pass |
+| **VERIFY-M5** | `flutter test` 71/71 pass ✅, `flutter analyze` 0 issues ✅, zero network call di semua tests ✅ | — | 🚧 Belum (Tunggu M3 Tests) |
 
 ---
 
@@ -384,14 +385,14 @@ Layer 6 — Deliverables (requires Layer 5)
 | Milestone | Total Actions | Selesai | Sisa | Status |
 |-----------|--------------|---------|------|--------|
 | M0: Foundation | 11 | 11 | 0 | ✅ COMPLETE |
-| M1: AI Core + Model Delivery | 16 | 16 | 0 | ✅ COMPLETE |
-| M2: Data Infrastructure | 16 | 16 | 0 | ✅ COMPLETE |
-| M3: Domain + Agents | 19 | 19 | 0 | ✅ COMPLETE |
-| M4: Presentation / UI | 13 | 12 | 1 | ✅ COMPLETE (ACT-73 visual verification remaining) |
-| M5: Testing & QA | 7 | 7 | 0 | ✅ COMPLETE |
+| M1: AI Core + Model Delivery | 15 | 15 | 0 | ✅ COMPLETE |
+| M2: Data Infrastructure | 18 | 18 | 0 | ✅ COMPLETE |
+| M3: Domain + Agents | 19 | 15 | 4 | 🚧 IN PROGRESS (4 Test Belum) |
+| M4: Presentation / UI | 13 | 12 | 1 | 🚧 IN PROGRESS (ACT-73 Belum) |
+| M5: Testing & QA | 7 | 7 | 0 | 🚧 IN PROGRESS (Tunggu M3 Tests) |
 | M7: Section 16 QA | 32 | 0 | 32 | ⬜ Pending |
 | M6: Deliverables | 4 | 0 | 4 | ⬜ Pending |
-| **TOTAL** | **118** | **81** | **37** | **69% Complete** |
+| **TOTAL** | **119** | **78** | **41** | **65.5% Complete** |
 
 > **NOTE**: Penomoran action ID direset mulai ACT-19 untuk actions baru (lanjut dari ACT-18 yang terakhir ✅). M7 diberi nomor terpisah dari M5 sesuai instruksi — keduanya layer 5 (paralel) tapi M7 khusus Section 16. M6 adalah gate akhir yang hanya bisa dibuka setelah M5 + M7 keduanya selesai.
 

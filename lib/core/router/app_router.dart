@@ -13,6 +13,7 @@ import '../../features/vision/presentation/pages/receipt_capture_page.dart';
 import '../../features/vision/presentation/pages/product_capture_page.dart';
 import '../ai/app_init_notifier.dart';
 import '../ai/app_init_state.dart';
+import '../../features/transaction/presentation/providers/voice_transaction_notifier.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
   debugLabel: 'root',
@@ -48,34 +49,55 @@ final appRouter = GoRouter(
     ),
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
-        return Scaffold(
-          body: navigationShell,
-          bottomNavigationBar: NavigationBar(
-            selectedIndex: navigationShell.currentIndex,
-            onDestinationSelected: (index) {
-              navigationShell.goBranch(
-                index,
-                initialLocation: index == navigationShell.currentIndex,
-              );
-            },
-            destinations: const [
-              NavigationDestination(
-                icon: Icon(Icons.home_outlined),
-                selectedIcon: Icon(Icons.home),
-                label: 'Beranda',
+        return Consumer(
+          builder: (context, ref, _) {
+            return Scaffold(
+              body: navigationShell,
+              bottomNavigationBar: SizedBox(
+                height: 80,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  alignment: Alignment.center,
+                  children: [
+                    NavigationBar(
+                      selectedIndex: navigationShell.currentIndex,
+                      onDestinationSelected: (index) {
+                        navigationShell.goBranch(
+                          index,
+                          initialLocation: index == navigationShell.currentIndex,
+                        );
+                      },
+                      height: 64,
+                      destinations: const [
+                        NavigationDestination(
+                          icon: Icon(Icons.home_outlined),
+                          selectedIcon: Icon(Icons.home),
+                          label: 'Beranda',
+                        ),
+                        NavigationDestination(
+                          icon: Icon(Icons.history_outlined),
+                          selectedIcon: Icon(Icons.history),
+                          label: 'Riwayat',
+                        ),
+                      ],
+                    ),
+                    Positioned(
+                      top: -28,
+                      child: FloatingActionButton(
+                        heroTag: 'voice_input',
+                        onPressed: () {
+                          ref
+                              .read(voiceTransactionProvider.notifier)
+                              .startListening();
+                        },
+                        child: const Icon(Icons.mic),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              NavigationDestination(
-                icon: Icon(Icons.history_outlined),
-                selectedIcon: Icon(Icons.history),
-                label: 'Riwayat',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.settings_outlined),
-                selectedIcon: Icon(Icons.settings),
-                label: 'Setelan',
-              ),
-            ],
-          ),
+            );
+          },
         );
       },
       branches: [
@@ -95,15 +117,11 @@ final appRouter = GoRouter(
             ),
           ],
         ),
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: '/settings',
-              builder: (context, state) => const SettingsPage(),
-            ),
-          ],
-        ),
       ],
+    ),
+    GoRoute(
+      path: '/settings',
+      builder: (context, state) => const SettingsPage(),
     ),
     GoRoute(
       path: '/catalog',

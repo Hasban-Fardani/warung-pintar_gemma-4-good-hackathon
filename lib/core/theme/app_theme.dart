@@ -114,17 +114,17 @@ class AppTheme {
       ),
       navigationBarTheme: NavigationBarThemeData(
         height: 64,
-        indicatorColor: AppColors.primaryContainer,
+        indicatorColor: const Color(0xFFD6E4FF),
         iconTheme: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return const IconThemeData(color: AppColors.primary);
+            return const IconThemeData(color: Color(0xFF005DAC));
           }
           return const IconThemeData(color: AppColors.onSurfaceVariant);
         }),
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           final style = textTheme.labelMedium!;
           if (states.contains(WidgetState.selected)) {
-            return style.copyWith(color: AppColors.primary);
+            return style.copyWith(color: const Color(0xFF005DAC));
           }
           return style.copyWith(color: AppColors.onSurfaceVariant);
         }),

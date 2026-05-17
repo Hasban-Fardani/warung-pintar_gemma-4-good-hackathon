@@ -80,7 +80,7 @@ class CatalogNotifier extends StateNotifier<CatalogState> {
 
     final catalogResult = await _repository.getCatalog(categoryId: categoryId);
     final lowStockResult = await _repository.getLowStockItems();
-    final categories = await _datasource.getCategories();
+    final categories = await _datasource.getAllCategories();
 
     switch (catalogResult) {
       case Success(:final data):

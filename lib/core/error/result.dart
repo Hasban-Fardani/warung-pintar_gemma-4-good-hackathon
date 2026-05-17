@@ -24,3 +24,25 @@ final class Failure<T, E> extends Result<T, E> {
   final E error;
   const Failure(this.error);
 }
+
+extension ResultExtensions<T, E> on Result<T, E> {
+  R when<R>({
+    required R Function(T data) success,
+    required R Function(E error) failure,
+  }) {
+    return switch (this) {
+      Success(:final data) => success(data),
+      Failure(:final error) => failure(error),
+    };
+  }
+
+  R maybeWhen<R>({
+    required R Function(T data) success,
+    required R Function() orElse,
+  }) {
+    return switch (this) {
+      Success(:final data) => success(data),
+      Failure() => orElse(),
+    };
+  }
+}

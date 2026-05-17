@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_it/get_it.dart';
 
+import 'package:warung_pintar_cimahi/core/database/database_service.dart';
 import 'package:warung_pintar_cimahi/core/error/result.dart';
 import 'package:warung_pintar_cimahi/features/catalog/domain/entities/stock_entity.dart';
 import 'package:warung_pintar_cimahi/features/catalog/domain/repositories/catalog_repository.dart';
@@ -16,6 +17,7 @@ class DashboardState {
   final int pendingCount;
   final List<TransactionEntity> recentTransactions;
   final List<StockEntity> lowStockItems;
+  final String ownerName;
   final bool isLoading;
   final String? error;
 
@@ -26,6 +28,7 @@ class DashboardState {
     this.pendingCount = 0,
     this.recentTransactions = const [],
     this.lowStockItems = const [],
+    this.ownerName = '',
     this.isLoading = false,
     this.error,
   });
@@ -37,6 +40,7 @@ class DashboardState {
     int? pendingCount,
     List<TransactionEntity>? recentTransactions,
     List<StockEntity>? lowStockItems,
+    String? ownerName,
     bool? isLoading,
     String? error,
   }) {
@@ -47,6 +51,7 @@ class DashboardState {
       pendingCount: pendingCount ?? this.pendingCount,
       recentTransactions: recentTransactions ?? this.recentTransactions,
       lowStockItems: lowStockItems ?? this.lowStockItems,
+      ownerName: ownerName ?? this.ownerName,
       isLoading: isLoading ?? this.isLoading,
       error: error,
     );
@@ -101,6 +106,20 @@ class DashboardNotifier extends StateNotifier<DashboardState> {
       Failure<List<StockEntity>, String>() => <StockEntity>[],
     };
 
+    // Owner name from app_settings
+    String ownerName = '';
+    try {
+      final db = _getIt<DatabaseService>().db;
+      final rows = await db.query(
+        'app_settings',
+        where: 'key = ?',
+        whereArgs: ['owner_name'],
+      );
+      if (rows.isNotEmpty) {
+        ownerName = rows.first['value'] as String? ?? '';
+      }
+    } catch (_) {}
+
     state = DashboardState(
       omzetSen: summary.omzetSen,
       profitSen: summary.profitSen,
@@ -108,6 +127,7 @@ class DashboardNotifier extends StateNotifier<DashboardState> {
       pendingCount: summary.pendingCount,
       recentTransactions: recentTransactions,
       lowStockItems: lowStockItems,
+      ownerName: ownerName,
       isLoading: false,
     );
   }

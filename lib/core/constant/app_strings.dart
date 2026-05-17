@@ -6,10 +6,9 @@ class AppStrings {
   // ── App ──
   static const String appName = 'WarungPintar';
 
-  // ── Bottom Navigation ──
+  // ── Bottom Navigation (3 tabs: Beranda / Riwayat / Setelan) ──
   static const String navBeranda = 'Beranda';
-  static const String navPending = 'Pending';
-  static const String navKatalog = 'Katalog';
+  static const String navRiwayat = 'Riwayat';
   static const String navSetelan = 'Setelan';
 
   // ── Dashboard ──

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get_it/get_it.dart';
 
 import 'package:warung_pintar_cimahi/core/constant/app_colors.dart';
+import 'package:warung_pintar_cimahi/core/database/database_service.dart';
 import 'package:warung_pintar_cimahi/core/theme/app_theme.dart';
 import 'package:warung_pintar_cimahi/features/onboarding/presentation/providers/onboarding_provider.dart';
 
@@ -316,7 +318,17 @@ class _PrimaryButton extends ConsumerWidget {
       width: double.infinity,
       height: AppTheme.touchTargetMin,
       child: ElevatedButton(
-        onPressed: () {
+        onPressed: () async {
+          final state = ref.read(onboardingProvider);
+          final db = GetIt.instance<DatabaseService>().db;
+          await db.insert(
+            'app_settings',
+            {'key': 'owner_name', 'value': state.ownerName},
+          );
+          await db.insert(
+            'app_settings',
+            {'key': 'shop_name', 'value': state.shopName},
+          );
           ref.read(onboardingProvider.notifier).confirmSetup();
         },
         style: ElevatedButton.styleFrom(

@@ -1,5 +1,6 @@
 import 'package:warung_pintar_cimahi/core/error/result.dart';
 import 'package:warung_pintar_cimahi/features/catalog/data/datasources/catalog_datasource.dart';
+import 'package:warung_pintar_cimahi/features/catalog/domain/entities/category_entity.dart';
 import 'package:warung_pintar_cimahi/features/catalog/domain/entities/stock_entity.dart';
 import 'package:warung_pintar_cimahi/features/catalog/domain/repositories/catalog_repository.dart';
 
@@ -91,6 +92,72 @@ class CatalogRepositoryImpl implements CatalogRepository {
       return Success(model?.toEntity());
     } catch (e) {
       return Failure('Gagal memuat detail barang: $e');
+    }
+  }
+
+  @override
+  Future<Result<List<CategoryEntity>, String>> getCategories({String? parentId}) async {
+    try {
+      final models = await _datasource.getCategories(parentId: parentId);
+      return Success(models.map((m) => CategoryEntity(
+        id: m['id'] as String,
+        name: m['name'] as String,
+        parentId: m['parent_id'] as String?,
+        createdAt: DateTime.parse(m['created_at'] as String),
+      )).toList());
+    } catch (e) {
+      return Failure('Gagal memuat kategori: $e');
+    }
+  }
+
+  @override
+  Future<Result<CategoryEntity, String>> addCategory({
+    required String name,
+    String? parentId,
+  }) async {
+    try {
+      final id = await _datasource.insertCategory(name, parentId: parentId);
+      final row = await _datasource.getCategoryById(id);
+      return Success(CategoryEntity(
+        id: row['id'] as String,
+        name: row['name'] as String,
+        parentId: row['parent_id'] as String?,
+        createdAt: DateTime.parse(row['created_at'] as String),
+      ));
+    } catch (e) {
+      return Failure('Gagal menambah kategori: $e');
+    }
+  }
+
+  @override
+  Future<Result<void, String>> updateCategory({
+    required String id,
+    required String name,
+    String? parentId,
+  }) async {
+    try {
+      await _datasource.updateCategory(id, name, parentId: parentId);
+      return const Success(null);
+    } catch (e) {
+      return Failure('Gagal memperbarui kategori: $e');
+    }
+  }
+
+  @override
+  Future<Result<void, String>> deleteCategory(String id) async {
+    try {
+      final itemCount = await _datasource.getItemCountByCategory(id);
+      if (itemCount > 0) {
+        return Failure('Kategori ini digunakan oleh $itemCount barang. Pindahkan dulu sebelum menghapus.');
+      }
+      final subCount = await _datasource.getSubCategoryCount(id);
+      if (subCount > 0) {
+        return const Failure('Hapus sub-kategori terlebih dahulu sebelum menghapus kategori ini.');
+      }
+      await _datasource.deleteCategory(id);
+      return const Success(null);
+    } catch (e) {
+      return Failure('Gagal menghapus kategori: $e');
     }
   }
 }

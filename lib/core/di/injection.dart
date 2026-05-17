@@ -13,7 +13,17 @@ import 'package:warung_pintar_cimahi/features/transaction/data/repositories/tran
 import 'package:warung_pintar_cimahi/features/transaction/domain/repositories/transaction_repository.dart';
 import 'package:warung_pintar_cimahi/features/transaction/domain/usecases/confirm_transaction_usecase.dart';
 import 'package:warung_pintar_cimahi/features/transaction/domain/usecases/get_pending_transactions_usecase.dart';
+import 'package:warung_pintar_cimahi/features/catalog/domain/usecases/add_category_usecase.dart';
+import 'package:warung_pintar_cimahi/features/catalog/domain/usecases/add_item_usecase.dart';
+import 'package:warung_pintar_cimahi/features/catalog/domain/usecases/delete_category_usecase.dart';
+import 'package:warung_pintar_cimahi/features/catalog/domain/usecases/get_catalog_usecase.dart';
+import 'package:warung_pintar_cimahi/features/catalog/domain/usecases/get_categories_usecase.dart';
+import 'package:warung_pintar_cimahi/features/catalog/domain/usecases/soft_delete_item_usecase.dart';
+import 'package:warung_pintar_cimahi/features/catalog/domain/usecases/update_category_usecase.dart';
+import 'package:warung_pintar_cimahi/features/catalog/domain/usecases/update_item_price_usecase.dart';
 import 'package:warung_pintar_cimahi/features/dashboard/domain/usecases/dashboard_summary_usecase.dart';
+import 'package:warung_pintar_cimahi/features/vision/domain/usecases/parse_product_usecase.dart';
+import 'package:warung_pintar_cimahi/features/vision/domain/usecases/parse_receipt_usecase.dart';
 
 final getIt = GetIt.instance;
 
@@ -75,6 +85,68 @@ void configureDependencies() {
   if (!getIt.isRegistered<DashboardSummaryUseCase>()) {
     getIt.registerLazySingleton<DashboardSummaryUseCase>(
       () => DashboardSummaryUseCase(getIt<TransactionRepository>()),
+    );
+  }
+
+  // Category use cases
+  if (!getIt.isRegistered<GetCategoriesUseCase>()) {
+    getIt.registerLazySingleton<GetCategoriesUseCase>(
+      () => GetCategoriesUseCase(getIt<CatalogRepository>()),
+    );
+  }
+  if (!getIt.isRegistered<AddCategoryUseCase>()) {
+    getIt.registerLazySingleton<AddCategoryUseCase>(
+      () => AddCategoryUseCase(getIt<CatalogRepository>()),
+    );
+  }
+  if (!getIt.isRegistered<UpdateCategoryUseCase>()) {
+    getIt.registerLazySingleton<UpdateCategoryUseCase>(
+      () => UpdateCategoryUseCase(getIt<CatalogRepository>()),
+    );
+  }
+  if (!getIt.isRegistered<DeleteCategoryUseCase>()) {
+    getIt.registerLazySingleton<DeleteCategoryUseCase>(
+      () => DeleteCategoryUseCase(getIt<CatalogRepository>()),
+    );
+  }
+
+  // Catalog use cases
+  if (!getIt.isRegistered<AddItemUseCase>()) {
+    getIt.registerLazySingleton<AddItemUseCase>(
+      () => AddItemUseCase(getIt<CatalogRepository>()),
+    );
+  }
+  if (!getIt.isRegistered<UpdateItemPriceUseCase>()) {
+    getIt.registerLazySingleton<UpdateItemPriceUseCase>(
+      () => UpdateItemPriceUseCase(getIt<CatalogRepository>()),
+    );
+  }
+  if (!getIt.isRegistered<GetCatalogUseCase>()) {
+    getIt.registerLazySingleton<GetCatalogUseCase>(
+      () => GetCatalogUseCase(getIt<CatalogRepository>()),
+    );
+  }
+  if (!getIt.isRegistered<SoftDeleteItemUseCase>()) {
+    getIt.registerLazySingleton<SoftDeleteItemUseCase>(
+      () => SoftDeleteItemUseCase(getIt<CatalogRepository>()),
+    );
+  }
+
+  // Vision use cases
+  if (!getIt.isRegistered<ParseReceiptUseCase>()) {
+    getIt.registerLazySingleton<ParseReceiptUseCase>(
+      () => ParseReceiptUseCase(
+        getIt<AiService>(),
+        getIt<TransactionRepository>(),
+      ),
+    );
+  }
+  if (!getIt.isRegistered<ParseProductUseCase>()) {
+    getIt.registerLazySingleton<ParseProductUseCase>(
+      () => ParseProductUseCase(
+        getIt<AiService>(),
+        getIt<CatalogRepository>(),
+      ),
     );
   }
 }

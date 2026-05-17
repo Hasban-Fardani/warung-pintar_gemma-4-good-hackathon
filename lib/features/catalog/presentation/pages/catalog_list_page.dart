@@ -7,6 +7,7 @@ import 'package:warung_pintar_cimahi/core/constant/app_colors.dart';
 import 'package:warung_pintar_cimahi/features/catalog/domain/entities/stock_entity.dart';
 import 'package:warung_pintar_cimahi/features/catalog/presentation/providers/catalog_provider.dart';
 import 'package:warung_pintar_cimahi/features/catalog/presentation/pages/add_item_page.dart';
+import 'package:warung_pintar_cimahi/features/catalog/presentation/pages/category_management_page.dart';
 
 class CatalogListPage extends ConsumerStatefulWidget {
   const CatalogListPage({super.key});
@@ -35,76 +36,92 @@ class _CatalogListPageState extends ConsumerState<CatalogListPage> {
   Widget build(BuildContext context) {
     final state = ref.watch(catalogProvider);
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(64),
-        child: Container(
-          decoration: const BoxDecoration(
-            color: AppColors.surface,
-            border: Border(
-              bottom: BorderSide(color: AppColors.outlineVariant, width: 0.5),
-            ),
-          ),
-          child: SafeArea(
-            bottom: false,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                children: [
-                  Text(
-                    'Data Barang',
-                    style: GoogleFonts.inter(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      height: 28 / 20,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                  const Spacer(),
-                  SizedBox(
-                    height: 48,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => const AddItemPage(),
-                          ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primaryContainer,
-                        foregroundColor: AppColors.onPrimaryContainer,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        textStyle: GoogleFonts.inter(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          height: 20 / 16,
-                          letterSpacing: 0.16,
-                        ),
+    return Container(
+      color: AppColors.background,
+      child: SafeArea(
+        child: Column(
+          children: [
+            _buildHeader(context),
+            Expanded(
+              child: state.isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : state.error != null
+                  ? Center(
+                      child: Text(
+                        state.error!,
+                        style: GoogleFonts.inter(fontSize: 16, color: AppColors.error),
                       ),
-                      child: const Text('Tambah Barang'),
-                    ),
-                  ),
-                ],
-              ),
+                    )
+                  : _buildContent(state),
             ),
-          ),
+          ],
         ),
       ),
-      body: state.isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : state.error != null
-          ? Center(
-              child: Text(
-                state.error!,
-                style: GoogleFonts.inter(fontSize: 16, color: AppColors.error),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: AppColors.surface,
+        border: Border(
+          bottom: BorderSide(color: AppColors.outlineVariant, width: 0.5),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Row(
+          children: [
+            Text(
+              'Data Barang',
+              style: GoogleFonts.inter(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                height: 28 / 20,
+                color: AppColors.primary,
               ),
-            )
-          : _buildContent(state),
+            ),
+            IconButton(
+              icon: const Icon(Icons.category, color: AppColors.onSurfaceVariant),
+              tooltip: 'Kelola Kategori',
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const CategoryManagementPage(),
+                  ),
+                );
+              },
+            ),
+            SizedBox(
+              height: 48,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const AddItemPage(),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryContainer,
+                  foregroundColor: AppColors.onPrimaryContainer,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  textStyle: GoogleFonts.inter(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    height: 20 / 16,
+                    letterSpacing: 0.16,
+                  ),
+                ),
+                child: const Text('Tambah Barang'),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -137,34 +154,39 @@ class _CatalogListPageState extends ConsumerState<CatalogListPage> {
   }
 
   Widget _buildStatsRow(CatalogState state) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        const gap = 8.0;
-        final itemWidth = (constraints.maxWidth - gap * 2) / 3;
-        return Row(
+    return Column(
+      children: [
+        Row(
           children: [
-            _statCard(itemWidth, 'Total Barang', '${state.totalItems} item'),
-            const SizedBox(width: 8),
-            _statCard(
-              itemWidth,
-              'Kategori Aktif',
-              '${state.activeCategoryCount} kategori',
+            Expanded(
+              child: _statCard(
+                'Total Barang',
+                '${state.totalItems} item',
+              ),
             ),
             const SizedBox(width: 8),
-            _statCard(
-              itemWidth,
-              'Barang Tanpa Stok',
-              '${state.outOfStockCount} item',
+            Expanded(
+              child: _statCard(
+                'Kategori Aktif',
+                '${state.activeCategoryCount} kategori',
+              ),
             ),
           ],
-        );
-      },
+        ),
+        const SizedBox(height: 8),
+        SizedBox(
+          width: double.infinity,
+          child: _statCard(
+            'Barang Tanpa Stok',
+            '${state.outOfStockCount} item',
+          ),
+        ),
+      ],
     );
   }
 
-  Widget _statCard(double width, String label, String value) {
+  Widget _statCard(String label, String value) {
     return Container(
-      width: width,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         border: Border.all(color: AppColors.outlineVariant),
@@ -183,6 +205,8 @@ class _CatalogListPageState extends ConsumerState<CatalogListPage> {
               letterSpacing: 0.28,
               color: AppColors.onSurfaceVariant,
             ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 8),
           Text(
@@ -207,36 +231,39 @@ class _CatalogListPageState extends ConsumerState<CatalogListPage> {
         borderRadius: BorderRadius.circular(4),
         color: AppColors.surface,
       ),
-      child: Row(
-        children: [
-          const SizedBox(width: 16),
-          const Icon(Icons.search, color: AppColors.onSurfaceVariant, size: 20),
-          const SizedBox(width: 8),
-          Expanded(
-            child: TextField(
-              controller: _searchController,
-              onChanged: (v) => setState(() => _searchQuery = v),
-              decoration: InputDecoration(
-                hintText: 'Cari nama barang...',
-                hintStyle: GoogleFonts.inter(
+      child: Material(
+        color: Colors.transparent,
+        child: Row(
+          children: [
+            const SizedBox(width: 16),
+            const Icon(Icons.search, color: AppColors.onSurfaceVariant, size: 20),
+            const SizedBox(width: 8),
+            Expanded(
+              child: TextField(
+                controller: _searchController,
+                onChanged: (v) => setState(() => _searchQuery = v),
+                decoration: InputDecoration(
+                  hintText: 'Cari nama barang...',
+                  hintStyle: GoogleFonts.inter(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    height: 24 / 16,
+                    color: AppColors.onSurfaceVariant,
+                  ),
+                  border: InputBorder.none,
+                  isDense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+                style: GoogleFonts.inter(
                   fontSize: 16,
                   fontWeight: FontWeight.w400,
                   height: 24 / 16,
-                  color: AppColors.onSurfaceVariant,
+                  color: AppColors.onSurface,
                 ),
-                border: InputBorder.none,
-                isDense: true,
-                contentPadding: EdgeInsets.zero,
-              ),
-              style: GoogleFonts.inter(
-                fontSize: 16,
-                fontWeight: FontWeight.w400,
-                height: 24 / 16,
-                color: AppColors.onSurface,
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -247,24 +274,27 @@ class _CatalogListPageState extends ConsumerState<CatalogListPage> {
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: [
-          _categoryChip('Semua', state.selectedCategory == null, null),
+          _categoryChip('Semua', state.selectedCategory == null, null, 'Semua'),
           ...state.categories.map((cat) {
             final id = cat['id'] as String;
             final name = cat['name'] as String;
-            return _categoryChip(name, state.selectedCategory == id, id);
+            return _categoryChip(name, state.selectedCategory == id, id, name);
           }),
         ],
       ),
     );
   }
 
-  Widget _categoryChip(String label, bool isActive, String? categoryId) {
+  Widget _categoryChip(String label, bool isActive, String? categoryId, String categoryName) {
     return Padding(
       padding: const EdgeInsets.only(right: 8),
       child: GestureDetector(
-        onTap: () => ref
-            .read(catalogProvider.notifier)
-            .loadCatalog(categoryId: categoryId),
+        onTap: () {
+          debugPrint('Kategori dipilih: $categoryName (id: $categoryId)');
+          ref
+              .read(catalogProvider.notifier)
+              .loadCatalog(categoryId: categoryId);
+        },
         child: Container(
           height: 48,
           padding: const EdgeInsets.symmetric(horizontal: 16),

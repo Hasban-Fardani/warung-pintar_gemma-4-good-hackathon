@@ -22,7 +22,7 @@ class DatabaseServiceImpl implements DatabaseService {
   static final _logger = Logger(printer: PrettyPrinter(methodCount: 0));
 
   Database? _db;
-  static const int _dbVersion = 1;
+  static const int _dbVersion = 2;
   static const String _dbName = 'warung_pintar.db';
 
   @override
@@ -47,6 +47,7 @@ class DatabaseServiceImpl implements DatabaseService {
       version: _dbVersion,
       onConfigure: _onConfigure,
       onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
     );
 
     _logger.i('DatabaseService: Ready at $dbPath');
@@ -166,5 +167,15 @@ class DatabaseServiceImpl implements DatabaseService {
 
     await batch.commit(noResult: true);
     _logger.i('DatabaseService: Schema created successfully');
+  }
+
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    _logger.i('DatabaseService: Upgrading schema v$oldVersion → v$newVersion');
+    if (oldVersion < 2) {
+      await db.execute(
+        'ALTER TABLE categories ADD COLUMN parent_id TEXT REFERENCES categories(id)',
+      );
+      _logger.i('DatabaseService: Added parent_id column to categories');
+    }
   }
 }

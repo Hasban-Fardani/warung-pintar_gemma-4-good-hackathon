@@ -1,17 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'package:warung_pintar_cimahi/core/ai/app_init_notifier.dart';
 import 'package:warung_pintar_cimahi/core/ai/app_init_state.dart';
 import 'package:warung_pintar_cimahi/core/constant/app_colors.dart';
 
-/// AI-aware FAB with 3 sub-FABs (ACT-68).
-///
-/// PRD §12.3: Suara, Kamera, Manual.
-/// Reads `AppInitState` — disables AI-dependent FABs when model not ready.
-/// Main FAB: 56×56 `bg-primary-container text-on-primary-container`.
-/// Overlay dim saat expand.
 class AiAwareFab extends ConsumerStatefulWidget {
   final VoidCallback? onVoiceTap;
   final VoidCallback? onCameraTap;
@@ -76,99 +69,95 @@ class _AiAwareFabState extends ConsumerState<AiAwareFab>
     return Stack(
       alignment: Alignment.bottomRight,
       children: [
-        // Dim overlay
         if (_expanded)
           Positioned.fill(
             child: GestureDetector(
               onTap: _close,
-              child: Container(color: Colors.black26),
+              behavior: HitTestBehavior.opaque,
+              child: Container(color: Colors.black.withValues(alpha: 0.4)),
             ),
           ),
 
-        // FAB column
-        Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            // Sub-FABs
-            SizeTransition(
+        if (_expanded)
+          Positioned(
+            bottom: 88,
+            right: 16,
+            child: SizeTransition(
               sizeFactor: _expandAnimation,
               axisAlignment: -1,
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  _SubFab(
+                  _SubFabItem(
                     icon: Icons.mic,
-                    label: isAiReady ? 'Suara' : 'AI sedang memuat...',
+                    label: 'Suara',
                     enabled: isAiReady,
                     onTap: () {
                       _close();
                       widget.onVoiceTap?.call();
                     },
                   ),
-                  const SizedBox(height: 8),
-                  _SubFab(
-                    icon: Icons.photo_camera,
-                    label: isAiReady ? 'Kamera' : 'AI sedang memuat...',
+                  const SizedBox(height: 12),
+                  _SubFabItem(
+                    icon: Icons.camera_alt,
+                    label: 'Kamera',
                     enabled: isAiReady,
                     onTap: () {
                       _close();
                       widget.onCameraTap?.call();
                     },
                   ),
-                  const SizedBox(height: 8),
-                  _SubFab(
+                  const SizedBox(height: 12),
+                  _SubFabItem(
                     icon: Icons.edit_document,
                     label: 'Manual',
-                    enabled: true, // Manual always enabled
+                    enabled: true,
                     onTap: () {
                       _close();
                       widget.onManualTap?.call();
                     },
                   ),
-                  const SizedBox(height: 12),
                 ],
               ),
             ),
+          ),
 
-            // Main FAB
-            SizedBox(
-              width: 56,
-              height: 56,
-              child: FloatingActionButton(
-                onPressed: _toggle,
-                backgroundColor: AppColors.primaryContainer,
-                foregroundColor: AppColors.onPrimaryContainer,
-                elevation: _expanded ? 8 : 4,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(28),
-                  side: const BorderSide(color: AppColors.primaryFixedDim),
-                ),
-                child: AnimatedRotation(
-                  turns: _expanded ? 0.125 : 0,
-                  duration: const Duration(milliseconds: 200),
-                  child: Icon(_expanded ? Icons.close : Icons.add),
-                ),
-              ),
+        SizedBox(
+          width: 56,
+          height: 56,
+          child: FloatingActionButton(
+            onPressed: _toggle,
+            backgroundColor: AppColors.primaryContainer,
+            foregroundColor: AppColors.onPrimaryContainer,
+            elevation: _expanded ? 8 : 4,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(28),
+              side: const BorderSide(color: AppColors.primaryFixedDim),
             ),
-          ],
+            child: AnimatedRotation(
+              turns: _expanded ? 0.125 : 0,
+              duration: const Duration(milliseconds: 200),
+              child: Icon(_expanded ? Icons.close : Icons.add),
+            ),
+          ),
         ),
       ],
     );
   }
 }
 
-class _SubFab extends StatelessWidget {
+class _SubFabItem extends StatelessWidget {
   final IconData icon;
   final String label;
-  final bool enabled;
   final VoidCallback? onTap;
+  final bool enabled;
 
-  const _SubFab({
+  const _SubFabItem({
     required this.icon,
     required this.label,
-    required this.enabled,
     this.onTap,
+    this.enabled = true,
   });
 
   @override
@@ -176,47 +165,59 @@ class _SubFab extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Label tooltip
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          constraints: const BoxConstraints(minWidth: 72),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
-            color: AppColors.surface,
-            border: Border.all(color: AppColors.outlineVariant),
-            borderRadius: BorderRadius.circular(4),
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: const Color(0xFFE0E0E0)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.10),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
           child: Text(
             label,
-            style: GoogleFonts.inter(
+            style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
-              height: 18 / 14,
-              letterSpacing: 0.28,
               color: enabled
-                  ? AppColors.onSurfaceVariant
-                  : AppColors.outlineVariant,
+                  ? const Color(0xFF1A1A1A)
+                  : const Color(0xFF414752).withValues(alpha: 0.38),
             ),
           ),
         ),
         const SizedBox(width: 8),
-        // Sub-FAB button
-        SizedBox(
-          width: 40,
-          height: 40,
-          child: FloatingActionButton.small(
-            heroTag: 'sub_fab_${icon.codePoint}',
-            onPressed: enabled ? onTap : null,
-            backgroundColor:
-                enabled ? AppColors.surface : AppColors.surfaceContainerHigh,
-            foregroundColor: enabled ? AppColors.primary : AppColors.outline,
-            elevation: 2,
-            shape: CircleBorder(
-              side: BorderSide(
-                color: enabled
-                    ? AppColors.outlineVariant
-                    : AppColors.surfaceContainerHigh,
-              ),
+        GestureDetector(
+          onTap: enabled ? onTap : null,
+          child: Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: enabled
+                  ? const Color(0xFFF6F3F2)
+                  : const Color(0xFFE5E2E1),
+              border: Border.all(color: const Color(0xFFE0E0E0)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.08),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
-            child: Icon(icon, size: 20),
+            child: Icon(
+              icon,
+              size: 22,
+              color: enabled
+                  ? const Color(0xFF005DAC)
+                  : const Color(0xFF414752).withValues(alpha: 0.38),
+            ),
           ),
         ),
       ],
