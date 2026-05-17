@@ -30,14 +30,21 @@ class AppInitNotifier extends StateNotifier<AppInitState> {
   Future<void> initialize() async {
     _logger.i('AppInitNotifier: Starting initialization...');
 
-    if (!FlutterGemma.hasActiveModel()) {
-      state = const AppInitModelDownloading(progress: 0.0);
-      _logger.i('AppInitNotifier: Model not installed, downloading via flutter_gemma...');
+    final modelId = _modelUrl.split('/').last;
+    final alreadyOnDisk = await FlutterGemma.isModelInstalled(modelId);
 
-      final modelId = _modelUrl.split('/').last;
+    if (FlutterGemma.hasActiveModel()) {
+      _logger.i('AppInitNotifier: Active model found, loading...');
+    } else if (alreadyOnDisk) {
+      _logger.i('AppInitNotifier: Model file exists on disk but not active, loading...');
+    } else {
+      state = const AppInitModelDownloading(progress: 0.0);
+      _logger.i('AppInitNotifier: Model not found, downloading...');
+
       try {
         await FlutterGemma.uninstallModel(modelId);
       } catch (_) {}
+
       try {
         await FlutterGemma.installModel(
           modelType: ModelType.gemma4,
