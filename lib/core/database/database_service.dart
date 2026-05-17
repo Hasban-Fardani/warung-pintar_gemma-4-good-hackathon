@@ -67,7 +67,6 @@ class DatabaseServiceImpl implements DatabaseService {
 
     final batch = db.batch();
 
-    // ── Categories (must be first — referenced by stock FK) ──
     batch.rawQuery('''
       CREATE TABLE categories (
         id         TEXT    PRIMARY KEY,
@@ -76,7 +75,6 @@ class DatabaseServiceImpl implements DatabaseService {
       )
     ''');
 
-    // ── Stock / Master Barang ──
     batch.rawQuery('''
       CREATE TABLE stock (
         id                   TEXT    PRIMARY KEY,
@@ -90,7 +88,6 @@ class DatabaseServiceImpl implements DatabaseService {
       )
     ''');
 
-    // ── Transactions ──
     batch.rawQuery('''
       CREATE TABLE transactions (
         id                       TEXT    PRIMARY KEY,
@@ -112,7 +109,6 @@ class DatabaseServiceImpl implements DatabaseService {
       )
     ''');
 
-    // ── Transaction Indexes ──
     batch.rawQuery(
       'CREATE INDEX idx_tx_date   ON transactions(date(created_at))',
     );
@@ -122,7 +118,6 @@ class DatabaseServiceImpl implements DatabaseService {
     batch.rawQuery('CREATE INDEX idx_tx_status ON transactions(status)');
     batch.rawQuery('CREATE INDEX idx_tx_method ON transactions(input_method)');
 
-    // ── Audit Logs — append-only, no UPDATE/DELETE (PRD §9) ──
     batch.rawQuery('''
       CREATE TABLE audit_logs (
         id               TEXT    PRIMARY KEY,
@@ -145,7 +140,6 @@ class DatabaseServiceImpl implements DatabaseService {
       )
     ''');
 
-    // ── Price History — append-only (PRD §10.6) ──
     batch.rawQuery('''
       CREATE TABLE price_history (
         id             TEXT    PRIMARY KEY,
@@ -156,7 +150,6 @@ class DatabaseServiceImpl implements DatabaseService {
       )
     ''');
 
-    // ── App Settings ──
     batch.rawQuery('''
       CREATE TABLE app_settings (
         key        TEXT PRIMARY KEY,

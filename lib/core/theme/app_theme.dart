@@ -142,7 +142,6 @@ class AppTheme {
   /// All sizes use Inter. Minimum body text = 16px.
   static TextTheme _buildTextTheme() {
     return TextTheme(
-      // headline-lg: 28px / 700 / 36px line / -0.02em
       headlineLarge: GoogleFonts.inter(
         fontSize: 28,
         fontWeight: FontWeight.w700,
@@ -150,7 +149,6 @@ class AppTheme {
         letterSpacing: -0.56,
         color: AppColors.textPrimary,
       ),
-      // headline-md: 24px / 700 / 32px / -0.01em
       headlineMedium: GoogleFonts.inter(
         fontSize: 24,
         fontWeight: FontWeight.w700,
@@ -158,28 +156,24 @@ class AppTheme {
         letterSpacing: -0.24,
         color: AppColors.textPrimary,
       ),
-      // headline-sm: 20px / 600 / 28px
       headlineSmall: GoogleFonts.inter(
         fontSize: 20,
         fontWeight: FontWeight.w600,
         height: 28 / 20,
         color: AppColors.textPrimary,
       ),
-      // body-lg: 18px / 400 / 26px
       bodyLarge: GoogleFonts.inter(
         fontSize: 18,
         fontWeight: FontWeight.w400,
         height: 26 / 18,
         color: AppColors.textPrimary,
       ),
-      // body-md: 16px / 400 / 24px (minimum body size)
       bodyMedium: GoogleFonts.inter(
         fontSize: 16,
         fontWeight: FontWeight.w400,
         height: 24 / 16,
         color: AppColors.textPrimary,
       ),
-      // label-lg: 16px / 600 / 20px / 0.01em
       labelLarge: GoogleFonts.inter(
         fontSize: 16,
         fontWeight: FontWeight.w600,
@@ -187,7 +181,6 @@ class AppTheme {
         letterSpacing: 0.16,
         color: AppColors.textPrimary,
       ),
-      // label-md: 14px / 500 / 18px / 0.02em
       labelMedium: GoogleFonts.inter(
         fontSize: 14,
         fontWeight: FontWeight.w500,
@@ -195,7 +188,6 @@ class AppTheme {
         letterSpacing: 0.28,
         color: AppColors.textPrimary,
       ),
-      // Numeric display — tabular-nums (PRD §12.7)
       displayMedium: GoogleFonts.inter(
         fontSize: 24,
         fontWeight: FontWeight.w700,

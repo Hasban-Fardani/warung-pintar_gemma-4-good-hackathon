@@ -76,9 +76,9 @@ final appRouter = GoRouter(
                           label: 'Beranda',
                         ),
                         NavigationDestination(
-                          icon: Icon(Icons.history_outlined),
-                          selectedIcon: Icon(Icons.history),
-                          label: 'Riwayat',
+                          icon: Icon(Icons.assessment_outlined),
+                          selectedIcon: Icon(Icons.assessment),
+                          label: 'Rekap',
                         ),
                       ],
                     ),
@@ -109,6 +109,10 @@ final appRouter = GoRouter(
               builder: (context, state) => const DashboardScreen(),
             ),
             GoRoute(
+              path: '/catalog',
+              builder: (context, state) => const CatalogListPage(),
+            ),
+            GoRoute(
               path: '/category-management',
               builder: (context, state) => const CategoryManagementPage(),
             ),
@@ -127,10 +131,6 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/settings',
       builder: (context, state) => const SettingsPage(),
-    ),
-    GoRoute(
-      path: '/catalog',
-      builder: (context, state) => const CatalogListPage(),
     ),
     GoRoute(
       path: '/pending',

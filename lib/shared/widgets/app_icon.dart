@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import 'package:warung_pintar_cimahi/core/constant/app_colors.dart';
+
 /// Custom app icon using the warungpintar SVG.
 class AppIcon extends StatelessWidget {
   final double? size;

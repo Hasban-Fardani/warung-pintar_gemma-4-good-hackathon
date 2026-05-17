@@ -95,15 +95,15 @@ class DashboardNotifier extends StateNotifier<DashboardState> {
       limit: 5,
     );
     final recentTransactions = switch (recentResult) {
-      Success<List<TransactionEntity>, String>(:final data) => data,
-      Failure<List<TransactionEntity>, String>() => <TransactionEntity>[],
+      Success(:final data) => data,
+      Failure() => <TransactionEntity>[],
     };
 
     // Low stock items for banner
     final lowStockResult = await _catalogRepository.getLowStockItems();
     final lowStockItems = switch (lowStockResult) {
-      Success<List<StockEntity>, String>(:final data) => data,
-      Failure<List<StockEntity>, String>() => <StockEntity>[],
+      Success(:final data) => data,
+      Failure() => <StockEntity>[],
     };
 
     // Owner name from app_settings

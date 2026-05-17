@@ -21,13 +21,13 @@ class DashboardSummaryUseCase {
     final pendingResult = await _transactionRepository.getPendingTransactions();
 
     final recentTransactions = switch (recentResult) {
-      Success<List<TransactionEntity>, String>(:final data) => data,
-      Failure<List<TransactionEntity>, String>() => <TransactionEntity>[],
+      Success(:final data) => data,
+      Failure() => <TransactionEntity>[],
     };
 
     final pendingList = switch (pendingResult) {
-      Success<List<TransactionEntity>, String>(:final data) => data,
-      Failure<List<TransactionEntity>, String>() => <TransactionEntity>[],
+      Success(:final data) => data,
+      Failure() => <TransactionEntity>[],
     };
 
     final now = DateTime.now();

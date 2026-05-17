@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:warung_pintar_cimahi/core/constant/app_colors.dart';
-import 'package:warung_pintar_cimahi/shared/widgets/app_icon.dart';
 
 class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -17,7 +16,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       leading: IconButton(
-        icon: AppIcon(size: 60),
+        icon: const Icon(Icons.storefront, color: AppColors.primary, size: 28),
         onPressed: () => context.go('/'),
         tooltip: 'Beranda',
       ),

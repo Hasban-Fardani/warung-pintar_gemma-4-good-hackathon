@@ -3,14 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:warung_pintar_cimahi/core/constant/app_colors.dart';
 
-/// Toast system — snackbar/toast per PRD §12.8 (ACT-71).
-///
-/// - Sukses: auto-dismiss 3s, `bg-secondary`, `text-on-secondary`
-/// - Info: auto-dismiss 4s, `bg-primary`, `text-on-primary`
-/// - Warning: manual dismiss, `bg-tertiary`, `text-on-tertiary`
-/// - Error: manual dismiss, `bg-error`, `text-on-error`
-///
-/// Toast muncul di bawah TopAppBar, bukan di bottom.
 class ToastService {
   ToastService._();
 
@@ -43,7 +35,7 @@ class ToastService {
       icon: Icons.warning_amber,
       backgroundColor: AppColors.tertiary,
       textColor: AppColors.onTertiary,
-      duration: null, // manual dismiss
+      duration: null,
     );
   }
 
@@ -54,7 +46,7 @@ class ToastService {
       icon: Icons.error,
       backgroundColor: AppColors.error,
       textColor: AppColors.onError,
-      duration: null, // manual dismiss — tidak pernah auto (PRD §12.8)
+      duration: null,
     );
   }
 
@@ -101,7 +93,7 @@ class ToastService {
         behavior: SnackBarBehavior.floating,
         margin: const EdgeInsets.fromLTRB(16, 0, 16, 0),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        duration: duration ?? const Duration(days: 1), // effectively infinite
+        duration: duration ?? const Duration(days: 1),
         dismissDirection:
             duration == null ? DismissDirection.horizontal : DismissDirection.down,
       ),

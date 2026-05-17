@@ -112,7 +112,6 @@ class ImageQualityGate {
         bytes[1] == 0x50 &&
         bytes[2] == 0x4E &&
         bytes[3] == 0x47) {
-      // IHDR at byte 16: width (4 bytes BE) + height (4 bytes BE)
       final width =
           (bytes[16] << 24) | (bytes[17] << 16) | (bytes[18] << 8) | bytes[19];
       final height =

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:warung_pintar_cimahi/core/constant/app_colors.dart';
+
 /// AI Degraded Banner — tampil saat `AppInitAiDegraded` (ACT-66).
 ///
 /// PRD §16.6.2: Warna `#FFEDED`, icon warning + teks + tombol "Coba Lagi"

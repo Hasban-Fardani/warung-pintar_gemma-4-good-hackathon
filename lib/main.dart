@@ -11,7 +11,6 @@ void main() async {
 
   configureDependencies();
 
-  // Initialize database on startup
   final databaseService = getIt<DatabaseService>();
   await databaseService.init();
 
@@ -23,12 +22,11 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Trigger app initialization (model check, download, load)
     ref.listen(appInitProvider, (prev, next) {});
     ref.read(appInitProvider.notifier).initialize();
 
     return MaterialApp.router(
-      title: 'WarungPintar',
+      title: 'Warung Pintar',
       theme: AppTheme.lightTheme,
       routerConfig: appRouter,
     );

@@ -8,10 +8,8 @@ import 'package:warung_pintar_cimahi/core/ai/app_init_notifier.dart';
 import 'package:warung_pintar_cimahi/core/ai/app_init_state.dart';
 import 'package:warung_pintar_cimahi/core/constant/app_colors.dart';
 import 'package:warung_pintar_cimahi/core/constant/app_strings.dart';
-import 'package:warung_pintar_cimahi/features/catalog/presentation/pages/add_item_page.dart';
 import 'package:warung_pintar_cimahi/features/dashboard/presentation/providers/dashboard_provider.dart';
 import 'package:warung_pintar_cimahi/features/transaction/domain/entities/transaction_entity.dart';
-import 'package:warung_pintar_cimahi/shared/widgets/ai_aware_fab.dart';
 import 'package:warung_pintar_cimahi/shared/widgets/ai_degraded_banner.dart';
 import 'package:warung_pintar_cimahi/shared/widgets/ai_loading_banner.dart';
 import 'package:warung_pintar_cimahi/shared/widgets/app_top_bar.dart';
@@ -55,36 +53,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       body: state.isLoading
           ? const Center(child: CircularProgressIndicator())
           : _buildContent(state, appState),
-      floatingActionButton: AiAwareFab(
-        onVoiceTap: () {
-          debugPrint('FAB: Voice input — not yet implemented');
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Masukan suara: fitur AI belum tersedia')),
-          );
-        },
-        onCameraTap: () {
-          try {
-            context.push('/receipt-capture');
-          } catch (e, stack) {
-            debugPrint('FAB: Camera navigation error — $e\n$stack');
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Gagal membuka kamera')),
-            );
-          }
-        },
-        onManualTap: () {
-          try {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const AddItemPage()),
-            );
-          } catch (e, stack) {
-            debugPrint('FAB: Manual navigation error — $e\n$stack');
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Gagal membuka form manual')),
-            );
-          }
-        },
-      ),
     );
   }
 

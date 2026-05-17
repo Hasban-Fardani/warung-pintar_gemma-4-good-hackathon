@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:warung_pintar_cimahi/core/constant/app_colors.dart';
+
 /// Permanent Manual Mode Banner — tampil saat `AppInitModelFailed` (ACT-67).
 ///
 /// PRD §16.6.3: Warna `#424242` (inverse-surface), teks putih permanen.
