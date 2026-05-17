@@ -81,17 +81,7 @@ class _CatalogListPageState extends ConsumerState<CatalogListPage> {
                 color: AppColors.primary,
               ),
             ),
-            IconButton(
-              icon: const Icon(Icons.category, color: AppColors.onSurfaceVariant),
-              tooltip: 'Kelola Kategori',
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => const CategoryManagementPage(),
-                  ),
-                );
-              },
-            ),
+            const Spacer(),
             SizedBox(
               height: 48,
               child: ElevatedButton(

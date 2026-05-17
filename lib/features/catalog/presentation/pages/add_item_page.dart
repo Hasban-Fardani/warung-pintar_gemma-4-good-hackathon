@@ -95,194 +95,238 @@ class _AddItemPageState extends ConsumerState<AddItemPage> {
   Widget build(BuildContext context) {
     final state = ref.watch(catalogProvider);
 
-    final body = Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (!widget.asBottomSheet) ...[
-          AppBar(
-            centerTitle: true,
-            leading: IconButton(
-              icon: const Icon(Icons.close),
-              onPressed: _batalkan,
-            ),
-            title: Text(
-              'Tambah Barang Baru',
-              style: GoogleFonts.poppins(
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-                color: AppColors.primary,
-              ),
-            ),
-            backgroundColor: Colors.white,
-            elevation: 0,
-            bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(1),
-              child: Container(color: AppColors.outlineVariant, height: 1),
-            ),
-          ),
-        ] else ...[
-          Center(
-            child: Container(
-              width: 48,
-              height: 4,
-              margin: const EdgeInsets.only(top: 12, bottom: 8),
-              decoration: BoxDecoration(
-                color: AppColors.outlineVariant,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    'Tambah Barang Baru',
-                    style: GoogleFonts.inter(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                      height: 28 / 20,
-                      color: AppColors.onSurface,
-                    ),
-                  ),
-                ),
-                GestureDetector(
-                  onTap: _batalkan,
-                  child: Container(
-                    width: 48,
-                    height: 48,
-                    alignment: Alignment.center,
-                    child: const Icon(
-                      Icons.close,
-                      color: AppColors.onSurfaceVariant,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const Divider(height: 1, color: AppColors.outlineVariant),
-        ],
-        Expanded(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildField(
-                    'Nama Barang',
-                    _namaController,
-                    isRequired: true,
-                    hint: 'Contoh: Mie Ayam',
-                  ),
-                  const SizedBox(height: 16),
-                  _buildField(
-                    'Kode Barang (SKU)',
-                    _skuController,
-                    isRequired: false,
-                    hint: 'Otomatis dibuat',
-                  ),
-                  const SizedBox(height: 16),
-                  _buildKategoriDropdown(state),
-                  const SizedBox(height: 16),
-                  _buildSatuanDropdown(),
-                  const SizedBox(height: 16),
-                  _buildHargaField(),
-                  const SizedBox(height: 16),
-                  _buildStokAwalField(),
-                ],
-              ),
-            ),
-          ),
-        ),
-        Container(
-          decoration: const BoxDecoration(
-            color: AppColors.surface,
-            border: Border(top: BorderSide(color: AppColors.outlineVariant)),
-          ),
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-          child: SafeArea(
-            top: false,
-            child: Row(
-              children: [
-                Expanded(
-                  child: SizedBox(
-                    height: 48,
-                    child: OutlinedButton(
-                      onPressed: _isSubmitting ? null : _batalkan,
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: AppColors.primary),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                      ),
-                      child: Text(
-                        'Batal',
-                        style: GoogleFonts.inter(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          height: 20 / 16,
-                          letterSpacing: 0.16,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: SizedBox(
-                    height: 48,
-                    child: ElevatedButton(
-                      onPressed: _isSubmitting ? null : _simpan,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primaryContainer,
-                        foregroundColor: AppColors.onPrimaryContainer,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                      ),
-                      child: _isSubmitting
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                          : Text(
-                              'Simpan Barang',
-                              style: GoogleFonts.inter(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                height: 20 / 16,
-                                letterSpacing: 0.16,
-                              ),
-                            ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-
     if (widget.asBottomSheet) {
       return SizedBox(
         height: MediaQuery.of(context).size.height * 0.85,
-        child: Column(children: [Expanded(child: body)]),
+        child: Column(
+          children: [
+            _buildBottomSheetHeader(),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildField(
+                        'Nama Barang',
+                        _namaController,
+                        isRequired: true,
+                        hint: 'Contoh: Mie Ayam',
+                      ),
+                      const SizedBox(height: 16),
+                      _buildField(
+                        'Kode Barang (SKU)',
+                        _skuController,
+                        isRequired: false,
+                        hint: 'Otomatis dibuat',
+                      ),
+                      const SizedBox(height: 16),
+                      _buildKategoriDropdown(state),
+                      const SizedBox(height: 16),
+                      _buildSatuanDropdown(),
+                      const SizedBox(height: 16),
+                      _buildHargaField(),
+                      const SizedBox(height: 16),
+                      _buildStokAwalField(),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            _buildBottomButton(),
+          ],
+        ),
       );
     }
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: SafeArea(child: body),
+      appBar: AppBar(
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.close),
+          onPressed: _batalkan,
+        ),
+        title: Text(
+          'Tambah Barang Baru',
+          style: GoogleFonts.poppins(
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+            color: AppColors.primary,
+          ),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(color: AppColors.outlineVariant, height: 1),
+        ),
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildField(
+                      'Nama Barang',
+                      _namaController,
+                      isRequired: true,
+                      hint: 'Contoh: Mie Ayam',
+                    ),
+                    const SizedBox(height: 16),
+                    _buildField(
+                      'Kode Barang (SKU)',
+                      _skuController,
+                      isRequired: false,
+                      hint: 'Otomatis dibuat',
+                    ),
+                    const SizedBox(height: 16),
+                    _buildKategoriDropdown(state),
+                    const SizedBox(height: 16),
+                    _buildSatuanDropdown(),
+                    const SizedBox(height: 16),
+                    _buildHargaField(),
+                    const SizedBox(height: 16),
+                    _buildStokAwalField(),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          _buildBottomButton(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBottomSheetHeader() {
+    return Column(
+      children: [
+        Center(
+          child: Container(
+            width: 48,
+            height: 4,
+            margin: const EdgeInsets.only(top: 12, bottom: 8),
+            decoration: BoxDecoration(
+              color: AppColors.outlineVariant,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Tambah Barang Baru',
+                  style: GoogleFonts.inter(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    height: 28 / 20,
+                    color: AppColors.onSurface,
+                  ),
+                ),
+              ),
+              GestureDetector(
+                onTap: _batalkan,
+                child: Container(
+                  width: 48,
+                  height: 48,
+                  alignment: Alignment.center,
+                  child: const Icon(
+                    Icons.close,
+                    color: AppColors.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const Divider(height: 1, color: AppColors.outlineVariant),
+      ],
+    );
+  }
+
+  Widget _buildBottomButton() {
+    return Container(
+      decoration: const BoxDecoration(
+        color: AppColors.surface,
+        border: Border(top: BorderSide(color: AppColors.outlineVariant)),
+      ),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+      child: SafeArea(
+        top: false,
+        child: Row(
+          children: [
+            Expanded(
+              child: SizedBox(
+                height: 48,
+                child: OutlinedButton(
+                  onPressed: _isSubmitting ? null : _batalkan,
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: AppColors.primary),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                  child: Text(
+                    'Batal',
+                    style: GoogleFonts.inter(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      height: 20 / 16,
+                      letterSpacing: 0.16,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: SizedBox(
+                height: 48,
+                child: ElevatedButton(
+                  onPressed: _isSubmitting ? null : _simpan,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryContainer,
+                    foregroundColor: AppColors.onPrimaryContainer,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                  child: _isSubmitting
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : Text(
+                          'Simpan Barang',
+                          style: GoogleFonts.inter(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            height: 20 / 16,
+                            letterSpacing: 0.16,
+                          ),
+                        ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
