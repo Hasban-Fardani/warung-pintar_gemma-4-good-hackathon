@@ -18,7 +18,14 @@ class AppInitNotifier extends StateNotifier<AppInitState> {
   static const String _modelUrl =
       'https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/main/gemma-4-E2B-it.litertlm';
 
+  static const double _totalSizeMB = 2594.0;
+  static const int _windowSize = 5;
+
   static final _logger = Logger(printer: PrettyPrinter(methodCount: 0));
+
+  final List<_SpeedSample> _speedSamples = [];
+  DateTime? _lastSampleTime;
+  double _lastProgress = 0;
 
   Future<void> initialize() async {
     _logger.i('AppInitNotifier: Starting initialization...');
@@ -32,11 +39,7 @@ class AppInitNotifier extends StateNotifier<AppInitState> {
           modelType: ModelType.gemma4,
           fileType: ModelFileType.litertlm,
         ).fromNetwork(_modelUrl, foreground: true).withProgress((progress) {
-          state = AppInitModelDownloading(
-            progress: progress / 100.0,
-            speedMBps: 0,
-            eta: 'menghitung...',
-          );
+          _updateProgress(progress.toDouble());
         }).install();
       } catch (e) {
         _logger.e('AppInitNotifier: Download failed: $e');
@@ -101,4 +104,59 @@ class AppInitNotifier extends StateNotifier<AppInitState> {
     _logger.e('AppInitNotifier: AI permanently failed — $reason');
     state = AppInitModelFailed(reason);
   }
+
+  void _updateProgress(double progress) {
+    final now = DateTime.now();
+    final progressFraction = progress / 100.0;
+
+    if (_lastSampleTime != null) {
+      final elapsed = now.difference(_lastSampleTime!).inMilliseconds / 1000.0;
+      if (elapsed > 0.5) {
+        final deltaProgress = progress - _lastProgress;
+        final speedMBps = (deltaProgress / elapsed) * (_totalSizeMB / 100);
+
+        _speedSamples.add(_SpeedSample(speedMBps, now));
+        if (_speedSamples.length > _windowSize) {
+          _speedSamples.removeAt(0);
+        }
+      }
+    }
+
+    _lastSampleTime = now;
+    _lastProgress = progress;
+
+    double avgSpeedMBps = 0;
+    if (_speedSamples.isNotEmpty) {
+      avgSpeedMBps = _speedSamples.map((s) => s.speedMBps).reduce((a, b) => a + b) /
+          _speedSamples.length;
+    }
+
+    String eta;
+    if (avgSpeedMBps > 0.05 && progress > 1) {
+      final remainingMB = (_totalSizeMB - (progressFraction * _totalSizeMB));
+      final remainingSeconds = remainingMB / avgSpeedMBps;
+      if (remainingSeconds >= 60) {
+        final mins = (remainingSeconds / 60).floor();
+        final secs = (remainingSeconds % 60).floor();
+        eta = '${mins}m ${secs}d';
+      } else {
+        eta = '${remainingSeconds.floor()}d';
+      }
+    } else {
+      eta = 'menghitung...';
+    }
+
+    state = AppInitModelDownloading(
+      progress: progressFraction,
+      speedMBps: avgSpeedMBps,
+      eta: eta,
+    );
+  }
+}
+
+class _SpeedSample {
+  final double speedMBps;
+  final DateTime time;
+
+  _SpeedSample(this.speedMBps, this.time);
 }
