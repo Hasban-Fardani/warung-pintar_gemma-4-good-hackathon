@@ -161,7 +161,7 @@ class AiLoadingBanner extends ConsumerWidget {
         const SizedBox(width: 8),
         Expanded(
           child: Text(
-            'AI sedang memuat model. Fitur suara dan foto belum tersedia.',
+            'Sedang memuat modal. Fitur suara dan foto akan segera tersedia',
             style: GoogleFonts.inter(
               fontSize: 14,
               fontWeight: FontWeight.w500,
