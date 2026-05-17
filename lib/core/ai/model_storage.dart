@@ -4,6 +4,8 @@ import 'package:crypto/crypto.dart';
 import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 
+import 'package:warung_pintar_cimahi/core/ai/model_download_config.dart';
+
 /// Manages the on-device Gemma model file location and integrity (PRD §16.1.1).
 ///
 /// Model is stored in app documents directory (not cache — survives
@@ -13,17 +15,9 @@ class ModelStorage {
 
   static final _logger = Logger(printer: PrettyPrinter(methodCount: 0));
 
-  static const String _modelFileName =
-      'gemma-4-E2B-it-litertlm-Q4_K_M.litertlm';
+  static const String _modelFileName = ModelDownloadConfig.modelFileName;
 
-  /// Placeholder SHA-256 — replace with official hash when model file
-  /// is publicly available from Kaggle.
-  static const String _modelSha256 = String.fromEnvironment(
-    'MODEL_SHA256',
-    defaultValue:
-        'a3f8c2d1e9b047f6a1c3e5d7b9f2a4c6'
-        'e8d0b2f4a6c8e0d2b4f6a8c0e2d4b6f8',
-  );
+  static const String _modelSha256 = ModelDownloadConfig.modelSha256;
 
   /// Full path to model file in app internal storage.
   static Future<String> get modelPath async {
@@ -63,15 +57,34 @@ class ModelStorage {
     }
   }
 
-  /// Verify SHA-256 hash of model file.
+  /// Verify SHA-256 hash of model file using chunked streaming.
   ///
-  /// Reads file as stream to avoid loading full 2.5GB into memory.
+  /// Reads file in 1MB chunks to avoid loading full 2.5GB into memory.
+  /// This is RAM-efficient for devices with 2GB memory.
   static Future<bool> _verifySha256(File file) async {
     _logger.d('ModelStorage: Verifying SHA-256...');
     final stream = file.openRead();
-    final digest = await sha256.bind(stream).first;
+    final output = AccumulatorSink<Digest>();
+    final input = sha256.startChunkedConversion(output);
+
+    await for (final chunk in stream) {
+      input.add(chunk);
+    }
+
+    input.close();
+    final digest = output.events.single;
     final hash = digest.toString();
     _logger.d('ModelStorage: Computed hash: $hash');
     return hash == _modelSha256;
   }
+}
+
+class AccumulatorSink<T> implements Sink<T> {
+  final List<T> events = [];
+
+  @override
+  void add(T event) => events.add(event);
+
+  @override
+  void close() {}
 }

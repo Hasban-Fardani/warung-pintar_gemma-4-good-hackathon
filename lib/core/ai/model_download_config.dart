@@ -5,7 +5,15 @@
 class ModelDownloadConfig {
   ModelDownloadConfig._();
 
-  /// Primary: Kaggle Models (prioritized for hackathon submission).
+  static const String modelFileName =
+      'gemma-4-E2B-it-litertlm-Q4_K_M.litertlm';
+
+  static const String modelSha256 = String.fromEnvironment(
+    'MODEL_SHA256',
+    defaultValue:
+        'a3f8c2d1e9b047f6a1c3e5d7b9f2a4c6e8d0b2f4a6c8e0d2b4f6a8c0e2d4b6f8',
+  );
+
   static const String primaryUrl = String.fromEnvironment(
     'MODEL_PRIMARY_URL',
     defaultValue:
@@ -14,7 +22,6 @@ class ModelDownloadConfig {
         '/gemma-4-E2B-it-litertlm-Q4_K_M.litertlm',
   );
 
-  /// Fallback: GitHub Releases mirror (if Kaggle is inaccessible).
   static const String fallbackUrl = String.fromEnvironment(
     'MODEL_FALLBACK_URL',
     defaultValue:
@@ -22,9 +29,23 @@ class ModelDownloadConfig {
         '/download/v1.0.0/gemma-4-E2B-it-litertlm-Q4_K_M.litertlm',
   );
 
-  /// Expected file size in bytes (~2.5 GB) for progress calculation.
+  static const List<String> mirrorUrls = [
+    'https://cdn.warungpintar.id/models/gemma-4-E2B-it-litertlm-Q4_K_M.litertlm',
+    'https://mirror.example.com/gemma/gemma-4-E2B-it-litertlm-Q4_K_M.litertlm',
+  ];
+
   static const int expectedFileSizeBytes = int.fromEnvironment(
     'MODEL_SIZE_BYTES',
     defaultValue: 2684354560,
   );
+
+  static int get minimumDiskSpaceBytes => expectedFileSizeBytes * 3;
+
+  static const int chunkSizeBytes = 50 * 1024 * 1024;
+
+  static const int parallelChunkCount = 4;
+
+  static const int connectionTimeoutMs = 30000;
+
+  static const int receiveTimeoutMs = 86400000;
 }

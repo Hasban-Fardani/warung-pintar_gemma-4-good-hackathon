@@ -69,6 +69,7 @@ dependencies:
   # Networking (model download — Section 16) & Crypto (SHA-256 verification)
   dio: ^5.4.0
   crypto: ^3.0.3
+  connectivity_plus: ^6.0.0
 
 dev_dependencies:
   flutter_test:
