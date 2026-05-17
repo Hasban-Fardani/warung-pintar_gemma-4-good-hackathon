@@ -31,7 +31,13 @@ class AppInitNotifier extends StateNotifier<AppInitState> {
         await FlutterGemma.installModel(
           modelType: ModelType.gemma4,
           fileType: ModelFileType.litertlm,
-        ).fromNetwork(_modelUrl, foreground: true).install();
+        ).fromNetwork(_modelUrl, foreground: true).withProgress((progress) {
+          state = AppInitModelDownloading(
+            progress: progress / 100.0,
+            speedMBps: 0,
+            eta: 'menghitung...',
+          );
+        }).install();
       } catch (e) {
         _logger.e('AppInitNotifier: Download failed: $e');
         state = AppInitModelFailed(

@@ -10,11 +10,13 @@ import '../../features/onboarding/presentation/pages/model_download_screen.dart'
 import '../../features/reports/presentation/pages/reports_page.dart';
 import '../../features/settings/presentation/pages/settings_page.dart';
 import '../../features/transaction/presentation/pages/pending_review_page.dart';
+import '../../features/transaction/presentation/pages/voice_input_page.dart';
+import '../../features/transaction/presentation/pages/transaction_form_page.dart';
 import '../../features/vision/presentation/pages/receipt_capture_page.dart';
 import '../../features/vision/presentation/pages/product_capture_page.dart';
 import '../ai/app_init_notifier.dart';
 import '../ai/app_init_state.dart';
-import '../../features/transaction/presentation/providers/voice_transaction_notifier.dart';
+import '../../shared/widgets/expandable_fab.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
   debugLabel: 'root',
@@ -82,17 +84,9 @@ final appRouter = GoRouter(
                         ),
                       ],
                     ),
-                    Positioned(
+                    const Positioned(
                       top: -28,
-                      child: FloatingActionButton(
-                        heroTag: 'voice_input',
-                        onPressed: () {
-                          ref
-                              .read(voiceTransactionProvider.notifier)
-                              .startListening();
-                        },
-                        child: const Icon(Icons.mic),
-                      ),
+                      child: ExpandableFab(),
                     ),
                   ],
                 ),
@@ -135,6 +129,14 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/pending',
       builder: (context, state) => const PendingReviewPage(),
+    ),
+    GoRoute(
+      path: '/voice-input',
+      builder: (context, state) => const VoiceInputPage(),
+    ),
+    GoRoute(
+      path: '/transaction/new',
+      builder: (context, state) => const TransactionFormPage(),
     ),
     GoRoute(
       path: '/receipt-capture',

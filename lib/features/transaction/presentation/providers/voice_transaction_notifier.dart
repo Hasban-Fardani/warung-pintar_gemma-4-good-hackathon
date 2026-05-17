@@ -63,6 +63,12 @@ class VoiceTransactionNotifier extends StateNotifier<VoiceTransactionState> {
         );
         await processTranscript(transcript);
       },
+      onError: (error) {
+        state = state.copyWith(
+          isListening: false,
+          resultMessage: 'Gagal mendengar. Silakan coba lagi.',
+        );
+      },
     );
   }
 

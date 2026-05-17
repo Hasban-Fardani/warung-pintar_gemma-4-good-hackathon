@@ -9,7 +9,10 @@ import 'package:warung_pintar_cimahi/core/voice/voice_init_result.dart';
 /// Abstract voice service interface for testability.
 abstract class VoiceService {
   Future<VoiceInitResult> initialize();
-  Future<void> startListening({required Function(String) onResult});
+  Future<void> startListening({
+    required Function(String) onResult,
+    required Function(String) onError,
+  });
   Future<void> stopListening();
   bool get isListening;
 }
@@ -22,6 +25,7 @@ class VoiceServiceImpl implements VoiceService {
   final SpeechToText _stt = SpeechToText();
   bool _isInitialized = false;
   String? _localeOverride;
+  Function(String)? _onErrorCallback;
 
   static final _logger = Logger(printer: PrettyPrinter(methodCount: 0));
 
@@ -79,11 +83,16 @@ class VoiceServiceImpl implements VoiceService {
   }
 
   @override
-  Future<void> startListening({required Function(String) onResult}) async {
+  Future<void> startListening({
+    required Function(String) onResult,
+    required Function(String) onError,
+  }) async {
     if (!_isInitialized) {
       _logger.e('VoiceService: Not initialized');
       return;
     }
+
+    _onErrorCallback = onError;
 
     await _stt.listen(
       localeId: _localeOverride ?? VoiceConfig.localeId,
@@ -112,5 +121,6 @@ class VoiceServiceImpl implements VoiceService {
 
   void _onError(dynamic error) {
     _logger.e('VoiceService error: $error');
+    _onErrorCallback?.call(error.toString());
   }
 }
