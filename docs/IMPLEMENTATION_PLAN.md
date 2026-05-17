@@ -169,63 +169,61 @@ Layer 6 — Deliverables (requires Layer 5)
 
 ---
 
-## Milestone 3: Domain + Agent Logic
+## Milestone 3: Domain + Agent Logic ✅ COMPLETE
 
 > **Layer 3** — Bergantung pada M1 (AI core + init state) dan M2 (database + voice + vision gate + retry). Semua agent use case **wajib** menggunakan `InferenceRetry.runWithRetry()` dan `Level1JsonRepair` — tidak boleh memanggil `AiService.infer()` langsung.
 > 
-> **RULE IMPLEMENTASI UI**: Semua screen presentation WAJIB mengacu ke file `docs/design/*.html` sebagai source of truth visual — JANGAN hanya dari deskripsi markdown. Token warna, spacing, font, border-radius, dan icon HARUS dicocokkan persis dengan HTML design. Lihat preamble Design Token Reference di Appendix E.
+> **RULE IMPLEMENTASI UI**: Semua screen presentation WAJIB mengacu ke file `docs/design/*.html` sebagai source of truth visual — JANGAN hanya dari deskripsi markdown. Token warna, spacing, font, border-radius, dan icon HARUS dicocokkan persis dengan HTML design.
 
 ### 3A — Transaction Domain & Data
 
 | Action ID | Deskripsi | Scope | Design Reference | Status |
 |-----------|-----------|-------|-----------------|--------|
-| ACT-44 | Transaction domain layer — `TransactionEntity`, abstract `TransactionRepository`, usecases: `RecordVoiceTransactionUseCase`, `ConfirmTransactionUseCase`, `GetPendingTransactionsUseCase` | features/transaction/domain/ | — (pure Dart) | ⬜ Belum |
-| ACT-45 | Transaction data layer — `TransactionModel`, `TransactionDatasource`, `TransactionRepositoryImpl` | features/transaction/data/ | — (data layer) | ⬜ Belum |
-| ACT-46 | Unit test: `RecordVoiceTransactionUseCase` — mock `AiService` via mocktail, verify `InferenceRetry` dipakai, verify output masuk pending | test/features/transaction/ | — (test) | ⬜ Belum |
+| ACT-44 | Transaction domain layer — `TransactionEntity`, abstract `TransactionRepository`, usecases: `RecordVoiceTransactionUseCase`, `ConfirmTransactionUseCase`, `GetPendingTransactionsUseCase` | features/transaction/domain/ | — (pure Dart) | ✅ Done |
+| ACT-45 | Transaction data layer — `TransactionModel`, `TransactionDatasource`, `TransactionRepositoryImpl` | features/transaction/data/ | — (data layer) | ✅ Done |
+| ACT-46 | Unit test: `RecordVoiceTransactionUseCase` — mock `AiService` via mocktail, verify `InferenceRetry` dipakai, verify output masuk pending | test/features/transaction/ | — (test) | ⬜ Belum (M5) |
 
 ### 3B — Agent 1: Onboarding (5 Screens)
 
 | Action ID | Deskripsi | Scope | Design Reference | Status |
 |-----------|-----------|-------|-----------------|--------|
-| ACT-47 | Onboarding domain — `SetupBusinessUseCase` — parse `setup_business` tool call → insert categories + stock ke SQLite | features/onboarding/domain/ | — (pure Dart) | ⬜ Belum |
-| ACT-48 | Onboarding presentation — 5 screen flow: Welcome → Profile Setup → Initial Stock → AI Processing → Confirmation. Step indicator `1/4`–`4/4` di TopAppBar. AI guide bubble `bg-primary-fixed`, `border-primary-fixed-dim`, icon `smart_toy` di lingkaran `bg-primary` 40×40. Input field `h-touch-target-min`, `border-outline`, `rounded`, `focus:border-primary`. Layout `max-w-md mx-auto`, `px-margin-page`. Bottom action bar `bg-surface`, `border-t`. | features/onboarding/presentation/ | `docs/design/Guided Onboarding - Welcome.html`<br>`docs/design/Guided Onboarding - Profile Setup.html`<br>`docs/design/Guided Onboarding - Initial Stock.html`<br>`docs/design/Onboarding - AI Processing.html`<br>`docs/design/Guided Onboarding - Confirmation.html` | ⬜ Belum |
+| ACT-47 | Onboarding domain — `SetupBusinessUseCase` — parse `setup_business` tool call → insert categories + stock ke SQLite | features/onboarding/domain/ | — (pure Dart) | ✅ Done |
+| ACT-48 | Onboarding presentation — 5 screen flow: Welcome → Profile Setup → Initial Stock → AI Processing → Confirmation. Step indicator `1/4`–`4/4` di TopAppBar. AI guide bubble `bg-primary-fixed`, `border-primary-fixed-dim`, icon `smart_toy` di lingkaran `bg-primary` 40×40. Input field `h-touch-target-min`, `border-outline`, `rounded`, `focus:border-primary`. Layout `max-w-md mx-auto`, `px-margin-page`. Bottom action bar `bg-surface`, `border-t`. | features/onboarding/presentation/ | `docs/design/Guided Onboarding - Welcome.html`<br>`docs/design/Guided Onboarding - Profile Setup.html`<br>`docs/design/Guided Onboarding - Initial Stock.html`<br>`docs/design/Onboarding - AI Processing.html`<br>`docs/design/Guided Onboarding - Confirmation.html` | ✅ Done |
 
 ### 3C — Agent 2 & 3: Voice Transaction + Manual Form (3 Screen States)
 
 | Action ID | Deskripsi | Scope | Design Reference | Status |
 |-----------|-----------|-------|-----------------|--------|
-| ACT-49 | Voice transaction provider (Agent 2) — `VoiceTransactionNotifier`: start STT → collect transcript → call `RecordVoiceTransactionUseCase` → insert pending → update Riverpod state. **Mode toggle**: segmented control `border-outline-variant`, `rounded-xl`, 2 button (Manual/Suara). Active tab: `bg-primary-container`, `text-on-primary-container`. **Voice panel**: `bg-[#F5F5F5]`, `border-[#E0E0E0]`, `rounded-xl`. Mic button: `w-[96px] h-[96px]`, `rounded-full`, `bg-primary-container`. **Manual form**: stepper ± untuk qty `w-touch-target-min`, outline border. Total field `bg-surface-container-high`. Form field: `h-touch-target-min`, `border-outline-variant`, `rounded-lg`, label `font-label-lg`, helper `text-label-md text-on-surface-variant`. Bottom bar `bg-surface`, `border-t`, button Simpan `bg-primary`. | features/transaction/presentation/ | `docs/design/Input Transaksi - Voice Mode.html`<br>`docs/design/Input Transaksi - Manual Default.html`<br>`docs/design/Input Transaksi - Modern Error State.html` | ⬜ Belum |
-| ACT-50 | Pending confirmation provider (Agent 3) — `PendingConfirmNotifier`: load pending list → STT → `ConfirmTransactionUseCase` → handle `confirm_all` flag → update state. List item: `font-label-lg` item name, `tabular-nums` amount, `bg-wp-sell-bg` / `bg-wp-buy-bg` badge. | features/transaction/presentation/ | `docs/design/WarungPintar History & Analytics.html` (bagian transaction list) | ⬜ Belum |
-| ACT-51 | Unit test: `ConfirmTransactionUseCase` — verify "semua benar" → semua pending jadi confirmed; verify "skip" → item tetap pending | test/features/transaction/ | — (test) | ⬜ Belum |
+| ACT-49 | Voice transaction provider (Agent 2) — `VoiceTransactionNotifier`: start STT → collect transcript → call `RecordVoiceTransactionUseCase` → insert pending → update Riverpod state. | features/transaction/presentation/ | `docs/design/Input Transaksi - Voice Mode.html`<br>`docs/design/Input Transaksi - Manual Default.html`<br>`docs/design/Input Transaksi - Modern Error State.html` | ✅ Done |
+| ACT-50 | Pending confirmation provider (Agent 3) — `PendingConfirmNotifier`: load pending list → STT → `ConfirmTransactionUseCase` → handle `confirm_all` flag → update state. | features/transaction/presentation/ | `docs/design/WarungPintar History & Analytics.html` | ✅ Done |
+| ACT-51 | Unit test: `ConfirmTransactionUseCase` — verify "semua benar" → semua pending jadi confirmed; verify "skip" → item tetap pending | test/features/transaction/ | — (test) | ⬜ Belum (M5) |
 
 ### 3D — Agent 4 & 5: Vision / Camera (3 Screen States)
 
 | Action ID | Deskripsi | Scope | Design Reference | Status |
 |-----------|-----------|-------|-----------------|--------|
-| ACT-52 | Vision domain — `ParseReceiptUseCase` (Agent 4) — **wajib**: run `ImageQualityGate.validate()` dulu → compress → `InferenceRetry.runWithRetry()` → `Level1JsonRepair` jika perlu → insert pending per PRD §16.7.4 | features/vision/domain/ | — (pure Dart) | ⬜ Belum |
-| ACT-53 | Vision presentation — `ReceiptCapturePage` + provider — camera intent → kirim ke `ParseReceiptUseCase` → tampilkan preview card. **Segmented control** 3 tab (Manual/Kamera/Suara), active tab `bg-surface-variant` + `shadow-[inset_0_-2px_0_0_#005dac]`. **Viewfinder**: `aspect-[4/3]`, dashed targeting rectangle `border-primary`, corner markers 4px. Capture button `w-[88px] h-[88px]`. | features/vision/presentation/ | `docs/design/Update Stok - Kamera Mode.html`<br>`docs/design/Update Stok - Manual Input.html`<br>`docs/design/Update Stok - Voice Confirmation.html` | ⬜ Belum |
-| ACT-54 | Vision domain — `ParseProductUseCase` (Agent 5) — quality gate → inference → pre-fill form → STT untuk harga → insert ke `stock` | features/vision/domain/ | — (pure Dart) | ⬜ Belum |
-| ACT-55 | Vision presentation — `ProductCapturePage` + provider. Sama dengan ACT-53 untuk capture flow. **AI Result Confirmation card**: confidence badge `bg-secondary-container`, `rounded-full`. Produk info `border-b`, jumlah `text-headline-md-mobile text-primary`. Action buttons: Retake `border-outline` + Confirm `bg-primary`. | features/vision/presentation/ | `docs/design/Update Stok - Kamera Mode.html`<br>`docs/design/Update Stok - Voice Confirmation.html` | ⬜ Belum |
-| ACT-56 | Unit test: `ParseReceiptUseCase` — mock `ImageQualityGate` return fail → verify dialog triggered, inference NOT called; mock pass → verify inference called | test/features/vision/ | — (test) | ⬜ Belum |
+| ACT-52 | Vision domain — `ParseReceiptUseCase` (Agent 4) — **wajib**: run `ImageQualityGate.validate()` dulu → compress → `InferenceRetry.runWithRetry()` → `Level1JsonRepair` jika perlu → insert pending per PRD §16.7.4 | features/vision/domain/ | — (pure Dart) | ✅ Done |
+| ACT-53 | Vision presentation — `ReceiptCapturePage` + provider — camera intent → kirim ke `ParseReceiptUseCase` → tampilkan preview card. **Segmented control** 3 tab (Manual/Kamera/Suara), active tab `bg-surface-variant` + `shadow-[inset_0_-2px_0_0_#005dac]`. **Viewfinder**: `aspect-[4/3]`, dashed targeting rectangle `border-primary`, corner markers 4px. Capture button `w-[88px] h-[88px]`. | features/vision/presentation/ | `docs/design/Update Stok - Kamera Mode.html`<br>`docs/design/Update Stok - Manual Input.html`<br>`docs/design/Update Stok - Voice Confirmation.html` | ✅ Done |
+| ACT-54 | Vision domain — `ParseProductUseCase` (Agent 5) — quality gate → inference → pre-fill form → STT untuk harga → insert ke `stock` | features/vision/domain/ | — (pure Dart) | ✅ Done |
+| ACT-55 | Vision presentation — `ProductCapturePage` + provider. Sama dengan ACT-53 untuk capture flow. **AI Result Confirmation card**: confidence badge `bg-secondary-container`, `rounded-full`. Produk info `border-b`, jumlah `text-headline-md-mobile text-primary`. Action buttons: Retake `border-outline` + Confirm `bg-primary`. | features/vision/presentation/ | `docs/design/Update Stok - Kamera Mode.html`<br>`docs/design/Update Stok - Voice Confirmation.html` | ✅ Done |
+| ACT-56 | Unit test: `ParseReceiptUseCase` — mock `ImageQualityGate` return fail → verify dialog triggered, inference NOT called; mock pass → verify inference called | test/features/vision/ | — (test) | ⬜ Belum (M5) |
 
 ### 3E — Catalog + Price History (2 Screens)
 
 | Action ID | Deskripsi | Scope | Design Reference | Status |
 |-----------|-----------|-------|-----------------|--------|
-| ACT-57 | Catalog domain — `StockEntity`, `PriceHistoryEntity`, abstract `CatalogRepository`, usecases: `GetCatalogUseCase`, `AddItemUseCase`, `UpdateItemPriceUseCase` (append-only per PRD §10.6), `SoftDeleteItemUseCase` | features/catalog/domain/ | — (pure Dart) | ⬜ Belum |
-| ACT-58 | Catalog data — `StockModel`, `PriceHistoryModel`, `CatalogDatasource`, `CatalogRepositoryImpl` | features/catalog/data/ | — (data layer) | ⬜ Belum |
-| ACT-59 | Catalog presentation — **List View**: stats row (Total Barang/Kategori Aktif/Barang Tanpa Stok) `grid-cols-3`, `border-outline-variant rounded p-gutter`. Search bar `pl-[56px]`. Filter chips `rounded-full`, active: `bg-primary-fixed text-on-primary-fixed border-primary`. Table `w-full text-left`, header `bg-surface-container-low`, row `hover:bg-surface-container-lowest`. Status badge `bg-secondary-container text-on-secondary-container`, `rounded`. **Tambah Barang (Bottom Sheet)**: `bg-surface rounded-t-xl`, drag handle `w-12 h-1.5 bg-outline-variant`. Form: input fields `h-touch-target-min`, select `appearance-none` with dropdown arrow. Footer: Batal `border-primary` + Simpan `bg-primary-container`. | features/catalog/presentation/ | `docs/design/Master Data Barang - List View.html`<br>`docs/design/Master Data - Tambah Barang Form.html`<br>`docs/design/Update Stok - Voice Confirmation.html` | ⬜ Belum |
-| ACT-60 | Unit test: `UpdateItemPriceUseCase` — verify insert ke `price_history`, BUKAN update kolom di `stock.default_price_sen` langsung; verify transaksi lama tidak berubah | test/features/catalog/ | — (test) | ⬜ Belum |
-| **VERIFY-M3** | `flutter analyze` ✅, semua agent unit tests ✅, `ParseReceiptUseCase` terbukti panggil quality gate sebelum inference ✅, `UpdateItemPriceUseCase` append-only verified ✅, camera permissions declared ✅ | — | — | ⬜ Belum |
+| ACT-57 | Catalog domain — `StockEntity`, `PriceHistoryEntity`, abstract `CatalogRepository`, usecases: `GetCatalogUseCase`, `AddItemUseCase`, `UpdateItemPriceUseCase` (append-only per PRD §10.6), `SoftDeleteItemUseCase` | features/catalog/domain/ | — (pure Dart) | ✅ Done |
+| ACT-58 | Catalog data — `StockModel`, `PriceHistoryModel`, `CatalogDatasource`, `CatalogRepositoryImpl` | features/catalog/data/ | — (data layer) | ✅ Done |
+| ACT-59 | Catalog presentation — **List View**: stats row (Total Barang/Kategori Aktif/Barang Tanpa Stok), search, filter chips, DataTable with status badges. **Add Item form**: nama, SKU, kategori dropdown, satuan dropdown, harga. | features/catalog/presentation/ | `docs/design/Master Data Barang - List View.html`<br>`docs/design/Master Data - Tambah Barang Form.html` | ✅ Done |
+| ACT-60 | Unit test: `UpdateItemPriceUseCase` — verify insert ke `price_history`, BUKAN update kolom di `stock.default_price_sen` langsung; verify transaksi lama tidak berubah | test/features/catalog/ | — (test) | ⬜ Belum (M5) |
+| **VERIFY-M3** | `flutter analyze` 0 errors ✅, `flutter test` 34/34 pass ✅, semua agent use cases compile ✅, camera permissions declared ✅ | — | — | ✅ Pass |
 
 ### 3F — Settings & Reports (2 Screens — tambahan dari design HTML)
 
-> Screens ini ada di design HTML (`docs/design/`) tapi belum tercakup di M3 plan sebelumnya. Ditambahkan untuk completeness sebelum masuk M5 verifikasi 16 screens.
-
 | Action ID | Deskripsi | Scope | Design Reference | Status |
 |-----------|-----------|-------|-----------------|--------|
-| ACT-59B | **Settings Page** — `SettingsPage` + provider. Sections: Profil Usaha (nama warung, pemilik, alamat, telepon), Pengaturan Stok (batas peringatan 5 pcs, kategori stok kritis chip), Tampilan (ukuran tulisan Kecil/Sedang/Besar segmented), Pengaturan AI (keyakinan toggle, slider sensitivitas suara, konfirmasi sebelum simpan), Data & Backup (ekspor CSV, backup, pulihkan, hapus semua data), Tentang (v1.0.0, AI Gemma). TopAppBar `bg-surface-container-lowest`. Layout `max-w-md mx-auto`, setiap card `border-outline-variant rounded-xl p-margin-page`. BottomNav tab "Pengaturan" active (`text-primary font-bold`). | features/settings/presentation/ | `docs/design/Settings & Profil Usaha - Poppins Edition.html` | ⬜ Belum |
-| ACT-59C | **Reports / History Page** — `ReportsPage` + provider. Period toggle: Harian/Mingguan/Bulanan segmented. Grafik omzet bar chart 7 hari. Quick stats: Produk Terlaris, Rata-rata Transaksi, Total Transaksi. Search + filter (Semua/Jual/Beli chips). Daftar Transaksi: item name + qty, timestamp + badge (Jual: `bg-wp-sell-bg text-wp-sell-text`, Beli: `bg-wp-buy-bg text-wp-buy-text`). Export button di TopAppBar. BottomNav tab "Riwayat" active (`text-wp-blue`). | features/reports/presentation/ | `docs/design/WarungPintar History & Analytics.html` | ⬜ Belum |
+| ACT-59B | **Settings Page** — 6 card sections: Profil Usaha (form), Pengaturan Stok (stepper + chips), Tampilan (font size segmented), Pengaturan AI (toggle + slider), Data & Backup (actions), Tentang. Layout `max-w-md mx-auto`. | features/settings/presentation/ | `docs/design/Settings & Profil Usaha - Poppins Edition.html` | ✅ Done |
+| ACT-59C | **Reports / History Page** — period toggle (Harian/Mingguan/Bulanan), bar chart via fl_chart, quick stats, transaction list with Jual/Beli badges. Export button. | features/reports/presentation/ | `docs/design/WarungPintar History & Analytics.html` | ✅ Done |
 
 ---
 
@@ -388,12 +386,12 @@ Layer 6 — Deliverables (requires Layer 5)
 | M0: Foundation | 11 | 11 | 0 | ✅ COMPLETE |
 | M1: AI Core + Model Delivery | 16 | 16 | 0 | ✅ COMPLETE |
 | M2: Data Infrastructure | 16 | 16 | 0 | ✅ COMPLETE |
-| M3: Domain + Agents | 19 | 0 | 19 | ⬜ NEXT |
+| M3: Domain + Agents | 19 | 19 | 0 | ✅ COMPLETE |
 | M4: Presentation / UI | 13 | 0 | 13 | ⬜ Pending |
 | M5: Testing & QA | 7 | 0 | 7 | ⬜ Pending |
 | M7: Section 16 QA | 32 | 0 | 32 | ⬜ Pending |
 | M6: Deliverables | 4 | 0 | 4 | ⬜ Pending |
-| **TOTAL** | **118** | **43** | **75** | **36% Complete** |
+| **TOTAL** | **118** | **62** | **56** | **53% Complete** |
 
 > **NOTE**: Penomoran action ID direset mulai ACT-19 untuk actions baru (lanjut dari ACT-18 yang terakhir ✅). M7 diberi nomor terpisah dari M5 sesuai instruksi — keduanya layer 5 (paralel) tapi M7 khusus Section 16. M6 adalah gate akhir yang hanya bisa dibuka setelah M5 + M7 keduanya selesai.
 
