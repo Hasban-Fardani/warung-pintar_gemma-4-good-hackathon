@@ -19,8 +19,6 @@ class ReportsPage extends ConsumerStatefulWidget {
 
 class _ReportsPageState extends ConsumerState<ReportsPage> {
   final _searchController = TextEditingController();
-  final _categories = ['Semua', 'Sembako', 'Minuman', 'Snack', 'Rokok'];
-  String _selectedCategory = 'Semua';
 
   @override
   void initState() {
@@ -73,13 +71,13 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
                 const SizedBox(height: AppTheme.stackMd),
                 _SearchAndFilter(
                   searchController: _searchController,
-                  categories: _categories,
-                  selectedCategory: _selectedCategory,
+                  categories: state.categories,
+                  selectedCategory: state.selectedCategory,
                   onCategoryChanged: (c) =>
-                      setState(() => _selectedCategory = c),
+                      ref.read(reportsProvider.notifier).setSelectedCategory(c),
                 ),
                 const SizedBox(height: AppTheme.stackSm),
-                _TransactionList(transactions: state.transactions),
+                _TransactionList(transactions: state.filteredTransactions),
               ],
             ),
     );
