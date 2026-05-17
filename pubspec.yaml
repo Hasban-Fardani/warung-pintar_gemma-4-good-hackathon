@@ -46,7 +46,6 @@ dependencies:
 
   # AI & Vision
   flutter_gemma: ^0.15.0
-  background_downloader: ^9.5.4
   speech_to_text: ^7.0.0
   flutter_image_compress: ^2.2.0
   image_picker: ^1.1.0
@@ -68,8 +67,7 @@ dependencies:
   file_picker: ^8.0.0
   permission_handler: ^11.3.0
 
-  # Networking (model download — Section 16) & Crypto (SHA-256 verification)
-  dio: ^5.4.0
+  # Networking
   connectivity_plus: ^6.0.0
 
 dev_dependencies:
