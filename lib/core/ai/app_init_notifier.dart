@@ -34,6 +34,10 @@ class AppInitNotifier extends StateNotifier<AppInitState> {
       state = const AppInitModelDownloading(progress: 0.0);
       _logger.i('AppInitNotifier: Model not installed, downloading via flutter_gemma...');
 
+      final modelId = _modelUrl.split('/').last;
+      try {
+        await FlutterGemma.uninstallModel(modelId);
+      } catch (_) {}
       try {
         await FlutterGemma.installModel(
           modelType: ModelType.gemma4,
