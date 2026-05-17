@@ -96,9 +96,10 @@ class AppInitNotifier extends StateNotifier<AppInitState> {
     try {
       final savePath = await _downloader.getModelSavePath();
 
-      await FlutterGemma.installModel(modelType: ModelType.gemma4)
-          .fromFile(savePath)
-          .install();
+      await FlutterGemma.installModel(
+        modelType: ModelType.gemma4,
+        fileType: ModelFileType.litertlm,
+      ).fromFile(savePath).install();
 
       final model = await FlutterGemma.getActiveModel(
         preferredBackend: PreferredBackend.gpu,
