@@ -12,9 +12,6 @@ import 'package:path_provider/path_provider.dart';
 
 import 'package:warung_pintar_cimahi/core/ai/model_download_config.dart';
 
-// ---------------------------------------------------------------------------
-// State — PRD §16.1.3 (Enhanced)
-// ---------------------------------------------------------------------------
 
 sealed class ModelDownloadState {
   const ModelDownloadState();
@@ -80,16 +77,10 @@ final class DownloadCancelled extends ModelDownloadState {
   const DownloadCancelled({required this.savedBytes});
 }
 
-// ---------------------------------------------------------------------------
-// Config
-// ---------------------------------------------------------------------------
 
 const int _chunkCount = 4;
 const int _chunkSizeBytes = 50 * 1024 * 1024;
 
-// ---------------------------------------------------------------------------
-// Provider
-// ---------------------------------------------------------------------------
 
 final modelDownloadProvider =
     StateNotifierProvider<ModelDownloadNotifier, ModelDownloadState>(
@@ -100,9 +91,6 @@ final connectivityProvider = StreamProvider<List<ConnectivityResult>>((ref) {
   return Connectivity().onConnectivityChanged;
 });
 
-// ---------------------------------------------------------------------------
-// Notifier — PRD §16.1.3 (Optimized)
-// ---------------------------------------------------------------------------
 
 class ModelDownloadNotifier extends StateNotifier<ModelDownloadState> {
   ModelDownloadNotifier() : super(const DownloadIdle());
@@ -208,6 +196,11 @@ class ModelDownloadNotifier extends StateNotifier<ModelDownloadState> {
       }
 
       _logger.i('ModelDownload: Starting $_chunkCount parallel chunks for $totalSize bytes');
+
+      final saveFile = File(savePath);
+      if (!await saveFile.exists()) {
+        await saveFile.create(recursive: true);
+      }
 
       final futures = chunks.map((chunk) => _downloadChunk(
         url: ModelDownloadConfig.primaryUrl,
@@ -366,7 +359,7 @@ class ModelDownloadNotifier extends StateNotifier<ModelDownloadState> {
     _ChunkInfo chunk,
     List<int> data,
   ) async {
-    final raf = await File(savePath).open(mode: FileMode.write);
+    final raf = await File(savePath).open(mode: FileMode.writeOnly);
 
     try {
       await raf.setPosition(chunk.startByte);

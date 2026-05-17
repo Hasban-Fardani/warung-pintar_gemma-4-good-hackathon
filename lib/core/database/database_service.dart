@@ -67,15 +67,16 @@ class DatabaseServiceImpl implements DatabaseService {
 
     final batch = db.batch();
 
-    batch.rawQuery('''
+    batch.execute('''
       CREATE TABLE categories (
         id         TEXT    PRIMARY KEY,
         name       TEXT    UNIQUE NOT NULL,
+        parent_id  TEXT    REFERENCES categories(id),
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )
     ''');
 
-    batch.rawQuery('''
+    batch.execute('''
       CREATE TABLE stock (
         id                   TEXT    PRIMARY KEY,
         item_name            TEXT    UNIQUE NOT NULL,
@@ -88,7 +89,7 @@ class DatabaseServiceImpl implements DatabaseService {
       )
     ''');
 
-    batch.rawQuery('''
+    batch.execute('''
       CREATE TABLE transactions (
         id                       TEXT    PRIMARY KEY,
         idempotency_key          TEXT    UNIQUE NOT NULL,
@@ -109,16 +110,16 @@ class DatabaseServiceImpl implements DatabaseService {
       )
     ''');
 
-    batch.rawQuery(
+    batch.execute(
       'CREATE INDEX idx_tx_date   ON transactions(date(created_at))',
     );
-    batch.rawQuery(
+    batch.execute(
       'CREATE INDEX idx_tx_type   ON transactions(transaction_type)',
     );
-    batch.rawQuery('CREATE INDEX idx_tx_status ON transactions(status)');
-    batch.rawQuery('CREATE INDEX idx_tx_method ON transactions(input_method)');
+    batch.execute('CREATE INDEX idx_tx_status ON transactions(status)');
+    batch.execute('CREATE INDEX idx_tx_method ON transactions(input_method)');
 
-    batch.rawQuery('''
+    batch.execute('''
       CREATE TABLE audit_logs (
         id               TEXT    PRIMARY KEY,
         transaction_id   TEXT    NOT NULL REFERENCES transactions(id),
@@ -140,7 +141,7 @@ class DatabaseServiceImpl implements DatabaseService {
       )
     ''');
 
-    batch.rawQuery('''
+    batch.execute('''
       CREATE TABLE price_history (
         id             TEXT    PRIMARY KEY,
         stock_id       TEXT    NOT NULL REFERENCES stock(id),
@@ -150,7 +151,7 @@ class DatabaseServiceImpl implements DatabaseService {
       )
     ''');
 
-    batch.rawQuery('''
+    batch.execute('''
       CREATE TABLE app_settings (
         key        TEXT PRIMARY KEY,
         value      TEXT NOT NULL,

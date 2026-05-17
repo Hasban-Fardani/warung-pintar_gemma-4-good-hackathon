@@ -6,7 +6,7 @@ class ModelDownloadConfig {
   ModelDownloadConfig._();
 
   static const String modelFileName =
-      'gemma-4-E2B-it-litert-lm.litertlm';
+      'gemma-4-E2B-it.litertlm';
 
   static const String modelSha256 = String.fromEnvironment(
     'MODEL_SHA256',
@@ -16,7 +16,7 @@ class ModelDownloadConfig {
   static const String primaryUrl = String.fromEnvironment(
     'MODEL_PRIMARY_URL',
     defaultValue:
-        'https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/main/gemma-4-E2B-it-litert-lm.litertlm',
+        'https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/main/gemma-4-E2B-it.litertlm',
   );
 
   static const String fallbackUrl = String.fromEnvironment(
@@ -28,7 +28,7 @@ class ModelDownloadConfig {
 
   static const int expectedFileSizeBytes = int.fromEnvironment(
     'MODEL_SIZE_BYTES',
-    defaultValue: 2684354560,
+    defaultValue: 2717908992,
   );
 
   static int get minimumDiskSpaceBytes => expectedFileSizeBytes * 3;
