@@ -1,96 +1,65 @@
-import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_gemma/flutter_gemma.dart';
 import 'package:logger/logger.dart';
 
 import 'package:warung_pintar_cimahi/core/ai/app_init_state.dart';
-import 'package:warung_pintar_cimahi/core/ai/gemma_isolate_service.dart';
-import 'package:warung_pintar_cimahi/core/ai/model_download_service.dart';
-import 'package:warung_pintar_cimahi/core/ai/model_storage.dart';
+import 'package:warung_pintar_cimahi/core/ai/gemma_service.dart';
 import 'package:warung_pintar_cimahi/core/di/injection.dart';
-import 'package:warung_pintar_cimahi/core/voice/voice_init_result.dart';
 import 'package:warung_pintar_cimahi/core/voice/voice_service_impl.dart';
 
-/// Riverpod provider for app initialization state.
 final appInitProvider = StateNotifierProvider<AppInitNotifier, AppInitState>(
-  (ref) => AppInitNotifier(ref),
+  (ref) => AppInitNotifier(),
 );
 
-/// State machine managing AI model lifecycle (PRD §16.2.1).
-///
-/// Flow:
-/// ```
-/// APP_LAUNCH
-///   → cek ModelStorage.isModelReady()
-///     → false → MODEL_DOWNLOADING → DownloadComplete → MODEL_LOADING
-///     → true  → MODEL_LOADING
-///       → load sukses → MODEL_READY
-///       → load gagal  → MODEL_FAILED
-/// ```
 class AppInitNotifier extends StateNotifier<AppInitState> {
-  AppInitNotifier(this._ref) : super(const AppInitModelLoading());
+  AppInitNotifier() : super(const AppInitLoading());
 
-  final Ref _ref;
-  bool _voiceInitialized = false;
+  static const String _modelUrl =
+      'https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/main/gemma-4-E2B-it.litertlm';
 
   static final _logger = Logger(printer: PrettyPrinter(methodCount: 0));
 
-  /// Start the initialization sequence.
-  ///
-  /// Checks model readiness, triggers download if needed, then loads model.
   Future<void> initialize() async {
     _logger.i('AppInitNotifier: Starting initialization...');
 
-    // Step 1: Is model file present and valid?
-    final modelReady = await ModelStorage.isModelReady();
-    if (!modelReady) {
-      state = const AppInitModelDownloading();
-      _logger.i('AppInitNotifier: Model not ready, starting download');
+    if (!FlutterGemma.hasActiveModel()) {
+      state = const AppInitModelDownloading(progress: 0.0);
+      _logger.i('AppInitNotifier: Model not installed, starting download');
 
-      // Listen for download completion
-      _ref.listen<ModelDownloadState>(modelDownloadProvider, (_, next) {
-        switch (next) {
-          case DownloadComplete():
-            _loadModel();
-          case DownloadFailed(:final reason):
-            state = AppInitModelFailed(reason);
-            _logger.e('AppInitNotifier: Download failed: $reason');
-          default:
-            break;
-        }
-      });
-
-      // Trigger download
-      await _ref.read(modelDownloadProvider.notifier).startDownload();
-      return;
+      try {
+        await FlutterGemma.installModel(modelType: ModelType.gemma4)
+            .fromNetwork(_modelUrl)
+            .withProgress((progress) {
+          state = AppInitModelDownloading(progress: progress / 100.0);
+        }).install();
+      } catch (e) {
+        _logger.e('AppInitNotifier: Download failed: $e');
+        state = AppInitModelFailed('Download gagal: $e');
+        return;
+      }
     }
 
-    // Step 2: Model exists — load into memory
     await _loadModel();
   }
 
-  /// Load model into memory via GemmaIsolateService.
   Future<void> _loadModel() async {
-    state = const AppInitModelLoading();
+    state = const AppInitLoading();
     _logger.i('AppInitNotifier: Loading model into memory...');
 
     try {
-      final modelPath = await ModelStorage.modelPath;
-      debugPrint('MODEL: Checking path: $modelPath');
-      final fileExists = await File(modelPath).exists();
-      debugPrint('MODEL: File exists: $fileExists');
-      if (fileExists) {
-        final fileSize = await File(modelPath).length();
-        debugPrint('MODEL: File size: ${fileSize ~/ 1048576} MB');
-      }
+      final model = await FlutterGemma.getActiveModel(
+        preferredBackend: PreferredBackend.gpu,
+      );
 
-      await GemmaIsolateService.initialize(modelPath: modelPath);
       debugPrint('MODEL: Load SUCCESS');
+
+      final gemmaService = getIt<GemmaService>();
+      await gemmaService.initialize(model);
+
       _logger.i('AppInitNotifier: Model loaded successfully');
       state = const AppInitModelReady();
 
-      // Initialize voice service after model ready (PRD §16.4)
       await _initVoiceService();
 
       _logger.i('AppInitNotifier: Model ready — AI fully operational');
@@ -98,38 +67,28 @@ class AppInitNotifier extends StateNotifier<AppInitState> {
       debugPrint('MODEL: Load FAILED — $e');
       debugPrint('STACK: $stack');
       _logger.e(
-        'AppInitNotifier: Model load failed (RAM/corruption/LiteRT)',
+        'AppInitNotifier: Model load failed',
         error: e,
       );
       state = AppInitModelFailed('Model gagal dimuat: $e');
     }
   }
 
-  /// Initialize voice service (STT) after model is ready.
   Future<void> _initVoiceService() async {
-    if (_voiceInitialized) return;
     try {
       final voiceService = getIt<VoiceService>();
       final result = await voiceService.initialize();
-      _voiceInitialized = result is VoiceInitSuccess;
       _logger.i('AppInitNotifier: Voice service init result: $result');
     } catch (e) {
       _logger.w('AppInitNotifier: Voice service init failed: $e');
     }
   }
 
-  /// Transition to AI degraded state (Level 2 fallback — PRD §16.6.2).
-  ///
-  /// Called by agent use cases when inference fails after all retries.
-  /// Session-scoped — resets on next [initialize] call.
   void markAsDegraded(String reason) {
     _logger.w('AppInitNotifier: AI degraded — $reason');
     state = AppInitAiDegraded(reason);
   }
 
-  /// Transition to permanent manual mode (Level 3 fallback — PRD §16.6.3).
-  ///
-  /// Called when model load fails permanently.
   void markAsFailed(String reason) {
     _logger.e('AppInitNotifier: AI permanently failed — $reason');
     state = AppInitModelFailed(reason);

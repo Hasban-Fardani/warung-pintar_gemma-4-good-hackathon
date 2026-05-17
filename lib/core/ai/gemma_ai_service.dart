@@ -1,20 +1,17 @@
 import 'package:logger/logger.dart';
 
 import 'package:warung_pintar_cimahi/core/ai/ai_service.dart';
-import 'package:warung_pintar_cimahi/core/ai/gemma_isolate_service.dart';
+import 'package:warung_pintar_cimahi/core/di/injection.dart';
+import 'package:warung_pintar_cimahi/core/ai/gemma_service.dart';
 import 'package:warung_pintar_cimahi/core/ai/json_parser.dart';
 import 'package:warung_pintar_cimahi/core/ai/tool_call_result.dart';
 import 'package:warung_pintar_cimahi/core/error/failures.dart';
 import 'package:warung_pintar_cimahi/core/error/result.dart';
 
-/// Production implementation of [AiService] using Gemma 4 via isolate.
-///
-/// Delegates inference to [GemmaIsolateService] and parses the raw
-/// output through [JsonParser.parseToolCall].
-///
-/// Requires [GemmaIsolateService.init] to be called before first use.
 class GemmaAiService implements AiService {
   final _logger = Logger(printer: PrettyPrinter(methodCount: 0));
+
+  GemmaService get _gemmaService => getIt<GemmaService>();
 
   @override
   Future<Result<ToolCallResult, AiFailure>> infer({
@@ -22,25 +19,25 @@ class GemmaAiService implements AiService {
     required String userInput,
     String? imageBase64,
   }) async {
-    if (!GemmaIsolateService.isInitialized) {
-      _logger.e('GemmaAiService: Isolate not initialized');
+    if (!_gemmaService.isInitialized) {
+      _logger.e('GemmaAiService: Service not initialized');
       return const Failure(ModelNotLoadedFailure());
     }
 
     try {
       _logger.d('GemmaAiService: Starting inference...');
 
-      final raw =
-          await GemmaIsolateService.infer(
-            systemPrompt,
-            userInput,
-            imageBase64,
-          ).timeout(
-            const Duration(seconds: 60),
-            onTimeout: () => throw const TimeoutException(
-              'Gemma inference exceeded 60s timeout',
-            ),
-          );
+      String raw;
+      final prompt = systemPrompt + userInput;
+
+      if (imageBase64 != null) {
+        final bytes = Uri.parse('data:image/png;base64,$imageBase64')
+            .data!
+            .contentAsBytes();
+        raw = await _gemmaService.inferWithImage(prompt, bytes);
+      } else {
+        raw = await _gemmaService.infer(prompt);
+      }
 
       _logger.d('GemmaAiService: Raw output length: ${raw.length}');
 
@@ -67,7 +64,6 @@ class GemmaAiService implements AiService {
   }
 }
 
-/// Dart core TimeoutException (avoid dart:io dependency).
 class TimeoutException implements Exception {
   final String message;
   const TimeoutException(this.message);

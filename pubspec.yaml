@@ -45,7 +45,7 @@ dependencies:
   go_router: ^14.0.0
 
   # AI & Vision
-  flutter_gemma: ^0.2.0
+  flutter_gemma: ^0.15.0
   speech_to_text: ^7.0.0
   flutter_image_compress: ^2.2.0
   image_picker: ^1.1.0
@@ -68,8 +68,6 @@ dependencies:
   permission_handler: ^11.3.0
 
   # Networking (model download — Section 16) & Crypto (SHA-256 verification)
-  dio: ^5.4.0
-  crypto: ^3.0.3
   connectivity_plus: ^6.0.0
 
 dev_dependencies:

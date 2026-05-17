@@ -2,6 +2,7 @@ import 'package:get_it/get_it.dart';
 
 import 'package:warung_pintar_cimahi/core/ai/ai_service.dart';
 import 'package:warung_pintar_cimahi/core/ai/gemma_ai_service.dart';
+import 'package:warung_pintar_cimahi/core/ai/gemma_service.dart';
 import 'package:warung_pintar_cimahi/core/database/database_service.dart';
 import 'package:warung_pintar_cimahi/core/voice/voice_service_impl.dart';
 import 'package:warung_pintar_cimahi/features/catalog/data/datasources/catalog_datasource.dart';
@@ -33,6 +34,9 @@ void configureDependencies() {
   // Services
   if (!getIt.isRegistered<AiService>()) {
     getIt.registerLazySingleton<AiService>(() => GemmaAiService());
+  }
+  if (!getIt.isRegistered<GemmaService>()) {
+    getIt.registerLazySingleton<GemmaService>(() => GemmaService());
   }
   if (!getIt.isRegistered<VoiceService>()) {
     getIt.registerLazySingleton<VoiceService>(() => VoiceServiceImpl());

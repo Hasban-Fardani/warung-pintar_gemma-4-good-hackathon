@@ -120,7 +120,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         padding: EdgeInsets.only(bottom: 16),
         child: AiLoadingBanner(),
       ),
-      AppInitModelLoading() => const Padding(
+      AppInitLoading() => const Padding(
         padding: EdgeInsets.only(bottom: 16),
         child: AiLoadingBanner(),
       ),
