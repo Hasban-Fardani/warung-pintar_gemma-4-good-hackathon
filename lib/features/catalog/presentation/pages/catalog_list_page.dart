@@ -35,17 +35,6 @@ class _CatalogListPageState extends ConsumerState<CatalogListPage> {
     super.dispose();
   }
 
-  void _navigateTo(int index) {
-    switch (index) {
-      case 0:
-        context.go('/');
-        break;
-      case 1:
-        context.go('/reports');
-        break;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(catalogProvider);
@@ -63,32 +52,6 @@ class _CatalogListPageState extends ConsumerState<CatalogListPage> {
                   ),
                 )
               : _buildContent(state),
-      bottomNavigationBar: SizedBox(
-        height: 80,
-        child: Stack(
-          clipBehavior: Clip.none,
-          alignment: Alignment.center,
-          children: [
-            NavigationBar(
-              selectedIndex: 0,
-              onDestinationSelected: _navigateTo,
-              height: 64,
-              destinations: const [
-                NavigationDestination(
-                  icon: Icon(Icons.home_outlined),
-                  selectedIcon: Icon(Icons.home),
-                  label: 'Beranda',
-                ),
-                NavigationDestination(
-                  icon: Icon(Icons.history_outlined),
-                  selectedIcon: Icon(Icons.history),
-                  label: 'Riwayat',
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
     );
   }
 
