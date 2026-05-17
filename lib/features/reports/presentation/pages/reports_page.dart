@@ -25,7 +25,9 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() => ref.read(reportsProvider.notifier).loadTransactions());
+    Future.microtask(
+      () => ref.read(reportsProvider.notifier).loadTransactions(),
+    );
   }
 
   @override
@@ -43,40 +45,43 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
       body: state.isLoading
           ? const Center(child: CircularProgressIndicator())
           : state.error != null
-              ? Center(child: Text('Error: ${state.error}'))
-              : ListView(
-                  padding: const EdgeInsets.fromLTRB(
-                    AppTheme.marginPage,
-                    AppTheme.stackSm,
-                    AppTheme.marginPage,
-                    80,
-                  ),
-                  children: [
-                    _PeriodToggle(
-                      selectedIndex: state.periodIndex,
-                      onChanged: (i) =>
-                          ref.read(reportsProvider.notifier).setPeriodIndex(i),
-                    ),
-                    const SizedBox(height: AppTheme.stackMd),
-                    _RevenueChart(barData: state.barData, dayLabels: state.dayLabels),
-                    const SizedBox(height: AppTheme.stackMd),
-                    _QuickStats(
-                      bestSelling: state.bestSellingProduct,
-                      averageTransaction: state.averageTransactionSen,
-                      totalTransactions: state.totalTransactions,
-                    ),
-                    const SizedBox(height: AppTheme.stackMd),
-                    _SearchAndFilter(
-                      searchController: _searchController,
-                      categories: _categories,
-                      selectedCategory: _selectedCategory,
-                      onCategoryChanged: (c) =>
-                          setState(() => _selectedCategory = c),
-                    ),
-                    const SizedBox(height: AppTheme.stackSm),
-                    _TransactionList(transactions: state.transactions),
-                  ],
+          ? Center(child: Text('Error: ${state.error}'))
+          : ListView(
+              padding: const EdgeInsets.fromLTRB(
+                AppTheme.marginPage,
+                AppTheme.stackSm,
+                AppTheme.marginPage,
+                80,
+              ),
+              children: [
+                _PeriodToggle(
+                  selectedIndex: state.periodIndex,
+                  onChanged: (i) =>
+                      ref.read(reportsProvider.notifier).setPeriodIndex(i),
                 ),
+                const SizedBox(height: AppTheme.stackMd),
+                _RevenueChart(
+                  barData: state.barData,
+                  dayLabels: state.dayLabels,
+                ),
+                const SizedBox(height: AppTheme.stackMd),
+                _QuickStats(
+                  bestSelling: state.bestSellingProduct,
+                  averageTransaction: state.averageTransactionSen,
+                  totalTransactions: state.totalTransactions,
+                ),
+                const SizedBox(height: AppTheme.stackMd),
+                _SearchAndFilter(
+                  searchController: _searchController,
+                  categories: _categories,
+                  selectedCategory: _selectedCategory,
+                  onCategoryChanged: (c) =>
+                      setState(() => _selectedCategory = c),
+                ),
+                const SizedBox(height: AppTheme.stackSm),
+                _TransactionList(transactions: state.transactions),
+              ],
+            ),
     );
   }
 }
@@ -148,7 +153,8 @@ class _RevenueChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final maxY = (barData.reduce((a, b) => a > b ? a : b) / 50).ceil() * 50.0;
+    final maxValue = barData.reduce((a, b) => a > b ? a : b);
+    final maxY = maxValue > 0 ? (maxValue / 50).ceil() * 50.0 : 100.0;
     final step = maxY / 3;
 
     return Container(
@@ -296,10 +302,7 @@ class _QuickStats extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: _StatItem(
-              label: 'Produk Terlaris',
-              value: bestSelling,
-            ),
+            child: _StatItem(label: 'Produk Terlaris', value: bestSelling),
           ),
           Container(width: 1, height: 48, color: AppColors.outlineVariant),
           Expanded(
@@ -489,13 +492,15 @@ class _TransactionList extends StatelessWidget {
 
     return Column(
       children: transactions
-          .map((tx) => _TransactionCard(
-                name: tx.itemName,
-                qty: tx.quantity,
-                timestamp: _formatTimestamp(tx.createdAt),
-                type: tx.type,
-                amountSen: tx.amountSen,
-              ))
+          .map(
+            (tx) => _TransactionCard(
+              name: tx.itemName,
+              qty: tx.quantity,
+              timestamp: _formatTimestamp(tx.createdAt),
+              type: tx.type,
+              amountSen: tx.amountSen,
+            ),
+          )
           .toList(),
     );
   }

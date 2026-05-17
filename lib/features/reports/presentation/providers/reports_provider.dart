@@ -44,7 +44,8 @@ class ReportsState {
       barData: barData ?? this.barData,
       dayLabels: dayLabels ?? this.dayLabels,
       bestSellingProduct: bestSellingProduct ?? this.bestSellingProduct,
-      averageTransactionSen: averageTransactionSen ?? this.averageTransactionSen,
+      averageTransactionSen:
+          averageTransactionSen ?? this.averageTransactionSen,
       totalTransactions: totalTransactions ?? this.totalTransactions,
       isLoading: isLoading ?? this.isLoading,
       error: error,
@@ -55,8 +56,8 @@ class ReportsState {
 
 class ReportsNotifier extends StateNotifier<ReportsState> {
   ReportsNotifier()
-      : _getRecentTransactions = getIt<GetRecentTransactionsUseCase>(),
-        super(const ReportsState());
+    : _getRecentTransactions = getIt<GetRecentTransactionsUseCase>(),
+      super(const ReportsState());
 
   final GetRecentTransactionsUseCase _getRecentTransactions;
 
@@ -71,7 +72,10 @@ class ReportsNotifier extends StateNotifier<ReportsState> {
             .where((t) => t.status == TransactionStatus.confirmed)
             .toList();
         final stats = _calculateStats(confirmedTransactions);
-        final barData = _calculateBarData(confirmedTransactions, state.periodIndex);
+        final barData = _calculateBarData(
+          confirmedTransactions,
+          state.periodIndex,
+        );
         state = state.copyWith(
           transactions: confirmedTransactions,
           barData: barData,
@@ -116,8 +120,9 @@ class ReportsNotifier extends StateNotifier<ReportsState> {
       }
     });
 
-    final averageSen =
-        transactions.isNotEmpty ? (totalSen / transactions.length).round() : 0;
+    final averageSen = transactions.isNotEmpty
+        ? (totalSen / transactions.length).round()
+        : 0;
 
     return _Stats(
       bestSellingProduct: bestSelling,
@@ -126,7 +131,9 @@ class ReportsNotifier extends StateNotifier<ReportsState> {
   }
 
   List<double> _calculateBarData(
-      List<TransactionEntity> transactions, int periodIndex) {
+    List<TransactionEntity> transactions,
+    int periodIndex,
+  ) {
     final now = DateTime.now();
     final dailyRevenue = <int, double>{};
 
@@ -139,7 +146,8 @@ class ReportsNotifier extends StateNotifier<ReportsState> {
 
       final daysDiff = _getDaysDiff(tx.createdAt, now, periodIndex);
       if (daysDiff >= 0 && daysDiff < 7) {
-        dailyRevenue[daysDiff] = (dailyRevenue[daysDiff] ?? 0) + tx.amountSen / 100;
+        dailyRevenue[daysDiff] =
+            (dailyRevenue[daysDiff] ?? 0) + tx.amountSen / 100;
       }
     }
 
@@ -155,7 +163,8 @@ class ReportsNotifier extends StateNotifier<ReportsState> {
         final txWeekStart = txDate.subtract(Duration(days: txDate.weekday - 1));
         return nowWeekStart.difference(txWeekStart).inDays ~/ 7;
       case 2:
-        return ((now.year * 12 + now.month) - (txDate.year * 12 + txDate.month));
+        return ((now.year * 12 + now.month) -
+            (txDate.year * 12 + txDate.month));
       default:
         return 0;
     }
@@ -172,5 +181,6 @@ class _Stats {
   });
 }
 
-final reportsProvider =
-    StateNotifierProvider<ReportsNotifier, ReportsState>((_) => ReportsNotifier());
+final reportsProvider = StateNotifierProvider<ReportsNotifier, ReportsState>(
+  (_) => ReportsNotifier(),
+);
