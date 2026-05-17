@@ -32,6 +32,7 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.8
+  flutter_svg: ^2.0.0
   flutter_skill: ^0.9.36
 
   # State Management & DI
@@ -97,6 +98,9 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  assets:
+    - assets/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

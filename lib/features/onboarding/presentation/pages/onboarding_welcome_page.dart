@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:warung_pintar_cimahi/core/constant/app_colors.dart';
 import 'package:warung_pintar_cimahi/core/theme/app_theme.dart';
 import 'package:warung_pintar_cimahi/features/onboarding/presentation/providers/onboarding_provider.dart';
+import 'package:warung_pintar_cimahi/shared/widgets/app_icon.dart';
 
 class OnboardingWelcomePage extends ConsumerWidget {
   const OnboardingWelcomePage({super.key});
@@ -56,7 +57,7 @@ class _TopAppBar extends StatelessWidget {
       child: Row(
         children: [
           const SizedBox(width: AppTheme.marginPage),
-          const Icon(Icons.storefront, color: AppColors.primary, size: 24),
+          AppIcon(size: 24, color: AppColors.primary),
           const SizedBox(width: 8),
           Text(
             'WarungPintar',
