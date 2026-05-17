@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:warung_pintar_cimahi/core/constant/app_colors.dart';
 import 'package:warung_pintar_cimahi/core/theme/app_theme.dart';
 import 'package:warung_pintar_cimahi/core/utils/money_formatter.dart';
+import 'package:warung_pintar_cimahi/features/reports/presentation/providers/reports_provider.dart';
 import 'package:warung_pintar_cimahi/features/transaction/domain/entities/transaction_entity.dart';
 import 'package:warung_pintar_cimahi/shared/widgets/app_top_bar.dart';
 
@@ -17,13 +18,15 @@ class ReportsPage extends ConsumerStatefulWidget {
 }
 
 class _ReportsPageState extends ConsumerState<ReportsPage> {
-  int _periodIndex = 0;
   final _searchController = TextEditingController();
   final _categories = ['Semua', 'Sembako', 'Minuman', 'Snack', 'Rokok'];
   String _selectedCategory = 'Semua';
 
-  final _barData = [120.0, 95.0, 150.0, 80.0, 135.0, 110.0, 145.0];
-  final _dayLabels = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() => ref.read(reportsProvider.notifier).loadTransactions());
+  }
 
   @override
   void dispose() {
@@ -33,35 +36,47 @@ class _ReportsPageState extends ConsumerState<ReportsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final state = ref.watch(reportsProvider);
+
     return Scaffold(
       appBar: const AppTopBar(title: 'Riwayat & Analisis'),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          AppTheme.marginPage,
-          AppTheme.stackSm,
-          AppTheme.marginPage,
-          80,
-        ),
-        children: [
-          _PeriodToggle(
-            selectedIndex: _periodIndex,
-            onChanged: (i) => setState(() => _periodIndex = i),
-          ),
-          const SizedBox(height: AppTheme.stackMd),
-          _RevenueChart(barData: _barData, dayLabels: _dayLabels),
-          const SizedBox(height: AppTheme.stackMd),
-          const _QuickStats(),
-          const SizedBox(height: AppTheme.stackMd),
-          _SearchAndFilter(
-            searchController: _searchController,
-            categories: _categories,
-            selectedCategory: _selectedCategory,
-            onCategoryChanged: (c) => setState(() => _selectedCategory = c),
-          ),
-          const SizedBox(height: AppTheme.stackSm),
-          const _TransactionList(),
-        ],
-      ),
+      body: state.isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : state.error != null
+              ? Center(child: Text('Error: ${state.error}'))
+              : ListView(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppTheme.marginPage,
+                    AppTheme.stackSm,
+                    AppTheme.marginPage,
+                    80,
+                  ),
+                  children: [
+                    _PeriodToggle(
+                      selectedIndex: state.periodIndex,
+                      onChanged: (i) =>
+                          ref.read(reportsProvider.notifier).setPeriodIndex(i),
+                    ),
+                    const SizedBox(height: AppTheme.stackMd),
+                    _RevenueChart(barData: state.barData, dayLabels: state.dayLabels),
+                    const SizedBox(height: AppTheme.stackMd),
+                    _QuickStats(
+                      bestSelling: state.bestSellingProduct,
+                      averageTransaction: state.averageTransactionSen,
+                      totalTransactions: state.totalTransactions,
+                    ),
+                    const SizedBox(height: AppTheme.stackMd),
+                    _SearchAndFilter(
+                      searchController: _searchController,
+                      categories: _categories,
+                      selectedCategory: _selectedCategory,
+                      onCategoryChanged: (c) =>
+                          setState(() => _selectedCategory = c),
+                    ),
+                    const SizedBox(height: AppTheme.stackSm),
+                    _TransactionList(transactions: state.transactions),
+                  ],
+                ),
     );
   }
 }
@@ -260,7 +275,15 @@ class _RevenueChart extends StatelessWidget {
 }
 
 class _QuickStats extends StatelessWidget {
-  const _QuickStats();
+  final String bestSelling;
+  final int averageTransaction;
+  final int totalTransactions;
+
+  const _QuickStats({
+    required this.bestSelling,
+    required this.averageTransaction,
+    required this.totalTransactions,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -272,16 +295,25 @@ class _QuickStats extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Expanded(
-            child: _StatItem(label: 'Produk Terlaris', value: 'Mie Instant'),
+          Expanded(
+            child: _StatItem(
+              label: 'Produk Terlaris',
+              value: bestSelling,
+            ),
           ),
           Container(width: 1, height: 48, color: AppColors.outlineVariant),
-          const Expanded(
-            child: _StatItem(label: 'Rata-rata Transaksi', value: 'Rp 45.000'),
+          Expanded(
+            child: _StatItem(
+              label: 'Rata-rata Transaksi',
+              value: MoneyFormatter.senToDisplay(averageTransaction),
+            ),
           ),
           Container(width: 1, height: 48, color: AppColors.outlineVariant),
-          const Expanded(
-            child: _StatItem(label: 'Total Transaksi', value: '128'),
+          Expanded(
+            child: _StatItem(
+              label: 'Total Transaksi',
+              value: totalTransactions.toString(),
+            ),
           ),
         ],
       ),
@@ -307,6 +339,8 @@ class _StatItem extends StatelessWidget {
             color: AppColors.textPrimary,
           ),
           textAlign: TextAlign.center,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
         const SizedBox(height: 2),
         Text(
@@ -406,92 +440,85 @@ class _SearchAndFilter extends StatelessWidget {
 }
 
 class _TransactionList extends StatelessWidget {
-  const _TransactionList();
+  final List<TransactionEntity> transactions;
+
+  const _TransactionList({required this.transactions});
+
+  String _formatTimestamp(DateTime dateTime) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = today.subtract(const Duration(days: 1));
+    final txDate = DateTime(dateTime.year, dateTime.month, dateTime.day);
+
+    if (txDate == today) {
+      return 'Hari ini, ${_formatTime(dateTime)}';
+    } else if (txDate == yesterday) {
+      return 'Kemarin, ${_formatTime(dateTime)}';
+    } else {
+      final diff = today.difference(txDate).inDays;
+      return '$diff hari lalu, ${_formatTime(dateTime)}';
+    }
+  }
+
+  String _formatTime(DateTime dateTime) {
+    final hour = dateTime.hour.toString().padLeft(2, '0');
+    final minute = dateTime.minute.toString().padLeft(2, '0');
+    return '$hour:$minute';
+  }
 
   @override
   Widget build(BuildContext context) {
-    const transactions = [
-      _TransactionItemData(
-        name: 'Mie Instant Goreng',
-        qty: 10,
-        timestamp: 'Hari ini, 10:30',
-        type: TransactionSell(),
-        amountSen: 2500000,
-      ),
-      _TransactionItemData(
-        name: 'Minyak Goreng 1L',
-        qty: 5,
-        timestamp: 'Hari ini, 09:15',
-        type: TransactionBuy(),
-        amountSen: 8750000,
-      ),
-      _TransactionItemData(
-        name: 'Gula Pasir 1kg',
-        qty: 20,
-        timestamp: 'Kemarin, 14:20',
-        type: TransactionSell(),
-        amountSen: 2600000,
-      ),
-      _TransactionItemData(
-        name: 'Beras 5kg',
-        qty: 3,
-        timestamp: 'Kemarin, 11:00',
-        type: TransactionBuy(),
-        amountSen: 4500000,
-      ),
-      _TransactionItemData(
-        name: 'Telur 1kg',
-        qty: 15,
-        timestamp: '2 hari lalu, 16:45',
-        type: TransactionSell(),
-        amountSen: 4500000,
-      ),
-      _TransactionItemData(
-        name: 'Kopi Sachet',
-        qty: 50,
-        timestamp: '2 hari lalu, 08:30',
-        type: TransactionSell(),
-        amountSen: 1250000,
-      ),
-      _TransactionItemData(
-        name: 'Sabun Mandi',
-        qty: 12,
-        timestamp: '3 hari lalu, 10:00',
-        type: TransactionBuy(),
-        amountSen: 1800000,
-      ),
-    ];
+    if (transactions.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.all(AppTheme.marginPage),
+        decoration: BoxDecoration(
+          border: Border.all(color: AppColors.outlineVariant),
+          borderRadius: BorderRadius.circular(AppTheme.radiusXl),
+        ),
+        child: Center(
+          child: Text(
+            'Belum ada transaksi',
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              color: AppColors.onSurfaceVariant,
+            ),
+          ),
+        ),
+      );
+    }
 
     return Column(
-      children: transactions.map((tx) => _TransactionCard(data: tx)).toList(),
+      children: transactions
+          .map((tx) => _TransactionCard(
+                name: tx.itemName,
+                qty: tx.quantity,
+                timestamp: _formatTimestamp(tx.createdAt),
+                type: tx.type,
+                amountSen: tx.amountSen,
+              ))
+          .toList(),
     );
   }
 }
 
-class _TransactionItemData {
+class _TransactionCard extends StatelessWidget {
   final String name;
   final int qty;
   final String timestamp;
   final TransactionType type;
   final int amountSen;
 
-  const _TransactionItemData({
+  const _TransactionCard({
     required this.name,
     required this.qty,
     required this.timestamp,
     required this.type,
     required this.amountSen,
   });
-}
-
-class _TransactionCard extends StatelessWidget {
-  final _TransactionItemData data;
-
-  const _TransactionCard({required this.data});
 
   @override
   Widget build(BuildContext context) {
-    final isSell = data.type is TransactionSell;
+    final isSell = type is TransactionSell;
     final amountColor = isSell ? AppColors.secondary : AppColors.error;
     final badgeColor = isSell
         ? const Color(0xFFE8F5E9)
@@ -515,7 +542,7 @@ class _TransactionCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${data.name} x${data.qty}',
+                  '$name x$qty',
                   style: GoogleFonts.inter(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -525,7 +552,7 @@ class _TransactionCard extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      data.timestamp,
+                      timestamp,
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         color: AppColors.onSurfaceVariant,
@@ -556,7 +583,7 @@ class _TransactionCard extends StatelessWidget {
             ),
           ),
           Text(
-            MoneyFormatter.senToDisplay(data.amountSen),
+            MoneyFormatter.senToDisplay(amountSen),
             style: GoogleFonts.inter(
               fontSize: 16,
               fontWeight: FontWeight.w700,
