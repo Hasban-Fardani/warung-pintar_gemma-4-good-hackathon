@@ -468,6 +468,12 @@ class ModelDownloadNotifier extends StateNotifier<ModelDownloadState> {
   }
 
   Future<bool> _verifySha256InIsolate(String filePath) async {
+    final expectedHash = ModelDownloadConfig.modelSha256;
+    if (expectedHash.isEmpty) {
+      _logger.i('ModelDownload: SHA-256 verification skipped (no hash configured)');
+      return true;
+    }
+
     final receivePort = ReceivePort();
 
     await Isolate.spawn(

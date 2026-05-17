@@ -95,7 +95,7 @@ class GemmaIsolateService {
   static Future<void> init() async {
     if (_isInitialized) return;
     final defaultPath =
-        _modelPath ?? 'models/gemma-4-E2B-it-litertlm-Q4_K_M.litertlm';
+        _modelPath ?? 'models/gemma-4-E2B-it-litert-lm.litertlm';
     await initialize(modelPath: defaultPath);
   }
 
