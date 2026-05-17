@@ -5,7 +5,6 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:warung_pintar_cimahi/core/constant/app_colors.dart';
 import 'package:warung_pintar_cimahi/core/theme/app_theme.dart';
-import 'package:warung_pintar_cimahi/shared/widgets/app_icon.dart';
 
 class SettingsPage extends ConsumerStatefulWidget {
   const SettingsPage({super.key});
@@ -51,7 +50,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: AppIcon(size: 24, color: AppColors.primary),
+          icon: const Icon(Icons.settings, color: AppColors.primary),
           onPressed: () => context.go('/'),
         ),
         centerTitle: true,

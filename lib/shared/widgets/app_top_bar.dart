@@ -17,7 +17,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       leading: IconButton(
-        icon: AppIcon(size: 24, color: AppColors.primary),
+        icon: AppIcon(size: 60),
         onPressed: () => context.go('/'),
         tooltip: 'Beranda',
       ),
@@ -32,7 +32,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       actions: [
         IconButton(
-          icon: AppIcon(size: 24, color: AppColors.primary),
+          icon: const Icon(Icons.settings, color: AppColors.primary),
           onPressed: () => context.push('/settings'),
           tooltip: 'Pengaturan',
         ),
