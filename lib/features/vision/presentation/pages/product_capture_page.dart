@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'package:warung_pintar_cimahi/core/constant/app_colors.dart';
 import 'package:warung_pintar_cimahi/core/theme/app_theme.dart';
@@ -21,6 +22,16 @@ class _ProductCapturePageState extends ConsumerState<ProductCapturePage> {
   File? _capturedImage;
 
   Future<void> _pickImage() async {
+    final status = await Permission.camera.request();
+    if (!status.isGranted) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Izin kamera diperlukan')),
+        );
+      }
+      return;
+    }
+
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(
       source: ImageSource.camera,

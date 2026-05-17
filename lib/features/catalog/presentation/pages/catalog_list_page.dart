@@ -119,27 +119,20 @@ class _CatalogListPageState extends ConsumerState<CatalogListPage> {
               )
               .toList();
 
-    return Column(
-      children: [
-        Expanded(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildStatsRow(state),
-                const SizedBox(height: 24),
-                _buildSearchBar(),
-                const SizedBox(height: 16),
-                _buildCategoryChips(state),
-                const SizedBox(height: 16),
-                _buildTable(filtered, state),
-              ],
-            ),
-          ),
-        ),
-        _buildBottomNav(context, state),
-      ],
+    return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildStatsRow(state),
+          const SizedBox(height: 24),
+          _buildSearchBar(),
+          const SizedBox(height: 16),
+          _buildCategoryChips(state),
+          const SizedBox(height: 16),
+          _buildTable(filtered, state),
+        ],
+      ),
     );
   }
 
@@ -491,51 +484,5 @@ class _CatalogListPageState extends ConsumerState<CatalogListPage> {
     );
   }
 
-  Widget _buildBottomNav(BuildContext context, CatalogState state) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
-        border: Border(top: BorderSide(color: AppColors.outlineVariant)),
-      ),
-      child: SafeArea(
-        top: false,
-        child: SizedBox(
-          height: 64,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _navItem(Icons.home, 'Home', false),
-              _navItem(Icons.history, 'Riwayat', false),
-              _navItem(Icons.settings, 'Pengaturan', false),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 
-  Widget _navItem(IconData icon, String label, bool active) {
-    final color = active ? AppColors.primary : AppColors.onSurfaceVariant;
-    return SizedBox(
-      width: 80,
-      height: 64,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 24, color: color),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: GoogleFonts.inter(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              height: 18 / 14,
-              letterSpacing: 0.28,
-              color: color,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }

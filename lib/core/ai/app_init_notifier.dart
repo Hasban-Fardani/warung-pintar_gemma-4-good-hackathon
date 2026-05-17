@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 
@@ -74,14 +77,26 @@ class AppInitNotifier extends StateNotifier<AppInitState> {
 
     try {
       final modelPath = await ModelStorage.modelPath;
+      debugPrint('MODEL: Checking path: $modelPath');
+      final fileExists = await File(modelPath).exists();
+      debugPrint('MODEL: File exists: $fileExists');
+      if (fileExists) {
+        final fileSize = await File(modelPath).length();
+        debugPrint('MODEL: File size: ${fileSize ~/ 1048576} MB');
+      }
+
       await GemmaIsolateService.initialize(modelPath: modelPath);
+      debugPrint('MODEL: Load SUCCESS');
+      _logger.i('AppInitNotifier: Model loaded successfully');
       state = const AppInitModelReady();
 
       // Initialize voice service after model ready (PRD §16.4)
       await _initVoiceService();
 
       _logger.i('AppInitNotifier: Model ready — AI fully operational');
-    } catch (e) {
+    } catch (e, stack) {
+      debugPrint('MODEL: Load FAILED — $e');
+      debugPrint('STACK: $stack');
       _logger.e(
         'AppInitNotifier: Model load failed (RAM/corruption/LiteRT)',
         error: e,

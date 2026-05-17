@@ -8,6 +8,7 @@ import 'package:warung_pintar_cimahi/core/ai/app_init_notifier.dart';
 import 'package:warung_pintar_cimahi/core/ai/app_init_state.dart';
 import 'package:warung_pintar_cimahi/core/constant/app_colors.dart';
 import 'package:warung_pintar_cimahi/core/constant/app_strings.dart';
+import 'package:warung_pintar_cimahi/features/catalog/presentation/pages/add_item_page.dart';
 import 'package:warung_pintar_cimahi/features/dashboard/presentation/providers/dashboard_provider.dart';
 import 'package:warung_pintar_cimahi/features/transaction/domain/entities/transaction_entity.dart';
 import 'package:warung_pintar_cimahi/shared/widgets/ai_aware_fab.dart';
@@ -55,13 +56,32 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           : _buildContent(state, appState),
       floatingActionButton: AiAwareFab(
         onVoiceTap: () {
-          // TODO: Navigate to voice input
+          debugPrint('FAB: Voice input — not yet implemented');
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Masukan suara: fitur AI belum tersedia')),
+          );
         },
         onCameraTap: () {
-          // TODO: Show camera bottom sheet (struk / kemasan)
+          try {
+            context.push('/receipt-capture');
+          } catch (e, stack) {
+            debugPrint('FAB: Camera navigation error — $e\n$stack');
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Gagal membuka kamera')),
+            );
+          }
         },
         onManualTap: () {
-          // TODO: Navigate to manual form
+          try {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const AddItemPage()),
+            );
+          } catch (e, stack) {
+            debugPrint('FAB: Manual navigation error — $e\n$stack');
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Gagal membuka form manual')),
+            );
+          }
         },
       ),
     );
@@ -298,6 +318,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         // Omzet Hari Ini (col-span-2)
         Container(
           width: double.infinity,
+          constraints: const BoxConstraints(minHeight: 88),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: AppColors.surface,
@@ -324,6 +345,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       letterSpacing: 0.5,
                       color: AppColors.onSurfaceVariant,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
@@ -337,6 +360,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   color: AppColors.primary,
                   fontFeatures: const [FontFeature.tabularFigures()],
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
@@ -348,6 +373,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             // Profit
             Expanded(
               child: Container(
+                constraints: const BoxConstraints(minHeight: 88),
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: AppColors.surface,
@@ -391,6 +417,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                         color: AppColors.onSurface,
                         fontFeatures: const [FontFeature.tabularFigures()],
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
@@ -400,6 +428,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             // Modal Keluar
             Expanded(
               child: Container(
+                constraints: const BoxConstraints(minHeight: 88),
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: AppColors.surface,
@@ -443,6 +472,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                         color: AppColors.onSurface,
                         fontFeatures: const [FontFeature.tabularFigures()],
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),

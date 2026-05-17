@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_it/get_it.dart';
 
@@ -104,12 +105,14 @@ class CatalogNotifier extends StateNotifier<CatalogState> {
     String? categoryId,
     int qty = 0,
   }) async {
+    debugPrint('USE CASE: addItem called with: $name, price=$price');
     final result = await _repository.addItem(
       itemName: name,
       defaultPriceSen: price,
       currentQty: qty,
       categoryId: categoryId,
     );
+    debugPrint('USE CASE: addItem result: $result');
     return switch (result) {
       Success() => null,
       Failure(:final error) => error,

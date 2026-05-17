@@ -65,14 +65,9 @@ final appRouter = GoRouter(
                 label: 'Beranda',
               ),
               NavigationDestination(
-                icon: Icon(Icons.pending_actions_outlined),
-                selectedIcon: Icon(Icons.pending_actions),
-                label: 'Pending',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.inventory_2_outlined),
-                selectedIcon: Icon(Icons.inventory_2),
-                label: 'Katalog',
+                icon: Icon(Icons.history_outlined),
+                selectedIcon: Icon(Icons.history),
+                label: 'Riwayat',
               ),
               NavigationDestination(
                 icon: Icon(Icons.settings_outlined),
@@ -95,16 +90,8 @@ final appRouter = GoRouter(
         StatefulShellBranch(
           routes: [
             GoRoute(
-              path: '/pending',
-              builder: (context, state) => const PendingReviewPage(),
-            ),
-          ],
-        ),
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: '/catalog',
-              builder: (context, state) => const CatalogListPage(),
+              path: '/reports',
+              builder: (context, state) => const ReportsPage(),
             ),
           ],
         ),
@@ -118,7 +105,14 @@ final appRouter = GoRouter(
         ),
       ],
     ),
-    GoRoute(path: '/reports', builder: (context, state) => const ReportsPage()),
+    GoRoute(
+      path: '/catalog',
+      builder: (context, state) => const CatalogListPage(),
+    ),
+    GoRoute(
+      path: '/pending',
+      builder: (context, state) => const PendingReviewPage(),
+    ),
     GoRoute(
       path: '/receipt-capture',
       builder: (context, state) => const ReceiptCapturePage(),

@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
 import 'package:warung_pintar_cimahi/core/voice/voice_config.dart';
@@ -27,13 +29,28 @@ class VoiceServiceImpl implements VoiceService {
 
   @override
   Future<VoiceInitResult> initialize() async {
+    // Request microphone permission first
+    final micStatus = await Permission.microphone.request();
+    debugPrint('VoiceService: Microphone permission status: $micStatus');
+    if (!micStatus.isGranted) {
+      _logger.w('VoiceService: Microphone permission denied');
+      return const VoiceInitFailed('Izin mikrofon ditolak');
+    }
+
     _isInitialized = await _stt.initialize(
-      onStatus: _onStatus,
-      onError: _onError,
+      onStatus: (status) {
+        debugPrint('STT Status: $status');
+        _onStatus(status);
+      },
+      onError: (error) {
+        debugPrint('STT Error: $error');
+        _onError(error);
+      },
     );
 
     if (!_isInitialized) {
       _logger.e('VoiceService: STT engine not available');
+      debugPrint('STT FAILED TO INITIALIZE');
       return const VoiceInitFailed('STT engine tidak tersedia di device ini');
     }
 
