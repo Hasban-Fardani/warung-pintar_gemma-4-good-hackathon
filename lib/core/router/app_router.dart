@@ -9,7 +9,8 @@ import '../../features/onboarding/presentation/pages/onboarding_welcome_page.dar
 import '../../features/onboarding/presentation/pages/model_download_screen.dart';
 import '../../features/reports/presentation/pages/reports_page.dart';
 import '../../features/settings/presentation/pages/settings_page.dart';
-import '../../features/transaction/presentation/pages/pending_review_page.dart';
+import '../../features/transaction/presentation/pages/pending_transactions_page.dart';
+import '../../features/transaction/presentation/pages/voice_confirm_page.dart';
 import '../../features/transaction/presentation/pages/voice_input_page.dart';
 import '../../features/transaction/presentation/pages/transaction_form_page.dart';
 import '../../features/vision/presentation/pages/receipt_capture_page.dart';
@@ -128,11 +129,15 @@ final appRouter = GoRouter(
     ),
     GoRoute(
       path: '/pending',
-      builder: (context, state) => const PendingReviewPage(),
+      builder: (context, state) => const PendingTransactionsPage(),
     ),
     GoRoute(
       path: '/voice-input',
       builder: (context, state) => const VoiceInputPage(),
+    ),
+    GoRoute(
+      path: '/voice-confirm',
+      builder: (context, state) => const VoiceConfirmPage(),
     ),
     GoRoute(
       path: '/transaction/new',
