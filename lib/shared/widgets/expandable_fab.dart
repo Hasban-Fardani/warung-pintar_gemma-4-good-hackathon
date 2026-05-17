@@ -60,7 +60,7 @@ class _ExpandableFabState extends ConsumerState<ExpandableFab>
   void _showAiDisabledSnackbar() {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Fitur membutuhkan AI. AI sedang dimuat.'),
+        content: Text('Fitur suara menunggu model AI selesai diunduh.'),
         duration: Duration(seconds: 2),
       ),
     );
@@ -70,14 +70,15 @@ class _ExpandableFabState extends ConsumerState<ExpandableFab>
   Widget build(BuildContext context) {
     final appState = ref.watch(appInitProvider);
     final isAiReady = appState is AppInitModelReady;
+    final isAiDisabled = !isAiReady;
 
     return Stack(
       clipBehavior: Clip.none,
-      alignment: Alignment.bottomRight,
+      alignment: Alignment.bottomCenter,
       children: [
         if (_expanded) _buildBackdrop(),
-        if (_expanded) _buildMiniFabs(isAiReady),
-        _buildMainFab(),
+        if (_expanded && isAiReady) _buildMiniFabs(),
+        _buildMainFab(isAiDisabled),
       ],
     );
   }
@@ -98,16 +99,15 @@ class _ExpandableFabState extends ConsumerState<ExpandableFab>
     );
   }
 
-  Widget _buildMiniFabs(bool isAiReady) {
+  Widget _buildMiniFabs() {
     return Positioned(
-      bottom: 88,
-      right: 0,
+      bottom: 0,
+      right: 32,
       child: AnimatedBuilder(
         animation: _controller,
         builder: (context, child) {
-          return Column(
+          return Row(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               _buildMiniFab(
                 index: 0,
@@ -120,28 +120,29 @@ class _ExpandableFabState extends ConsumerState<ExpandableFab>
                   context.push('/transaction/new');
                 },
               ),
-              const SizedBox(height: 12),
+              const SizedBox(width: 12),
               _buildMiniFab(
                 index: 1,
-                icon: Icons.camera_alt_outlined,
-                label: 'Foto',
-                color: Colors.green.shade600,
-                enabled: isAiReady,
-                onTap: isAiReady ? _showPhotoSourceSheet : _showAiDisabledSnackbar,
-              ),
-              const SizedBox(height: 12),
-              _buildMiniFab(
-                index: 2,
                 icon: Icons.mic,
                 label: 'Suara',
                 color: AppColors.primary,
-                enabled: isAiReady,
-                onTap: isAiReady
-                    ? () {
-                        _close();
-                        context.push('/voice-input');
-                      }
-                    : _showAiDisabledSnackbar,
+                enabled: true,
+                onTap: () {
+                  _close();
+                  context.push('/voice-input');
+                },
+              ),
+              const SizedBox(width: 12),
+              _buildMiniFab(
+                index: 2,
+                icon: Icons.camera_alt_outlined,
+                label: 'Foto',
+                color: Colors.green.shade600,
+                enabled: true,
+                onTap: () {
+                  _close();
+                  _showPhotoSourceSheet();
+                },
               ),
             ],
           );
@@ -160,7 +161,7 @@ class _ExpandableFabState extends ConsumerState<ExpandableFab>
   }) {
     final delay = index * 50;
     final slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 1),
+      begin: const Offset(1, 0),
       end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: _controller,
@@ -183,35 +184,61 @@ class _ExpandableFabState extends ConsumerState<ExpandableFab>
       ),
     ));
 
+    final scaleAnimation = Tween<double>(
+      begin: 0.8,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Interval(
+        delay / 250,
+        1.0,
+        curve: Curves.easeOutBack,
+      ),
+    ));
+
     return SlideTransition(
       position: slideAnimation,
       child: FadeTransition(
         opacity: fadeAnimation,
-        child: _MiniFabItem(
-          icon: icon,
-          label: label,
-          color: color,
-          enabled: enabled,
-          onTap: onTap,
+        child: ScaleTransition(
+          scale: scaleAnimation,
+          child: _MiniFabItem(
+            icon: icon,
+            label: label,
+            color: color,
+            enabled: enabled,
+            onTap: onTap,
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildMainFab() {
-    return RotationTransition(
-      turns: Tween<double>(begin: 0, end: 0.125).animate(
-        CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-      ),
-      child: SizedBox(
-        width: 56,
-        height: 56,
-        child: FloatingActionButton(
-          onPressed: _toggle,
-          backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
-          elevation: _expanded ? 8 : 4,
-          child: Icon(_expanded ? Icons.close : Icons.mic),
+  Widget _buildMainFab(bool isAiDisabled) {
+    final rotation = _controller.drive(
+      Tween<double>(begin: 0, end: 0.125),
+    );
+
+    return SizedBox(
+      width: 56,
+      height: 56,
+      child: FloatingActionButton(
+        onPressed: isAiDisabled ? _showAiDisabledSnackbar : _toggle,
+        backgroundColor: isAiDisabled
+            ? AppColors.surfaceContainerHighest
+            : AppColors.primary,
+        foregroundColor: isAiDisabled
+            ? AppColors.onSurfaceVariant.withValues(alpha: 0.5)
+            : Colors.white,
+        elevation: _expanded ? 8 : (isAiDisabled ? 0 : 4),
+        child: AnimatedBuilder(
+          animation: rotation,
+          builder: (context, child) {
+            return Transform.rotate(
+              angle: rotation.value * 3.14159 * 2,
+              child: Icon(_expanded ? Icons.close : Icons.add),
+            );
+          },
         ),
       ),
     );
@@ -238,7 +265,7 @@ class _MiniFabItem extends StatelessWidget {
     return GestureDetector(
       onTap: enabled ? onTap : null,
       behavior: HitTestBehavior.opaque,
-      child: Row(
+      child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
@@ -266,7 +293,7 @@ class _MiniFabItem extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(height: 8),
           Container(
             width: 48,
             height: 48,
