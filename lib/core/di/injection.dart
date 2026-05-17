@@ -13,6 +13,7 @@ import 'package:warung_pintar_cimahi/features/transaction/data/repositories/tran
 import 'package:warung_pintar_cimahi/features/transaction/domain/repositories/transaction_repository.dart';
 import 'package:warung_pintar_cimahi/features/transaction/domain/usecases/confirm_transaction_usecase.dart';
 import 'package:warung_pintar_cimahi/features/transaction/domain/usecases/get_pending_transactions_usecase.dart';
+import 'package:warung_pintar_cimahi/features/transaction/domain/usecases/record_voice_transaction_usecase.dart';
 import 'package:warung_pintar_cimahi/features/catalog/domain/usecases/add_category_usecase.dart';
 import 'package:warung_pintar_cimahi/features/catalog/domain/usecases/add_item_usecase.dart';
 import 'package:warung_pintar_cimahi/features/catalog/domain/usecases/delete_category_usecase.dart';
@@ -80,6 +81,14 @@ void configureDependencies() {
   if (!getIt.isRegistered<GetPendingTransactionsUseCase>()) {
     getIt.registerLazySingleton<GetPendingTransactionsUseCase>(
       () => GetPendingTransactionsUseCase(getIt<TransactionRepository>()),
+    );
+  }
+  if (!getIt.isRegistered<RecordVoiceTransactionUseCase>()) {
+    getIt.registerLazySingleton<RecordVoiceTransactionUseCase>(
+      () => RecordVoiceTransactionUseCase(
+        getIt<AiService>(),
+        getIt<TransactionRepository>(),
+      ),
     );
   }
   if (!getIt.isRegistered<DashboardSummaryUseCase>()) {
