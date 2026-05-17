@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 import 'package:warung_pintar_cimahi/core/constant/app_colors.dart';
+import 'package:warung_pintar_cimahi/core/constant/app_strings.dart';
 import 'package:warung_pintar_cimahi/features/catalog/domain/entities/stock_entity.dart';
 import 'package:warung_pintar_cimahi/features/catalog/presentation/providers/catalog_provider.dart';
 import 'package:warung_pintar_cimahi/features/catalog/presentation/pages/add_item_page.dart';
 import 'package:warung_pintar_cimahi/features/catalog/presentation/pages/category_management_page.dart';
+import 'package:warung_pintar_cimahi/shared/widgets/app_top_bar.dart';
 
 class CatalogListPage extends ConsumerStatefulWidget {
   const CatalogListPage({super.key});
@@ -32,82 +35,56 @@ class _CatalogListPageState extends ConsumerState<CatalogListPage> {
     super.dispose();
   }
 
+  void _navigateTo(int index) {
+    switch (index) {
+      case 0:
+        context.go('/');
+        break;
+      case 1:
+        context.go('/reports');
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(catalogProvider);
 
-    return Container(
-      color: AppColors.background,
-      child: SafeArea(
-        child: Column(
-          children: [
-            _buildHeader(context),
-            Expanded(
-              child: state.isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : state.error != null
-                  ? Center(
-                      child: Text(
-                        state.error!,
-                        style: GoogleFonts.inter(fontSize: 16, color: AppColors.error),
-                      ),
-                    )
-                  : _buildContent(state),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
-        border: Border(
-          bottom: BorderSide(color: AppColors.outlineVariant, width: 0.5),
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Row(
-          children: [
-            Text(
-              'Data Barang',
-              style: GoogleFonts.inter(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                height: 28 / 20,
-                color: AppColors.primary,
-              ),
-            ),
-            const Spacer(),
-            SizedBox(
-              height: 48,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const AddItemPage(),
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryContainer,
-                  foregroundColor: AppColors.onPrimaryContainer,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(4),
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: const AppTopBar(title: AppStrings.appName),
+      body: state.isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : state.error != null
+              ? Center(
+                  child: Text(
+                    state.error!,
+                    style: GoogleFonts.inter(fontSize: 16, color: AppColors.error),
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  textStyle: GoogleFonts.inter(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    height: 20 / 16,
-                    letterSpacing: 0.16,
-                  ),
+                )
+              : _buildContent(state),
+      bottomNavigationBar: SizedBox(
+        height: 80,
+        child: Stack(
+          clipBehavior: Clip.none,
+          alignment: Alignment.center,
+          children: [
+            NavigationBar(
+              selectedIndex: 0,
+              onDestinationSelected: _navigateTo,
+              height: 64,
+              destinations: const [
+                NavigationDestination(
+                  icon: Icon(Icons.home_outlined),
+                  selectedIcon: Icon(Icons.home),
+                  label: 'Beranda',
                 ),
-                child: const Text('Tambah Barang'),
-              ),
+                NavigationDestination(
+                  icon: Icon(Icons.history_outlined),
+                  selectedIcon: Icon(Icons.history),
+                  label: 'Riwayat',
+                ),
+              ],
             ),
           ],
         ),
