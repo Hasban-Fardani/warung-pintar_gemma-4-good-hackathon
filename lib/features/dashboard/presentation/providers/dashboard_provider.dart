@@ -4,6 +4,8 @@ import 'package:get_it/get_it.dart';
 import 'package:warung_pintar_cimahi/core/error/result.dart';
 import 'package:warung_pintar_cimahi/features/catalog/domain/entities/stock_entity.dart';
 import 'package:warung_pintar_cimahi/features/catalog/domain/repositories/catalog_repository.dart';
+import 'package:warung_pintar_cimahi/features/dashboard/domain/entities/dashboard_summary_entity.dart';
+import 'package:warung_pintar_cimahi/features/dashboard/domain/usecases/dashboard_summary_usecase.dart';
 import 'package:warung_pintar_cimahi/features/transaction/domain/entities/transaction_entity.dart';
 import 'package:warung_pintar_cimahi/features/transaction/domain/repositories/transaction_repository.dart';
 
@@ -52,16 +54,21 @@ class DashboardState {
 }
 
 class DashboardNotifier extends StateNotifier<DashboardState> {
+  final DashboardSummaryUseCase _summaryUseCase;
   final TransactionRepository _transactionRepository;
   final CatalogRepository _catalogRepository;
 
-  DashboardNotifier(this._transactionRepository, this._catalogRepository)
-    : super(const DashboardState());
+  DashboardNotifier(
+    this._summaryUseCase,
+    this._transactionRepository,
+    this._catalogRepository,
+  ) : super(const DashboardState());
 
   static final _getIt = GetIt.instance;
 
   static DashboardNotifier create() {
     return DashboardNotifier(
+      _getIt<DashboardSummaryUseCase>(),
       _getIt<TransactionRepository>(),
       _getIt<CatalogRepository>(),
     );
@@ -70,53 +77,36 @@ class DashboardNotifier extends StateNotifier<DashboardState> {
   Future<void> loadSummary() async {
     state = state.copyWith(isLoading: true);
 
-    final recentResult = _transactionRepository.getRecentTransactions(
-      limit: 50,
+    // Use DashboardSummaryUseCase for confirmed-only calculations (PRD §7.2)
+    final summaryResult = await _summaryUseCase();
+    final summary = switch (summaryResult) {
+      Success<DashboardSummaryEntity, String>(:final data) => data,
+      Failure<DashboardSummaryEntity, String>() =>
+        const DashboardSummaryEntity(),
+    };
+
+    // Recent transactions for the list
+    final recentResult = await _transactionRepository.getRecentTransactions(
+      limit: 5,
     );
-    final pendingResult = _transactionRepository.getPendingTransactions();
-    final lowStockResult = _catalogRepository.getLowStockItems();
-
-    final recentTransactions = switch (await recentResult) {
+    final recentTransactions = switch (recentResult) {
       Success<List<TransactionEntity>, String>(:final data) => data,
       Failure<List<TransactionEntity>, String>() => <TransactionEntity>[],
     };
 
-    final pendingList = switch (await pendingResult) {
-      Success<List<TransactionEntity>, String>(:final data) => data,
-      Failure<List<TransactionEntity>, String>() => <TransactionEntity>[],
-    };
-
-    final lowStockItems = switch (await lowStockResult) {
+    // Low stock items for banner
+    final lowStockResult = await _catalogRepository.getLowStockItems();
+    final lowStockItems = switch (lowStockResult) {
       Success<List<StockEntity>, String>(:final data) => data,
       Failure<List<StockEntity>, String>() => <StockEntity>[],
     };
 
-    final now = DateTime.now();
-    final todayStart = DateTime(now.year, now.month, now.day);
-
-    final todayConfirmed = recentTransactions.where(
-      (t) =>
-          t.status == TransactionStatus.confirmed &&
-          t.createdAt.isAfter(todayStart) &&
-          t.createdAt.isBefore(todayStart.add(const Duration(days: 1))),
-    );
-
-    int omzetSen = 0;
-    int modalSen = 0;
-    for (final tx in todayConfirmed) {
-      if (tx.type is TransactionSell) {
-        omzetSen += tx.amountSen;
-      } else if (tx.type is TransactionBuy) {
-        modalSen += tx.amountSen;
-      }
-    }
-
     state = DashboardState(
-      omzetSen: omzetSen,
-      profitSen: omzetSen - modalSen,
-      modalSen: modalSen,
-      pendingCount: pendingList.length,
-      recentTransactions: recentTransactions.take(5).toList(),
+      omzetSen: summary.omzetSen,
+      profitSen: summary.profitSen,
+      modalSen: summary.modalSen,
+      pendingCount: summary.pendingCount,
+      recentTransactions: recentTransactions,
       lowStockItems: lowStockItems,
       isLoading: false,
     );

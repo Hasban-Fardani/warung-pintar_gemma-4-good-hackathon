@@ -1,13 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
+import 'package:warung_pintar_cimahi/core/ai/app_init_notifier.dart';
+import 'package:warung_pintar_cimahi/core/ai/app_init_state.dart';
 import 'package:warung_pintar_cimahi/core/constant/app_colors.dart';
 import 'package:warung_pintar_cimahi/core/constant/app_strings.dart';
 import 'package:warung_pintar_cimahi/features/dashboard/presentation/providers/dashboard_provider.dart';
 import 'package:warung_pintar_cimahi/features/transaction/domain/entities/transaction_entity.dart';
+import 'package:warung_pintar_cimahi/shared/widgets/ai_aware_fab.dart';
+import 'package:warung_pintar_cimahi/shared/widgets/ai_degraded_banner.dart';
+import 'package:warung_pintar_cimahi/shared/widgets/ai_loading_banner.dart';
+import 'package:warung_pintar_cimahi/shared/widgets/pending_banner.dart';
+import 'package:warung_pintar_cimahi/shared/widgets/permanent_manual_mode_banner.dart';
+import 'package:warung_pintar_cimahi/shared/widgets/status_badge.dart';
 
+/// Dashboard — Beranda screen (ACT-62 + ACT-69).
+///
+/// Full implementation per `docs/design/Home - Dashboard with Transactions & Toast.html`.
+/// Integrates:
+/// - TopAppBar: storefront icon, title, AI status dot
+/// - AI banners stack: PermanentManualMode → AiDegraded → AiLoading
+/// - Low stock alert banner
+/// - Pending banner (reactive)
+/// - Bento grid: Omzet (col-span-2), Profit, Modal Keluar
+/// - Recent transactions list with status badges
+/// - AI-aware FAB
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
 
@@ -16,8 +36,6 @@ class DashboardScreen extends ConsumerStatefulWidget {
 }
 
 class _DashboardScreenState extends ConsumerState<DashboardScreen> {
-  bool _fabExpanded = false;
-
   @override
   void initState() {
     super.initState();
@@ -27,105 +45,183 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(dashboardProvider);
+    final appState = ref.watch(appInitProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(64),
-        child: Container(
-          decoration: const BoxDecoration(
-            color: AppColors.surface,
-            border: Border(
-              bottom: BorderSide(color: AppColors.outlineVariant, width: 0.5),
-            ),
+      appBar: _buildAppBar(appState),
+      body: state.isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _buildContent(state, appState),
+      floatingActionButton: AiAwareFab(
+        onVoiceTap: () {
+          // TODO: Navigate to voice input
+        },
+        onCameraTap: () {
+          // TODO: Show camera bottom sheet (struk / kemasan)
+        },
+        onManualTap: () {
+          // TODO: Navigate to manual form
+        },
+      ),
+    );
+  }
+
+  PreferredSizeWidget _buildAppBar(AppInitState appState) {
+    final isAiReady = appState is AppInitModelReady;
+    final isAiDegraded = appState is AppInitAiDegraded;
+    final isAiFailed = appState is AppInitModelFailed;
+
+    // AI status dot color
+    Color dotColor;
+    if (isAiReady) {
+      dotColor = AppColors.secondary; // Green — ready
+    } else if (isAiDegraded || isAiFailed) {
+      dotColor = AppColors.error; // Red — failed/degraded
+    } else {
+      dotColor = AppColors.pendingText; // Yellow — loading
+    }
+
+    return PreferredSize(
+      preferredSize: const Size.fromHeight(64),
+      child: Container(
+        decoration: const BoxDecoration(
+          color: AppColors.surface,
+          border: Border(
+            bottom: BorderSide(color: AppColors.outlineVariant, width: 0.5),
           ),
-          child: SafeArea(
-            bottom: false,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                children: [
-                  GestureDetector(
-                    onTap: () =>
-                        ref.read(dashboardProvider.notifier).loadSummary(),
-                    child: Container(
+        ),
+        child: SafeArea(
+          bottom: false,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                GestureDetector(
+                  onTap: () =>
+                      ref.read(dashboardProvider.notifier).loadSummary(),
+                  child: Container(
+                    width: 48,
+                    height: 48,
+                    alignment: Alignment.center,
+                    child: const Icon(
+                      Icons.storefront,
+                      color: AppColors.onSurfaceVariant,
+                      size: 24,
+                    ),
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  AppStrings.appName,
+                  style: GoogleFonts.poppins(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    height: 28 / 20,
+                    color: AppColors.primary,
+                  ),
+                ),
+                const Spacer(),
+                Stack(
+                  children: [
+                    Container(
                       width: 48,
                       height: 48,
                       alignment: Alignment.center,
                       child: const Icon(
-                        Icons.storefront,
+                        Icons.smart_toy,
                         color: AppColors.onSurfaceVariant,
                         size: 24,
                       ),
                     ),
-                  ),
-                  const Spacer(),
-                  Text(
-                    AppStrings.appName,
-                    style: GoogleFonts.poppins(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      height: 28 / 20,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                  const Spacer(),
-                  Stack(
-                    children: [
-                      Container(
-                        width: 48,
-                        height: 48,
-                        alignment: Alignment.center,
-                        child: const Icon(
-                          Icons.smart_toy,
-                          color: AppColors.onSurfaceVariant,
-                          size: 24,
-                        ),
-                      ),
-                      Positioned(
-                        top: 6,
-                        right: 6,
-                        child: Container(
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: AppColors.secondary,
-                            shape: BoxShape.circle,
-                            border: Border.all(color: AppColors.surface),
+                    Positioned(
+                      top: 6,
+                      right: 6,
+                      child: Container(
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color: dotColor,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: AppColors.surface,
+                            width: 1.5,
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                ],
-              ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         ),
       ),
-      body: state.isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _buildContent(state),
-      floatingActionButton: _buildFab(),
     );
   }
 
-  Widget _buildContent(DashboardState state) {
+  Widget _buildContent(DashboardState state, AppInitState appState) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(16, 24, 16, 100),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (state.lowStockItems.isNotEmpty) _buildLowStockBanner(state),
-          if (state.lowStockItems.isNotEmpty) const SizedBox(height: 24),
+          // Banner stack (PRD §16 — ACT-69):
+          // PermanentManualModeBanner → AiDegradedBanner → AiLoadingBanner
+          _buildAiBanners(appState),
+
+          // Low stock alert banner
+          if (state.lowStockItems.isNotEmpty) ...[
+            _buildLowStockBanner(state),
+            const SizedBox(height: 16),
+          ],
+
+          // Pending banner (ACT-63)
+          if (state.pendingCount > 0) ...[
+            PendingBanner(
+              pendingCount: state.pendingCount,
+              onConfirmTap: () => context.go('/pending'),
+            ),
+            const SizedBox(height: 16),
+          ],
+
+          // Greeting
           _buildGreeting(),
           const SizedBox(height: 24),
+
+          // Bento grid
           _buildBentoGrid(state),
           const SizedBox(height: 24),
+
+          // Recent transactions
           _buildTransactionList(state),
         ],
       ),
     );
+  }
+
+  /// AI banners stack per ACT-69.
+  /// Order: PermanentManualMode → AiDegraded → AiLoading.
+  /// Only one shows at a time (mutually exclusive states).
+  Widget _buildAiBanners(AppInitState appState) {
+    return switch (appState) {
+      AppInitModelFailed(:final reason) => Padding(
+        padding: const EdgeInsets.only(bottom: 16),
+        child: PermanentManualModeBanner(reason: reason),
+      ),
+      AppInitAiDegraded(:final reason) => Padding(
+        padding: const EdgeInsets.only(bottom: 16),
+        child: AiDegradedBanner(
+          reason: reason,
+          onRetry: () => ref.read(appInitProvider.notifier).initialize(),
+        ),
+      ),
+      AppInitModelLoading() => const Padding(
+        padding: EdgeInsets.only(bottom: 16),
+        child: AiLoadingBanner(),
+      ),
+      _ => const SizedBox.shrink(),
+    };
   }
 
   Widget _buildLowStockBanner(DashboardState state) {
@@ -145,11 +241,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           Expanded(
             child: Text(
               'Perhatian: Stok Menipis ($names$suffix)',
-              style: GoogleFonts.poppins(
-                fontSize: 16,
+              style: GoogleFonts.inter(
+                fontSize: 14,
                 fontWeight: FontWeight.w600,
-                height: 20 / 16,
-                letterSpacing: 0.16,
+                height: 20 / 14,
                 color: AppColors.onErrorContainer,
               ),
             ),
@@ -186,7 +281,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         const SizedBox(height: 4),
         Text(
           'Cek performa warung Anda hari ini.',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.inter(
             fontSize: 16,
             fontWeight: FontWeight.w400,
             height: 24 / 16,
@@ -222,11 +317,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   const SizedBox(width: 8),
                   Text(
                     'OMZET HARI INI',
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      height: 20 / 16,
-                      letterSpacing: 0.16,
+                      height: 20 / 14,
+                      letterSpacing: 0.5,
                       color: AppColors.onSurfaceVariant,
                     ),
                   ),
@@ -250,6 +345,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         // Profit & Modal (2 columns)
         Row(
           children: [
+            // Profit
             Expanded(
               child: Container(
                 padding: const EdgeInsets.all(16),
@@ -271,12 +367,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            'PROFIT HARI INI',
-                            style: GoogleFonts.poppins(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              height: 18 / 14,
-                              letterSpacing: 0.28,
+                            'PROFIT',
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              height: 16 / 12,
+                              letterSpacing: 0.5,
                               color: AppColors.onSurfaceVariant,
                             ),
                             maxLines: 1,
@@ -301,6 +397,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               ),
             ),
             const SizedBox(width: 16),
+            // Modal Keluar
             Expanded(
               child: Container(
                 padding: const EdgeInsets.all(16),
@@ -322,12 +419,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            'MODAL KELUAR',
-                            style: GoogleFonts.poppins(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              height: 18 / 14,
-                              letterSpacing: 0.28,
+                            'MODAL',
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              height: 16 / 12,
+                              letterSpacing: 0.5,
                               color: AppColors.onSurfaceVariant,
                             ),
                             maxLines: 1,
@@ -385,7 +482,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   child: Center(
                     child: Text(
                       'Belum ada transaksi hari ini',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.inter(
                         fontSize: 16,
                         fontWeight: FontWeight.w400,
                         color: AppColors.onSurfaceVariant,
@@ -409,11 +506,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   Widget _transactionRow(TransactionEntity tx, bool isLast) {
     final isSell = tx.type is TransactionSell;
     final icon = isSell ? Icons.shopping_bag : Icons.receipt_long;
-    final color = isSell
+    final bgColor = isSell
         ? AppColors.primaryContainer
         : AppColors.errorContainer;
     final amountColor = isSell ? AppColors.secondary : AppColors.error;
     final sign = isSell ? '+' : '-';
+
+    // Pending amounts show tilde prefix (PRD §12.7)
+    final isPending = tx.status == TransactionStatus.pending;
+    final prefix = isPending ? '~' : '';
 
     final timeDiff = DateTime.now().difference(tx.createdAt);
     String timeAgo;
@@ -428,7 +529,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     }
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         border: isLast
             ? null
@@ -436,11 +537,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       ),
       child: Row(
         children: [
+          // Icon circle 40×40
           Container(
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.2),
+              color: bgColor.withValues(alpha: 0.2),
               shape: BoxShape.circle,
             ),
             alignment: Alignment.center,
@@ -451,114 +553,60 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             ),
           ),
           const SizedBox(width: 12),
+          // Name + time + badges
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   tx.itemName,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.inter(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     height: 20 / 16,
-                    letterSpacing: 0.16,
                     color: AppColors.onSurface,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
+                const SizedBox(height: 2),
                 Text(
                   timeAgo,
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.inter(
                     fontSize: 14,
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w400,
                     height: 18 / 14,
                     color: AppColors.onSurfaceVariant,
                   ),
                 ),
+                const SizedBox(height: 4),
+                // Status badges (ACT-64)
+                Row(
+                  children: [
+                    StatusBadge.inputMethod(tx.inputMethod),
+                    const SizedBox(width: 4),
+                    StatusBadge.transactionStatus(
+                      tx.status,
+                      needsClarification: tx.needsClarification,
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
+          // Amount
           Text(
-            '$sign${_formatCompactRupiah(tx.amountSen)}',
+            '$prefix$sign${_formatCompactRupiah(tx.amountSen)}',
             style: GoogleFonts.poppins(
               fontSize: 16,
               fontWeight: FontWeight.w600,
               height: 20 / 16,
-              letterSpacing: 0.16,
               color: amountColor,
               fontFeatures: const [FontFeature.tabularFigures()],
             ),
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildFab() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        if (_fabExpanded) ...[
-          _fabOption(Icons.mic, 'Suara', () {
-            setState(() => _fabExpanded = false);
-          }),
-          const SizedBox(height: 8),
-          _fabOption(Icons.photo_camera, 'Kamera', () {
-            setState(() => _fabExpanded = false);
-          }),
-          const SizedBox(height: 8),
-          _fabOption(Icons.edit_document, 'Manual', () {
-            setState(() => _fabExpanded = false);
-          }),
-          const SizedBox(height: 12),
-        ],
-        FloatingActionButton(
-          onPressed: () => setState(() => _fabExpanded = !_fabExpanded),
-          backgroundColor: AppColors.primaryContainer,
-          foregroundColor: AppColors.onPrimaryContainer,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(28),
-            side: const BorderSide(color: AppColors.primaryFixedDim),
-          ),
-          child: Icon(_fabExpanded ? Icons.close : Icons.add),
-        ),
-      ],
-    );
-  }
-
-  Widget _fabOption(IconData icon, String label, VoidCallback onTap) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            border: Border.all(color: AppColors.outlineVariant),
-            borderRadius: BorderRadius.circular(2),
-          ),
-          child: Text(
-            label,
-            style: GoogleFonts.poppins(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              height: 18 / 14,
-              letterSpacing: 0.28,
-              color: AppColors.onSurfaceVariant,
-            ),
-          ),
-        ),
-        const SizedBox(width: 8),
-        FloatingActionButton.small(
-          onPressed: onTap,
-          backgroundColor: AppColors.surface,
-          foregroundColor: AppColors.primary,
-          shape: const CircleBorder(
-            side: BorderSide(color: AppColors.outlineVariant),
-          ),
-          child: Icon(icon),
-        ),
-      ],
     );
   }
 

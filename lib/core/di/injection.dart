@@ -12,6 +12,7 @@ import 'package:warung_pintar_cimahi/features/transaction/data/datasources/trans
 import 'package:warung_pintar_cimahi/features/transaction/data/repositories/transaction_repository_impl.dart';
 import 'package:warung_pintar_cimahi/features/transaction/domain/repositories/transaction_repository.dart';
 import 'package:warung_pintar_cimahi/features/transaction/domain/usecases/get_pending_transactions_usecase.dart';
+import 'package:warung_pintar_cimahi/features/dashboard/domain/usecases/dashboard_summary_usecase.dart';
 
 final getIt = GetIt.instance;
 
@@ -60,6 +61,11 @@ void configureDependencies() {
   if (!getIt.isRegistered<GetPendingTransactionsUseCase>()) {
     getIt.registerLazySingleton<GetPendingTransactionsUseCase>(
       () => GetPendingTransactionsUseCase(getIt<TransactionRepository>()),
+    );
+  }
+  if (!getIt.isRegistered<DashboardSummaryUseCase>()) {
+    getIt.registerLazySingleton<DashboardSummaryUseCase>(
+      () => DashboardSummaryUseCase(getIt<TransactionRepository>()),
     );
   }
 }
