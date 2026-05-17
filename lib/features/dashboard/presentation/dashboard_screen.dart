@@ -134,7 +134,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   }
 
   /// AI banners stack per ACT-69.
-  /// Order: PermanentManualMode → AiDegraded → AiLoading.
+  /// Order: PermanentManualMode → AiDegraded → AiLoading/Downloading.
   /// Only one shows at a time (mutually exclusive states).
   Widget _buildAiBanners(AppInitState appState) {
     return switch (appState) {
@@ -148,6 +148,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           reason: reason,
           onRetry: () => ref.read(appInitProvider.notifier).initialize(),
         ),
+      ),
+      AppInitModelDownloading() => const Padding(
+        padding: EdgeInsets.only(bottom: 16),
+        child: AiLoadingBanner(),
       ),
       AppInitModelLoading() => const Padding(
         padding: EdgeInsets.only(bottom: 16),
