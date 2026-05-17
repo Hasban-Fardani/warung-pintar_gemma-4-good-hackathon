@@ -79,15 +79,6 @@ class _AiAwareFabState extends ConsumerState<AiAwareFab>
       alignment: Alignment.bottomRight,
       children: [
         if (_expanded)
-          Positioned.fill(
-            child: GestureDetector(
-              onTap: _close,
-              behavior: HitTestBehavior.opaque,
-              child: Container(color: Colors.black.withValues(alpha: 0.4)),
-            ),
-          ),
-
-        if (_expanded)
           Positioned(
             bottom: 88,
             right: 0,
