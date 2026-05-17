@@ -50,8 +50,8 @@ class ModelDownloader {
     );
 
     int totalBytes = 0;
-    final startTime = DateTime.now();
-    int lastBytes = existingBytes;
+    int lastCallbackBytes = 0;
+    DateTime? lastCallbackTime;
 
     try {
       final headResp = await dio.head(url);
@@ -70,6 +70,9 @@ class ModelDownloader {
         existingBytes = 0;
       }
 
+      lastCallbackBytes = existingBytes;
+      lastCallbackTime = DateTime.now();
+
       await dio.download(
         url,
         savePath,
@@ -83,13 +86,20 @@ class ModelDownloader {
           final actualTotal = total ?? totalBytes;
           final progress = actualTotal > 0 ? currentBytes / actualTotal : 0.0;
 
-          final elapsed = DateTime.now().difference(startTime).inSeconds;
+          final now = DateTime.now();
+          final deltaBytes = currentBytes - lastCallbackBytes;
+          final deltaSeconds = lastCallbackTime != null
+              ? now.difference(lastCallbackTime!).inMilliseconds / 1000.0
+              : 0.0;
+
           double speedMBps = 0;
-          if (elapsed > 0) {
-            speedMBps = (currentBytes - lastBytes) / elapsed / 1024 / 1024;
+          if (deltaSeconds > 0.1) {
+            speedMBps = deltaBytes / deltaSeconds / 1024 / 1024;
             if (speedMBps < 0) speedMBps = 0;
-            lastBytes = currentBytes;
           }
+
+          lastCallbackBytes = currentBytes;
+          lastCallbackTime = now;
 
           String eta = 'menghitung...';
           if (speedMBps > 0 && actualTotal > currentBytes) {

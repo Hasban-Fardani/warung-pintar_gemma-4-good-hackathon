@@ -133,7 +133,7 @@ class _ModelDownloadScreenState extends ConsumerState<ModelDownloadScreen>
         ),
         const SizedBox(height: 8),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
             color: AppColors.primaryContainer.withValues(alpha: 0.3),
             borderRadius: BorderRadius.circular(20),
@@ -143,36 +143,44 @@ class _ModelDownloadScreenState extends ConsumerState<ModelDownloadScreen>
             children: [
               const Icon(
                 Icons.speed,
-                size: 16,
+                size: 14,
                 color: AppColors.primary,
               ),
-              const SizedBox(width: 6),
-              Text(
-                speedText,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w600,
-                    ),
+              const SizedBox(width: 4),
+              Flexible(
+                child: Text(
+                  speedText,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                      ),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 8),
               Container(
                 width: 1,
-                height: 12,
+                height: 10,
                 color: AppColors.primary.withValues(alpha: 0.3),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 8),
               const Icon(
                 Icons.access_time,
-                size: 16,
+                size: 14,
                 color: AppColors.primary,
               ),
-              const SizedBox(width: 6),
-              Text(
-                'Sisa: $eta',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w600,
-                    ),
+              const SizedBox(width: 4),
+              Flexible(
+                child: Text(
+                  'Sisa: $eta',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                      ),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ],
           ),
