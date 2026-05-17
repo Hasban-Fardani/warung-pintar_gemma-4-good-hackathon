@@ -435,6 +435,9 @@ class _AddItemPageState extends ConsumerState<AddItemPage> {
             isExpanded: true,
             decoration: const InputDecoration(
               border: InputBorder.none,
+              enabledBorder: InputBorder.none,
+              focusedBorder: InputBorder.none,
+              errorBorder: InputBorder.none,
               contentPadding: EdgeInsets.symmetric(horizontal: 16),
             ),
             hint: Text(
@@ -506,6 +509,9 @@ class _AddItemPageState extends ConsumerState<AddItemPage> {
             isExpanded: true,
             decoration: const InputDecoration(
               border: InputBorder.none,
+              enabledBorder: InputBorder.none,
+              focusedBorder: InputBorder.none,
+              errorBorder: InputBorder.none,
               contentPadding: EdgeInsets.symmetric(horizontal: 16),
             ),
             validator: (v) => v == null ? 'Wajib dipilih' : null,
