@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/catalog/presentation/pages/catalog_list_page.dart';
+import '../../features/catalog/presentation/pages/category_management_page.dart';
 import '../../features/dashboard/presentation/dashboard_screen.dart';
 import '../../features/onboarding/presentation/pages/onboarding_welcome_page.dart';
 import '../../features/onboarding/presentation/pages/model_download_screen.dart';
@@ -106,6 +107,10 @@ final appRouter = GoRouter(
             GoRoute(
               path: '/',
               builder: (context, state) => const DashboardScreen(),
+            ),
+            GoRoute(
+              path: '/category-management',
+              builder: (context, state) => const CategoryManagementPage(),
             ),
           ],
         ),

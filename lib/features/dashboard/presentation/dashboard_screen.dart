@@ -11,7 +11,6 @@ import 'package:warung_pintar_cimahi/core/constant/app_strings.dart';
 import 'package:warung_pintar_cimahi/features/catalog/presentation/pages/add_item_page.dart';
 import 'package:warung_pintar_cimahi/features/dashboard/presentation/providers/dashboard_provider.dart';
 import 'package:warung_pintar_cimahi/features/transaction/domain/entities/transaction_entity.dart';
-import 'package:warung_pintar_cimahi/features/catalog/presentation/pages/category_management_page.dart';
 import 'package:warung_pintar_cimahi/shared/widgets/ai_aware_fab.dart';
 import 'package:warung_pintar_cimahi/shared/widgets/ai_degraded_banner.dart';
 import 'package:warung_pintar_cimahi/shared/widgets/ai_loading_banner.dart';
@@ -258,13 +257,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               child: _NavCard(
                 icon: Icons.category,
                 label: 'Kategori',
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const CategoryManagementPage(),
-                    ),
-                  );
-                },
+                onTap: () => context.push('/category-management'),
               ),
             ),
           ],
