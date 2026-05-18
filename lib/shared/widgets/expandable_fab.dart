@@ -14,43 +14,78 @@ class ExpandableFab extends ConsumerStatefulWidget {
   ConsumerState<ExpandableFab> createState() => _ExpandableFabState();
 }
 
-class _ExpandableFabState extends ConsumerState<ExpandableFab>
-    with SingleTickerProviderStateMixin {
-  bool _expanded = false;
-  late AnimationController _controller;
+class _ExpandableFabState extends ConsumerState<ExpandableFab> {
+  void _showActionSheet() {
+    final appState = ref.read(appInitProvider);
+    final isAiReady = appState is AppInitModelReady;
 
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 250),
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Handle bar
+                Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: AppColors.outlineVariant,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                // Manual
+                _SheetItem(
+                  icon: Icons.edit_outlined,
+                  label: 'Transaksi Manual',
+                  subtitle: 'Input barang satu per satu',
+                  enabled: true,
+                  onTap: () {
+                    Navigator.pop(sheetContext);
+                    context.push('/transaction/new');
+                  },
+                ),
+                const Divider(height: 1, indent: 72, endIndent: 16),
+                // Foto
+                _SheetItem(
+                  icon: Icons.camera_alt_outlined,
+                  label: 'Foto Struk / Barang',
+                  subtitle: 'AI baca struk atau kemasan',
+                  enabled: isAiReady,
+                  onTap: () {
+                    Navigator.pop(sheetContext);
+                    _showPhotoSourceSheet();
+                  },
+                ),
+                const Divider(height: 1, indent: 72, endIndent: 16),
+                // Suara
+                _SheetItem(
+                  icon: Icons.mic,
+                  label: 'Transaksi Suara',
+                  subtitle: 'Rekam suara, AI catat otomatis',
+                  enabled: isAiReady,
+                  onTap: () {
+                    Navigator.pop(sheetContext);
+                    context.push('/voice-input');
+                  },
+                ),
+                const SizedBox(height: 8),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _toggle() {
-    setState(() {
-      _expanded = !_expanded;
-      if (_expanded) {
-        _controller.forward();
-      } else {
-        _controller.reverse();
-      }
-    });
-  }
-
-  void _close() {
-    if (_expanded) _toggle();
-  }
-
   void _showPhotoSourceSheet() {
-    _close();
     showModalBottomSheet(
       context: context,
       builder: (context) => const PhotoSourceBottomSheet(),
@@ -72,235 +107,77 @@ class _ExpandableFabState extends ConsumerState<ExpandableFab>
     final isAiReady = appState is AppInitModelReady;
     final isAiDisabled = !isAiReady;
 
-    return Stack(
-      clipBehavior: Clip.none,
-      alignment: Alignment.bottomCenter,
-      children: [
-        if (_expanded && isAiReady) _buildMiniFabs(),
-        _buildMainFab(isAiDisabled),
-      ],
-    );
-  }
-
-  Widget _buildMiniFabs() {
-    return Positioned(
-      bottom: 72,
-      right: 0,
-      child: AnimatedBuilder(
-        animation: _controller,
-        builder: (context, child) {
-          return Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildMiniFab(
-                index: 0,
-                icon: Icons.edit_outlined,
-                label: 'Manual',
-                color: Colors.grey.shade700,
-                enabled: true,
-                onTap: () {
-                  _close();
-                  context.push('/transaction/new');
-                },
-              ),
-              const SizedBox(width: 12),
-              _buildMiniFab(
-                index: 1,
-                icon: Icons.mic,
-                label: 'Suara',
-                color: AppColors.primary,
-                enabled: true,
-                onTap: () {
-                  _close();
-                  context.push('/voice-input');
-                },
-              ),
-              const SizedBox(width: 12),
-              _buildMiniFab(
-                index: 2,
-                icon: Icons.camera_alt_outlined,
-                label: 'Foto',
-                color: Colors.green.shade600,
-                enabled: true,
-                onTap: () {
-                  _close();
-                  _showPhotoSourceSheet();
-                },
-              ),
-            ],
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildMiniFab({
-    required int index,
-    required IconData icon,
-    required String label,
-    required Color color,
-    required bool enabled,
-    required VoidCallback onTap,
-  }) {
-    final delay = index * 50;
-    final slideAnimation = Tween<Offset>(
-      begin: const Offset(1, 0),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Interval(
-        delay / 250,
-        1.0,
-        curve: Curves.easeOutCubic,
-      ),
-    ));
-
-    final fadeAnimation = Tween<double>(
-      begin: 0,
-      end: 1,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Interval(
-        delay / 250,
-        1.0,
-        curve: Curves.easeIn,
-      ),
-    ));
-
-    final scaleAnimation = Tween<double>(
-      begin: 0.8,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Interval(
-        delay / 250,
-        1.0,
-        curve: Curves.easeOutBack,
-      ),
-    ));
-
-    return SlideTransition(
-      position: slideAnimation,
-      child: FadeTransition(
-        opacity: fadeAnimation,
-        child: ScaleTransition(
-          scale: scaleAnimation,
-          child: _MiniFabItem(
-            icon: icon,
-            label: label,
-            color: color,
-            enabled: enabled,
-            onTap: onTap,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMainFab(bool isAiDisabled) {
-    final rotation = _controller.drive(
-      Tween<double>(begin: 0, end: 0.125),
-    );
-
     return SizedBox(
       width: 56,
       height: 56,
       child: FloatingActionButton(
-        onPressed: isAiDisabled ? _showAiDisabledSnackbar : _toggle,
+        onPressed: isAiDisabled ? _showAiDisabledSnackbar : _showActionSheet,
         backgroundColor: isAiDisabled
             ? AppColors.surfaceContainerHighest
             : AppColors.primary,
         foregroundColor: isAiDisabled
             ? AppColors.onSurfaceVariant.withValues(alpha: 0.5)
             : Colors.white,
-        elevation: _expanded ? 8 : (isAiDisabled ? 0 : 4),
-        child: AnimatedBuilder(
-          animation: rotation,
-          builder: (context, child) {
-            return Transform.rotate(
-              angle: rotation.value * 3.14159 * 2,
-              child: Icon(_expanded ? Icons.close : Icons.add),
-            );
-          },
-        ),
+        elevation: isAiDisabled ? 0 : 4,
+        child: const Icon(Icons.add),
       ),
     );
   }
 }
 
-class _MiniFabItem extends StatelessWidget {
+class _SheetItem extends StatelessWidget {
   final IconData icon;
   final String label;
-  final Color color;
+  final String subtitle;
   final bool enabled;
   final VoidCallback onTap;
 
-  const _MiniFabItem({
+  const _SheetItem({
     required this.icon,
     required this.label,
-    required this.color,
+    required this.subtitle,
     required this.enabled,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: enabled ? onTap : null,
-      behavior: HitTestBehavior.opaque,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            constraints: const BoxConstraints(minWidth: 72),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.10),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Text(
-              label,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: enabled
-                    ? AppColors.onSurface
-                    : AppColors.onSurfaceVariant.withValues(alpha: 0.5),
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: enabled
-                  ? AppColors.surfaceContainerLowest
-                  : AppColors.surfaceContainerHighest,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.08),
-                  blurRadius: 6,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Icon(
-              icon,
-              size: 24,
-              color: enabled ? color : AppColors.onSurfaceVariant.withValues(alpha: 0.5),
-            ),
-          ),
-        ],
+    return ListTile(
+      leading: Container(
+        width: 48,
+        height: 48,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: enabled
+              ? AppColors.surfaceContainerLow
+              : AppColors.surfaceContainerHighest,
+          border: Border.all(color: AppColors.outlineVariant),
+        ),
+        child: Icon(
+          icon,
+          size: 22,
+          color: enabled
+              ? AppColors.primary
+              : AppColors.onSurfaceVariant.withValues(alpha: 0.38),
+        ),
       ),
+      title: Text(
+        label,
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: enabled ? AppColors.onSurface : AppColors.onSurfaceVariant.withValues(alpha: 0.38),
+        ),
+      ),
+      subtitle: Text(
+        subtitle,
+        style: TextStyle(
+          fontSize: 12,
+          color: enabled ? AppColors.onSurfaceVariant : AppColors.onSurfaceVariant.withValues(alpha: 0.38),
+        ),
+      ),
+      enabled: enabled,
+      onTap: enabled ? onTap : null,
     );
   }
 }

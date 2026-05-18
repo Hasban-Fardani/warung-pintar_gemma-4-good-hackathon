@@ -13,6 +13,9 @@ class GemmaAiService implements AiService {
 
   GemmaService get _gemmaService => getIt<GemmaService>();
 
+  /// Guard flag — LiteRT-LM is not thread-safe for concurrent inference sessions.
+  bool _isInferring = false;
+
   @override
   Future<Result<ToolCallResult, AiFailure>> infer({
     required String systemPrompt,
@@ -24,6 +27,13 @@ class GemmaAiService implements AiService {
       return const Failure(ModelNotLoadedFailure());
     }
 
+    // GUARD: tolak concurrent inference — LiteRT-LM tidak thread-safe
+    if (_isInferring) {
+      _logger.w('GemmaAiService: Inference already in progress, rejecting duplicate call');
+      return const Failure(ConcurrentInferenceFailure());
+    }
+
+    _isInferring = true;
     try {
       _logger.d('GemmaAiService: Starting inference...');
 
@@ -60,6 +70,8 @@ class GemmaAiService implements AiService {
     } catch (e) {
       _logger.e('GemmaAiService: Unexpected error', error: e);
       return Failure(InvalidJsonOutputFailure(e.toString()));
+    } finally {
+      _isInferring = false;
     }
   }
 }

@@ -28,3 +28,9 @@ final class InvalidJsonOutputFailure extends AiFailure {
 final class ImageUnreadableFailure extends AiFailure {
   const ImageUnreadableFailure() : super('Gambar tidak terbaca');
 }
+
+/// Inference already in progress — LiteRT-LM is not thread-safe for concurrent sessions.
+final class ConcurrentInferenceFailure extends AiFailure {
+  const ConcurrentInferenceFailure()
+    : super('Inferensi sedang berjalan. Tunggu sebentar lalu coba lagi.');
+}

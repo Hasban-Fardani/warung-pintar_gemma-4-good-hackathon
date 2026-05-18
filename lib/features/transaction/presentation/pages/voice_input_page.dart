@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:logger/logger.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 
@@ -43,6 +44,7 @@ class VoiceInputPage extends ConsumerStatefulWidget {
 
 class _VoiceInputPageState extends ConsumerState<VoiceInputPage>
     with TickerProviderStateMixin {
+  final _logger = Logger(printer: PrettyPrinter(methodCount: 0));
   final SpeechToText _speech = SpeechToText();
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _transcriptController = TextEditingController();
@@ -51,6 +53,7 @@ class _VoiceInputPageState extends ConsumerState<VoiceInputPage>
   bool _isUserStillRecording = false;
   bool _isInitialized = false;
   bool _isSttPaused = false;
+  bool _isProcessing = false;
   String _fullTranscript = '';
   Timer? _timer;
   int _elapsedSeconds = 0;
@@ -98,6 +101,8 @@ class _VoiceInputPageState extends ConsumerState<VoiceInputPage>
     await _speech.initialize(
       onStatus: (status) {
         if (!mounted) return;
+        // Jangan restart jika sudah processing
+        if (_isProcessing) return;
         setState(() {
           _isSttPaused = status == 'notListening' || status == 'paused';
         });
@@ -146,6 +151,11 @@ class _VoiceInputPageState extends ConsumerState<VoiceInputPage>
 
   void _onSpeechResult(SpeechRecognitionResult result) {
     if (result.finalResult) {
+      // Guard: jangan proses jika sudah ada yang sedang diproses
+      if (_isProcessing) {
+        _logger.d('VoiceInputPage: Ignoring duplicate finalResult — already processing');
+        return;
+      }
       _appendTranscript(result.recognizedWords);
     } else {
       _transcriptController.text = _fullTranscript + result.recognizedWords;
@@ -153,7 +163,8 @@ class _VoiceInputPageState extends ConsumerState<VoiceInputPage>
   }
 
   Future<void> _restartListening() async {
-    if (!_isUserStillRecording || !mounted || !_isInitialized) return;
+    // Jangan restart jika sudah masuk fase processing
+    if (!_isUserStillRecording || !mounted || !_isInitialized || _isProcessing) return;
 
     await _speech.listen(
       onResult: _onSpeechResult,
@@ -201,11 +212,15 @@ class _VoiceInputPageState extends ConsumerState<VoiceInputPage>
   }
 
   Future<void> _stopAndProcess() async {
+    if (_isProcessing) return;
+    _isProcessing = true;
+
     _isUserStillRecording = false;
     _stopTimer();
     await _speech.stop();
 
     if (_fullTranscript.isEmpty) {
+      _isProcessing = false;
       setState(() {
         _state = VoiceInputState.error;
         _errorMessage = 'Tidak ada input suara';
@@ -220,41 +235,50 @@ class _VoiceInputPageState extends ConsumerState<VoiceInputPage>
   Future<void> _processTranscript(String transcript) async {
     setState(() => _state = VoiceInputState.processing);
 
-    await ref.read(voiceTransactionProvider.notifier).processTranscript(transcript);
+    try {
+      await ref.read(voiceTransactionProvider.notifier).processTranscript(transcript);
 
-    final vtState = ref.read(voiceTransactionProvider);
+      final vtState = ref.read(voiceTransactionProvider);
 
-    if (vtState.isProcessing == false && vtState.resultMessage != null) {
-      await ref.read(pendingConfirmProvider.notifier).loadPending();
-      final pendingState = ref.read(pendingConfirmProvider);
+      if (vtState.isProcessing == false && vtState.resultMessage != null) {
+        await ref.read(pendingConfirmProvider.notifier).loadPending();
+        final pendingState = ref.read(pendingConfirmProvider);
 
-      if (pendingState.items.isNotEmpty) {
-        setState(() {
-          _draftItems = pendingState.items
-              .take(10)
-              .map((e) => DraftTransactionItem(
-                    name: e.itemName,
-                    quantity: e.quantity,
-                    priceSen: e.priceAtTransactionSen,
-                  ))
-              .toList();
-          _totalSen = _draftItems.fold(
-            0,
-            (sum, item) => sum + (item.priceSen * item.quantity),
-          );
-          _state = VoiceInputState.result;
-        });
+        if (pendingState.items.isNotEmpty) {
+          setState(() {
+            _draftItems = pendingState.items
+                .take(10)
+                .map((e) => DraftTransactionItem(
+                      name: e.itemName,
+                      quantity: e.quantity,
+                      priceSen: e.priceAtTransactionSen,
+                    ))
+                .toList();
+            _totalSen = _draftItems.fold(
+              0,
+              (sum, item) => sum + (item.priceSen * item.quantity),
+            );
+            _state = VoiceInputState.result;
+          });
+        } else {
+          setState(() {
+            _state = VoiceInputState.error;
+            _errorMessage = 'Tidak ada transaksi yang berhasil dicatat';
+          });
+        }
       } else {
         setState(() {
           _state = VoiceInputState.error;
-          _errorMessage = 'Tidak ada transaksi yang berhasil dicatat';
+          _errorMessage = vtState.resultMessage ?? 'Terjadi kesalahan';
         });
       }
-    } else {
+    } catch (e) {
       setState(() {
         _state = VoiceInputState.error;
-        _errorMessage = vtState.resultMessage ?? 'Terjadi kesalahan';
+        _errorMessage = 'Terjadi kesalahan: ${e.toString()}';
       });
+    } finally {
+      _isProcessing = false;
     }
   }
 
@@ -289,6 +313,7 @@ class _VoiceInputPageState extends ConsumerState<VoiceInputPage>
 
   @override
   void dispose() {
+    _isProcessing = false;
     _timer?.cancel();
     _speech.stop();
     _scrollController.dispose();
