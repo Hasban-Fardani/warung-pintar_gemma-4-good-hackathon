@@ -1,38 +1,35 @@
 #!/bin/bash
+set -e
 
-MODEL_NAME="gemma-4-E2B-it.litertlm"
-LOCAL_PATH="$HOME/Downloads/$MODEL_NAME"
-ANDROID_PATH="/sdcard/Download/$MODEL_NAME"
+MODEL_FILE="gemma-4-E2B-it.litertlm"
+SOURCE="$HOME/Downloads/$MODEL_FILE"
+# Direct Downloads folder path
+DEST="/storage/emulated/0/Download/$MODEL_FILE"
 
-echo "🔍 Checking local model..."
-
-if [ ! -f "$LOCAL_PATH" ]; then
-  echo "❌ Model not found at $LOCAL_PATH"
-  echo "   Download dulu dari HuggingFace ke ~/Downloads/"
-  exit 1
+if [ ! -f "$SOURCE" ]; then
+    echo "ERROR: Model not found at $SOURCE"
+    echo "Please download gemma-4-E2B-it.litertlm to ~/Downloads/ first"
+    exit 1
 fi
 
-echo "📱 Checking ADB connection..."
-if ! adb devices | grep -q "device$"; then
-  echo "❌ No Android device connected"
-  exit 1
-fi
+SOURCE_SIZE=$(stat -f%z "$SOURCE" 2>/dev/null || stat -c%s "$SOURCE" 2>/dev/null)
+echo "Source: $SOURCE ($SOURCE_SIZE bytes)"
 
-# Cek apakah model sudah ada di device dan ukurannya sama
-LOCAL_SIZE=$(stat -f%z "$LOCAL_PATH" 2>/dev/null || stat -c%s "$LOCAL_PATH")
-REMOTE_SIZE=$(adb shell stat -c%s "$ANDROID_PATH" 2>/dev/null || echo "0")
-
-if [ "$LOCAL_SIZE" = "$REMOTE_SIZE" ]; then
-  echo "✅ Model already on device (size match: $LOCAL_SIZE bytes), skipping push"
-  exit 0
-fi
-
-echo "⬆️  Pushing model to device ($((LOCAL_SIZE / 1024 / 1024)) MB)..."
-adb push "$LOCAL_PATH" "$ANDROID_PATH"
-
-if [ $? -eq 0 ]; then
-  echo "✅ Model pushed successfully to $ANDROID_PATH"
+# Check if already on device with same size
+if adb shell test -f "$DEST" 2>/dev/null; then
+    DEST_SIZE=$(adb shell stat -c%s "$DEST" 2>/dev/null || echo "0")
+    echo "Device already has: $DEST ($DEST_SIZE bytes)"
+    if [ "$DEST_SIZE" = "$SOURCE_SIZE" ]; then
+        echo "Size matches, skipping push"
+        exit 0
+    else
+        echo "Size differs, re-pushing..."
+    fi
 else
-  echo "❌ Push failed"
-  exit 1
+    echo "Pushing to $DEST..."
 fi
+
+echo "This may take a few minutes for 2.5GB..."
+adb push "$SOURCE" "$DEST"
+
+echo "Done! Model ready at $DEST"
