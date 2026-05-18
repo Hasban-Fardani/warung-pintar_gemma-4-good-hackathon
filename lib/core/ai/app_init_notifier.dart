@@ -20,7 +20,6 @@ class AppInitNotifier extends StateNotifier<AppInitState> {
   static const String _modelUrl =
     'https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/main/gemma-4-E2B-it.litertlm';
   static const String _modelFileName = 'gemma-4-E2B-it.litertlm';
-  static const double _minValidSizeBytes = 100 * 1024 * 1024;
 
   static final _logger = Logger(printer: PrettyPrinter(methodCount: 0));
   final Dio _dio = Dio(BaseOptions(
@@ -33,51 +32,15 @@ class AppInitNotifier extends StateNotifier<AppInitState> {
 
     try {
       final modelFile = await _getModelFile();
-      final isValid = await _isModelFileValid(modelFile);
+      final exists = await modelFile.exists();
 
-      if (isValid) {
-        _logger.i('AppInitNotifier: Valid model found on disk, installing...');
+      if (exists) {
+        _logger.i('AppInitNotifier: Model file found, installing...');
         await _installFromFile(modelFile);
       } else {
-        if (await modelFile.exists()) {
-          _logger.w('AppInitNotifier: Corrupt/incomplete model found, deleting...');
-          await modelFile.delete();
-        }
-
-        // Check for sideloaded model in Downloads folder
-        final sideloadedFile = await _getSideloadedModelFile();
-        if (sideloadedFile != null && await sideloadedFile.exists()) {
-          final sideloadedSize = await sideloadedFile.length();
-          _logger.i('AppInitNotifier: Sideloaded model found: ${sideloadedFile.path} ($sideloadedSize bytes)');
-          
-          if (sideloadedSize > _minValidSizeBytes) {
-            _logger.i('AppInitNotifier: Copying sideloaded model...');
-            try {
-              await sideloadedFile.copy(modelFile.path);
-              final isValidAfterCopy = await _isModelFileValid(modelFile);
-              if (isValidAfterCopy) {
-                await _installFromFile(modelFile);
-              } else {
-                _logger.w('AppInitNotifier: Sideloaded model invalid after copy, downloading...');
-                if (await modelFile.exists()) await modelFile.delete();
-                await _downloadWithResume(modelFile);
-              }
-            } catch (e) {
-              _logger.w('AppInitNotifier: Copy failed: $e, downloading...');
-              if (await modelFile.exists()) await modelFile.delete();
-              await _downloadWithResume(modelFile);
-            }
-          } else {
-            _logger.w('AppInitNotifier: Sideloaded model too small ($sideloadedSize), downloading...');
-            await _downloadWithResume(modelFile);
-          }
-        } else {
-          _logger.i('AppInitNotifier: No sideloaded model found, downloading...');
-          await _downloadWithResume(modelFile);
-        }
+        _logger.i('AppInitNotifier: No model file found, downloading...');
+        await _downloadWithResume(modelFile);
       }
-
-      await _loadModel();
     } catch (e, stack) {
       _logger.e('AppInitNotifier: Initialization failed', error: e, stackTrace: stack);
       state = AppInitModelFailed('Inisialisasi gagal: $e');
@@ -90,10 +53,8 @@ class AppInitNotifier extends StateNotifier<AppInitState> {
   }
 
   /// Get sideloaded model file from Downloads folder
-  /// With MANAGE_EXTERNAL_STORAGE, we can access /sdcard/Download/
   Future<File?> _getSideloadedModelFile() async {
     try {
-      // /storage/emulated/0/Download/
       final downloadsPath = '/storage/emulated/0/Download/$_modelFileName';
       _logger.i('AppInitNotifier: Checking sideload path: $downloadsPath');
       final file = File(downloadsPath);
@@ -108,22 +69,11 @@ class AppInitNotifier extends StateNotifier<AppInitState> {
     }
   }
 
-  Future<bool> _isModelFileValid(File file) async {
-    if (!await file.exists()) return false;
-    final size = await file.length();
-    _logger.i('AppInitNotifier: Found model file, size: ${(size / 1024 / 1024).toStringAsFixed(0)} MB');
-    return size > _minValidSizeBytes;
-  }
-
   Future<void> _installFromFile(File modelFile) async {
     state = const AppInitLoading();
     try {
       if (!await modelFile.exists()) {
         throw Exception('Model file does not exist');
-      }
-      final size = await modelFile.length();
-      if (size <= _minValidSizeBytes) {
-        throw Exception('Model file too small: ${(size / 1024 / 1024).toStringAsFixed(0)} MB');
       }
 
       await FlutterGemma.installModel(
@@ -132,10 +82,9 @@ class AppInitNotifier extends StateNotifier<AppInitState> {
       ).fromFile(modelFile.path).install();
       _logger.i('AppInitNotifier: Model installed from file successfully');
     } catch (e) {
-      _logger.w('AppInitNotifier: Install from file failed ($e), deleting and re-downloading...');
-      if (await modelFile.exists()) {
-        await modelFile.delete();
-      }
+      _logger.w('AppInitNotifier: Install from file failed ($e)');
+      // Don't delete - might be valid for fine-tuned model
+      // Just try to download fresh copy
       await _downloadWithResume(modelFile);
     }
   }
