@@ -75,7 +75,7 @@ class _ModelDownloadScreenState extends ConsumerState<ModelDownloadScreen>
         const SizedBox(height: 8),
         Text(
           isDownloading
-              ? 'Menyatukan model AI...'
+              ? 'Mendownload model AI...'
               : 'Memuat model AI...',
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
