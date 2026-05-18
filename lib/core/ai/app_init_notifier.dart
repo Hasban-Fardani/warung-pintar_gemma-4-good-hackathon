@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_gemma/flutter_gemma.dart';
 import 'package:logger/logger.dart';
@@ -28,6 +29,8 @@ class AppInitNotifier extends StateNotifier<AppInitState> {
     receiveTimeout: Duration(minutes: 30),
   ));
 
+  static const _mediaStoreChannel = MethodChannel('warung_pintar_cimahi/mediastore');
+
   Future<void> initialize() async {
     _logger.i('AppInitNotifier: Starting initialization...');
 
@@ -43,8 +46,28 @@ class AppInitNotifier extends StateNotifier<AppInitState> {
           _logger.w('AppInitNotifier: Corrupt/incomplete model found, deleting...');
           await modelFile.delete();
         }
-        // Direct download to app documents with resume support
-        await _downloadWithResume(modelFile);
+
+        // Check for sideloaded model in Downloads folder
+        final sideloadedPath = await _checkSideloadedModel();
+        if (sideloadedPath != null) {
+          _logger.i('AppInitNotifier: Sideloaded model found at: $sideloadedPath, copying...');
+          final success = await _copySideloadedModel(sideloadedPath, modelFile.path);
+          if (success) {
+            final isValidAfterCopy = await _isModelFileValid(modelFile);
+            if (isValidAfterCopy) {
+              await _installFromFile(modelFile);
+            } else {
+              _logger.w('AppInitNotifier: Sideloaded model invalid after copy, downloading...');
+              await _downloadWithResume(modelFile);
+            }
+          } else {
+            _logger.w('AppInitNotifier: Failed to copy sideloaded model, downloading...');
+            await _downloadWithResume(modelFile);
+          }
+        } else {
+          _logger.i('AppInitNotifier: No sideloaded model found, downloading...');
+          await _downloadWithResume(modelFile);
+        }
       }
 
       await _loadModel();
@@ -64,6 +87,49 @@ class AppInitNotifier extends StateNotifier<AppInitState> {
     final size = await file.length();
     _logger.i('AppInitNotifier: Found model file, size: ${(size / 1024 / 1024).toStringAsFixed(0)} MB');
     return size > _minValidSizeBytes;
+  }
+
+  /// Check for sideloaded model in Downloads folder using native method channel
+  /// Returns absolute file path if found, null otherwise
+  Future<String?> _checkSideloadedModel() async {
+    try {
+      if (!Platform.isAndroid) return null;
+
+      _logger.i('AppInitNotifier: Checking for sideloaded model in Downloads...');
+      final result = await _mediaStoreChannel.invokeMethod<String>('findDownloadedFile', {
+        'fileName': _modelFileName,
+      });
+
+      if (result != null) {
+        _logger.i('AppInitNotifier: Sideloaded model found: $result');
+      } else {
+        _logger.i('AppInitNotifier: No sideloaded model found');
+      }
+      return result;
+    } on PlatformException catch (e) {
+      _logger.w('AppInitNotifier: Sideload check failed: ${e.message}');
+      return null;
+    } catch (e) {
+      _logger.w('AppInitNotifier: Sideload check failed: $e');
+      return null;
+    }
+  }
+
+  /// Copy sideloaded model from Downloads to app documents using native method channel
+  Future<bool> _copySideloadedModel(String sourcePath, String destinationPath) async {
+    try {
+      final result = await _mediaStoreChannel.invokeMethod<bool>('copyFileFromMediaStore', {
+        'sourcePath': sourcePath,
+        'destinationPath': destinationPath,
+      });
+      return result ?? false;
+    } on PlatformException catch (e) {
+      _logger.w('AppInitNotifier: Copy failed: ${e.message}');
+      return false;
+    } catch (e) {
+      _logger.w('AppInitNotifier: Copy failed: $e');
+      return false;
+    }
   }
 
   Future<void> _installFromFile(File modelFile) async {
