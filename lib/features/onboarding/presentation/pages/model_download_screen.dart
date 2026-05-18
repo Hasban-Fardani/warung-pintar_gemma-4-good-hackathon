@@ -75,7 +75,7 @@ class _ModelDownloadScreenState extends ConsumerState<ModelDownloadScreen>
         const SizedBox(height: 8),
         Text(
           isDownloading
-              ? 'Mengunduh model AI...'
+              ? 'Menyatukan model AI...'
               : 'Memuat model AI...',
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -240,7 +240,7 @@ class _ModelDownloadScreenState extends ConsumerState<ModelDownloadScreen>
         ),
         const SizedBox(height: 8),
         Text(
-          'Model AI berhasil diunduh dan diverifikasi.\n'
+          'Model AI berhasil disiapkan dan diverifikasi.\n'
           'Fitur suara dan foto sekarang aktif.',
           textAlign: TextAlign.center,
           style: Theme.of(

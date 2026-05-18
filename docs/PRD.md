@@ -1266,197 +1266,28 @@ DELIVERABLES
 
 ### 16.1 Model Delivery Strategy
 
-#### 16.1.1 Mekanisme: Download on First Launch (Bukan Bundle APK)
+#### 16.1.1 Mekanisme: Bundle via Git LFS ZIP + Local Extraction
 
-File model `gemma-4-E2B-it-litertlm-Q4_K_M.litertlm` **tidak di-bundle ke dalam APK**. Alasan:
+Strategi penyampaian file model `gemma-4-E2B-it-litertlm-Q4_K_M.litertlm` (estimasi ~2.5GB) diubah dari mekanisme *download-on-first-launch* menjadi mekanisme bundle ZIP:
 
-- Ukuran model ~2.5GB melebihi batas upload APK Google Play (150MB untuk base APK)
-- Bundle ke APK akan membuat cold start install lebih berat untuk user dengan storage terbatas
-- Download on first launch memungkinkan SHA-256 verification dan resume jika interrupted
+- **Git LFS**: File berukuran besar dikompres dalam format `.zip` (`gemma.zip`) dan dikelola melalui Git LFS (`git lfs track "*.zip"`) untuk menghindari batasan 100MB dari GitHub.
+- **App Asset**: `gemma.zip` ditempatkan dalam `assets/models/gemma.zip` dan didaftarkan di `pubspec.yaml`. APK yang dihasilkan akan menyertakan model ini.
+- **Runtime Extraction**: Pada saat aplikasi pertama kali dijalankan, `AppInitNotifier` akan mengekstrak file ZIP tersebut ke Application Documents Directory secara asinkron (menggunakan isolat via `compute` dan package `archive`), lalu memuatnya melalui instruksi `FlutterGemma.installModel().fromFile()`.
 
-**Lokasi penyimpanan di device:**
+Alasan Transisi:
+- Menghindari isu memori tidak terpakai/korup dari pengunduhan yang tidak selesai.
+- Menjamin status "Offline First" yang sejati (tanpa koneksi internet sama sekali, aplikasi siap digunakan sejak APK terinstal).
+- Karena ini adalah kompetisi Hackathon (dan bukan rilis Google Play), batasan ukuran maksimal APK (Play Store) dapat dihiraukan.
 
-```dart
-// lib/core/ai/model_storage.dart
-import 'dart:io';
-import 'package:path_provider/path_provider.dart';
-
-class ModelStorage {
-  static const String _modelFileName = 'gemma-4-E2B-it-litertlm-Q4_K_M.litertlm';
-  static const String _modelSha256   = 'a3f8c2d1e9b047f6a1c3e5d7b9f2a4c6'
-                                        'e8d0b2f4a6c8e0d2b4f6a8c0e2d4b6f8'; // placeholder — ganti dengan hash resmi
-  
-  /// Path lengkap file model di storage internal app
-  static Future<String> get modelPath async {
-    final dir = await getApplicationDocumentsDirectory();
-    return '${dir.path}/models/$_modelFileName';
-  }
-
-  /// Cek apakah model sudah ada dan valid
-  static Future<bool> isModelReady() async {
-    final path = await modelPath;
-    final file = File(path);
-    if (!await file.exists()) return false;
-    final verified = await _verifySha256(file);
-    return verified;
-  }
-
-  static Future<bool> _verifySha256(File file) async {
-    import 'package:crypto/crypto.dart';
-    final bytes = await file.readAsBytes();
-    final digest = sha256.convert(bytes);
-    return digest.toString() == _modelSha256;
-  }
-}
-```
-
-> **Catatan:** Tambahkan `crypto: ^3.0.3` ke `pubspec.yaml` untuk SHA-256 verification.
-
-#### 16.1.2 Sumber Download
-
-Model diunduh dari salah satu sumber berikut (URL dikonfigurasi di `app_settings`, bukan hardcoded):
+**Kode Logika Instalasi (Referensi `app_init_notifier.dart`):**
 
 ```dart
-// lib/core/ai/model_download_config.dart
-class ModelDownloadConfig {
-  /// Primary: Kaggle Models (diutamakan untuk submission hackathon)
-  static const String primaryUrl =
-      'https://www.kaggle.com/models/google/gemma-4/frameworks/litert/variations/gemma-4-e2b-it-litertlm/versions/1/download/gemma-4-E2B-it-litertlm-Q4_K_M.litertlm';
-
-  /// Fallback: GitHub Releases mirror (jika Kaggle tidak accessible)
-  static const String fallbackUrl =
-      'https://github.com/your-org/warungpintar-models/releases/download/v1.0.0/gemma-4-E2B-it-litertlm-Q4_K_M.litertlm';
-
-  static const int expectedFileSizeBytes = 2_684_354_560; // 2.5 GB estimasi
-}
-```
-
-#### 16.1.3 Download Manager dengan Resume Support
-
-Menggunakan `dio: ^5.4.0` untuk resume download via HTTP `Range` header.
-
-```dart
-// lib/core/ai/model_download_service.dart
-import 'dart:io';
-import 'package:dio/dio.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:riverpod/riverpod.dart';
-
-/// State download model
-sealed class ModelDownloadState {
-  const ModelDownloadState();
-}
-final class DownloadIdle       extends ModelDownloadState { const DownloadIdle(); }
-final class DownloadProgress   extends ModelDownloadState {
-  final double percent;          // 0.0–1.0
-  final int    downloadedBytes;
-  final int    totalBytes;
-  final int    estimatedSecondsRemaining;
-  const DownloadProgress({
-    required this.percent,
-    required this.downloadedBytes,
-    required this.totalBytes,
-    required this.estimatedSecondsRemaining,
-  });
-}
-final class DownloadVerifying  extends ModelDownloadState { const DownloadVerifying(); }
-final class DownloadComplete   extends ModelDownloadState { const DownloadComplete(); }
-final class DownloadFailed     extends ModelDownloadState {
-  final String reason;
-  const DownloadFailed(this.reason);
-}
-
-/// Provider Riverpod
-final modelDownloadProvider =
-    StateNotifierProvider<ModelDownloadNotifier, ModelDownloadState>(
-  (ref) => ModelDownloadNotifier(),
-);
-
-class ModelDownloadNotifier extends StateNotifier<ModelDownloadState> {
-  ModelDownloadNotifier() : super(const DownloadIdle());
-
-  final _dio = Dio();
-  CancelToken? _cancelToken;
-
-  Future<void> startDownload() async {
-    final savePath = await ModelStorage.modelPath;
-    final saveFile = File(savePath);
-    await saveFile.parent.create(recursive: true);
-
-    // Resume: cek berapa byte sudah terdownload
-    int startByte = 0;
-    if (await saveFile.exists()) {
-      startByte = await saveFile.length();
-    }
-
-    _cancelToken = CancelToken();
-    final startTime = DateTime.now();
-
-    try {
-      await _dio.download(
-        ModelDownloadConfig.primaryUrl,
-        savePath,
-        cancelToken: _cancelToken,
-        options: Options(
-          headers: startByte > 0 ? {'Range': 'bytes=$startByte-'} : null,
-          responseType: ResponseType.stream,
-        ),
-        onReceiveProgress: (received, total) {
-          final actualTotal = total + startByte;
-          final actualReceived = received + startByte;
-          final percent = actualReceived / actualTotal;
-
-          // Estimasi waktu tersisa
-          final elapsed = DateTime.now().difference(startTime).inSeconds;
-          final speed = received / (elapsed == 0 ? 1 : elapsed); // bytes/detik
-          final remaining = ((actualTotal - actualReceived) / speed).round();
-
-          state = DownloadProgress(
-            percent: percent,
-            downloadedBytes: actualReceived,
-            totalBytes: actualTotal,
-            estimatedSecondsRemaining: remaining,
-          );
-        },
-      );
-
-      // Verifikasi SHA-256
-      state = const DownloadVerifying();
-      final valid = await ModelStorage.isModelReady();
-      if (!valid) {
-        await saveFile.delete(); // Hapus file korup
-        state = const DownloadFailed('SHA-256 mismatch — file korup, silakan coba lagi');
-        return;
-      }
-
-      state = const DownloadComplete();
-    } on DioException catch (e) {
-      if (CancelToken.isCancel(e)) {
-        state = const DownloadIdle(); // User batalkan — progress tersimpan untuk resume
-      } else {
-        // Coba fallback URL
-        await _retryWithFallback(savePath, startByte, startTime);
-      }
-    }
-  }
-
-  Future<void> _retryWithFallback(String savePath, int startByte, DateTime startTime) async {
-    try {
-      await _dio.download(
-        ModelDownloadConfig.fallbackUrl,
-        savePath,
-        options: Options(
-          headers: startByte > 0 ? {'Range': 'bytes=$startByte-'} : null,
-        ),
-      );
-      state = const DownloadComplete();
-    } catch (e) {
-      state = DownloadFailed('Download gagal dari semua sumber: $e');
-    }
-  }
-
-  void cancelDownload() => _cancelToken?.cancel();
-}
+// Ekstraksi Zip Asinkron ke Documents Directory
+final extractedFile = await compute(_extractZipFromAsset, 'assets/models/gemma.zip');
+await FlutterGemma.installModel(
+  modelType: ModelType.gemma4,
+  fileType: ModelFileType.litertlm,
+).fromFile(extractedFile.path).install();
 ```
 
 #### 16.1.4 UI Progress Download

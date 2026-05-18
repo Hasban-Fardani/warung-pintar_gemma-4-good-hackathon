@@ -1,7 +1,12 @@
+import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_gemma/flutter_gemma.dart';
 import 'package:logger/logger.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:archive/archive_io.dart';
 
 import 'package:warung_pintar_cimahi/core/ai/app_init_state.dart';
 import 'package:warung_pintar_cimahi/core/ai/gemma_service.dart';
@@ -15,8 +20,8 @@ final appInitProvider = StateNotifierProvider<AppInitNotifier, AppInitState>(
 class AppInitNotifier extends StateNotifier<AppInitState> {
   AppInitNotifier() : super(const AppInitLoading());
 
-  static const String _modelUrl =
-      'https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/main/gemma-4-E2B-it.litertlm';
+  static const String _modelFileName = 'gemma-4-E2B-it.litertlm';
+  static const String _zipAssetPath = 'assets/models/gemma.zip';
 
   static const double _totalSizeMB = 2594.0;
   static const int _windowSize = 5;
@@ -30,8 +35,7 @@ class AppInitNotifier extends StateNotifier<AppInitState> {
   Future<void> initialize() async {
     _logger.i('AppInitNotifier: Starting initialization...');
 
-    final modelId = _modelUrl.split('/').last;
-    final alreadyOnDisk = await FlutterGemma.isModelInstalled(modelId);
+    final alreadyOnDisk = await FlutterGemma.isModelInstalled(_modelFileName);
 
     if (FlutterGemma.hasActiveModel()) {
       _logger.i('AppInitNotifier: Active model found, loading...');
@@ -39,24 +43,57 @@ class AppInitNotifier extends StateNotifier<AppInitState> {
       _logger.i('AppInitNotifier: Model file exists on disk but not active, loading...');
     } else {
       state = const AppInitModelDownloading(progress: 0.0);
-      _logger.i('AppInitNotifier: Model not found, downloading...');
+      _logger.i('AppInitNotifier: Model not found, stitching from bundled chunks...');
 
       try {
-        await FlutterGemma.uninstallModel(modelId);
+        await FlutterGemma.uninstallModel(_modelFileName);
       } catch (_) {}
 
       try {
+        // Step 1: Stitch chunks from Assets
+        final appDir = await getApplicationDocumentsDirectory();
+        final targetFile = File('${appDir.path}/$_modelFileName');
+        
+        final manifest = await AssetManifest.loadFromAssetBundle(rootBundle);
+        final chunkPaths = manifest.listAssets()
+            .where((path) => path.startsWith('assets/models/model_part_'))
+            .toList()..sort();
+            
+        if (chunkPaths.isEmpty) {
+          throw Exception('No model chunks found in assets/models/');
+        }
+        
+        if (await targetFile.exists()) {
+          await targetFile.delete();
+        }
+        await targetFile.create(recursive: true);
+        
+        for (int i = 0; i < chunkPaths.length; i++) {
+          final data = await rootBundle.load(chunkPaths[i]);
+          await targetFile.writeAsBytes(data.buffer.asUint8List(), mode: FileMode.append, flush: true);
+          
+          final progress = (i + 1) / chunkPaths.length * 100.0;
+          _updateProgress(progress);
+        }
+
+        // Step 2: Install via fromFile
+        _logger.i('AppInitNotifier: Chunks stitched to ${targetFile.path}, installing model...');
         await FlutterGemma.installModel(
           modelType: ModelType.gemma4,
           fileType: ModelFileType.litertlm,
-        ).fromNetwork(_modelUrl).withProgress((progress) {
-          _updateProgress(progress.toDouble());
-        }).install();
+        ).fromFile(targetFile.path).install();
+        
+        // Clean up extracted temp file to save space if FlutterGemma copies it internally
+        try {
+          if (await targetFile.exists()) {
+            await targetFile.delete();
+          }
+        } catch (_) {}
       } catch (e) {
-        _logger.e('AppInitNotifier: Download failed: $e');
+        _logger.e('AppInitNotifier: Stitching/Installation failed: $e');
         state = AppInitModelFailed(
-          'Download gagal: $e\n\n'
-          'Pastikan koneksi internet stabil dan coba lagi.',
+          'Penyiapan model gagal: $e\n\n'
+          'Pastikan ruang penyimpanan cukup dan coba lagi.',
         );
         return;
       }

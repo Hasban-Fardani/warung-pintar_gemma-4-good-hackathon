@@ -69,6 +69,7 @@ dependencies:
 
   # Networking
   connectivity_plus: ^6.0.0
+  archive: ^4.0.9
 
 dev_dependencies:
   flutter_test:
@@ -100,6 +101,7 @@ flutter:
 
   assets:
     - assets/
+    - assets/models/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

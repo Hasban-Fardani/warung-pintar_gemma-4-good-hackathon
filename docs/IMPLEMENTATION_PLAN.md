@@ -15,7 +15,7 @@
 | Confirmed green: #059669 vs #1B6D24 | **#059669** | PRD §12.7 (WCAG validated) |
 | Gemma package | **flutter_gemma: ^0.2.0** | User approved |
 | Test mocking | **mocktail** (bukan mockito) | User confirmed |
-| Model delivery | **Download on first launch** (bukan bundle APK) | PRD §16.1 |
+| Model delivery | **Bundle via Git LFS ZIP + Local Extraction** | PRD §16.1 |
 | STT engine | **Android SpeechRecognizer API** (on-device, bukan cloud) | PRD §16.4 |
 | Inference timeout voice | **30 detik** | PRD §16.5 |
 | Inference timeout vision | **45 detik** | PRD §16.5 |
