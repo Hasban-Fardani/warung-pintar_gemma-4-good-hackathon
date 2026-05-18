@@ -41,6 +41,9 @@ class AppInitNotifier extends StateNotifier<AppInitState> {
         _logger.i('AppInitNotifier: No model file found, downloading...');
         await _downloadWithResume(modelFile);
       }
+
+      _logger.i('AppInitNotifier: Model installed, now loading into memory...');
+      await _loadModel();
     } catch (e, stack) {
       _logger.e('AppInitNotifier: Initialization failed', error: e, stackTrace: stack);
       state = AppInitModelFailed('Inisialisasi gagal: $e');
@@ -76,6 +79,7 @@ class AppInitNotifier extends StateNotifier<AppInitState> {
         throw Exception('Model file does not exist');
       }
 
+      _logger.i('AppInitNotifier: Calling FlutterGemma.installModel...');
       await FlutterGemma.installModel(
         modelType: ModelType.gemma4,
         fileType: ModelFileType.litertlm,
@@ -203,19 +207,25 @@ class AppInitNotifier extends StateNotifier<AppInitState> {
   }
 
   Future<void> _loadModel() async {
+    _logger.i('AppInitNotifier: _loadModel started, current state: $state');
     state = const AppInitLoading();
     _logger.i('AppInitNotifier: Loading model into memory...');
 
     try {
+      _logger.i('AppInitNotifier: Calling FlutterGemma.getActiveModel...');
       final model = await FlutterGemma.getActiveModel(
         preferredBackend: PreferredBackend.gpu,
       );
+      _logger.i('AppInitNotifier: getActiveModel returned, model: $model');
 
+      _logger.i('AppInitNotifier: Initializing GemmaService...');
       final gemmaService = getIt<GemmaService>();
       await gemmaService.initialize(model);
+      _logger.i('AppInitNotifier: GemmaService initialized');
 
-      _logger.i('AppInitNotifier: Model loaded successfully');
+      _logger.i('AppInitNotifier: Model loaded successfully, setting state to Ready');
       state = const AppInitModelReady();
+      _logger.i('AppInitNotifier: State is now: $state');
 
       await _initVoiceService();
     } catch (e, stack) {
