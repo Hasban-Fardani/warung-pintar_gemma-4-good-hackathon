@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_gemma/flutter_gemma.dart';
 import 'package:logger/logger.dart';
@@ -21,7 +22,6 @@ class AppInitNotifier extends StateNotifier<AppInitState> {
   static const String _modelUrl =
     'https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/main/gemma-4-E2B-it.litertlm';
   static const String _modelFileName = 'gemma-4-E2B-it.litertlm';
-  static const String _sideloadPath = '/sdcard/Download/$_modelFileName';
   static const double _minValidSizeBytes = 100 * 1024 * 1024;
 
   static final _logger = Logger(printer: PrettyPrinter(methodCount: 0));
@@ -29,6 +29,8 @@ class AppInitNotifier extends StateNotifier<AppInitState> {
     connectTimeout: Duration(seconds: 30),
     receiveTimeout: Duration(minutes: 30),
   ));
+
+  static const _mediaStoreChannel = MethodChannel('warung_pintar_cimahi/mediastore');
 
   Future<void> initialize() async {
     _logger.i('AppInitNotifier: Starting initialization...');
@@ -48,8 +50,8 @@ class AppInitNotifier extends StateNotifier<AppInitState> {
 
         final sideloaded = await _checkSideloadedModel();
         if (sideloaded != null) {
-          _logger.i('AppInitNotifier: Sideloaded model found, copying...');
-          await sideloaded.copy(modelFile.path);
+          _logger.i('AppInitNotifier: Sideloaded model found, copying via MediaStore...');
+          await _copyFromMediaStore(sideloaded, modelFile);
           final isValidAfterCopy = await _isModelFileValid(modelFile);
           if (isValidAfterCopy) {
             await _installFromFile(modelFile);
@@ -81,20 +83,47 @@ class AppInitNotifier extends StateNotifier<AppInitState> {
     return size > _minValidSizeBytes;
   }
 
-  Future<File?> _checkSideloadedModel() async {
+  /// Check for sideloaded model via MediaStore API (scoped storage compliant)
+  /// Returns content URI string if found, null otherwise
+  Future<String?> _checkSideloadedModel() async {
     try {
-      final sideloadFile = File(_sideloadPath);
-      if (await sideloadFile.exists()) {
-        final size = await sideloadFile.length();
-        _logger.i('AppInitNotifier: Sideloaded model found, size: ${(size / 1024 / 1024).toStringAsFixed(0)} MB');
-        if (size > _minValidSizeBytes) {
-          return sideloadFile;
-        }
+      if (!Platform.isAndroid) return null;
+
+      _logger.i('AppInitNotifier: Checking for sideloaded model via MediaStore...');
+      final result = await _mediaStoreChannel.invokeMethod<String>('findDownloadedFile', {
+        'fileName': _modelFileName,
+      });
+
+      if (result != null) {
+        _logger.i('AppInitNotifier: Sideloaded model found via MediaStore: $result');
+      } else {
+        _logger.i('AppInitNotifier: No sideloaded model found');
       }
+      return result;
+    } on PlatformException catch (e) {
+      _logger.w('AppInitNotifier: MediaStore query failed: ${e.message}');
+      return null;
     } catch (e) {
       _logger.w('AppInitNotifier: Sideload check failed: $e');
+      return null;
     }
-    return null;
+  }
+
+  /// Copy file from MediaStore content URI to app documents directory
+  Future<void> _copyFromMediaStore(String contentUri, File destination) async {
+    try {
+      final result = await _mediaStoreChannel.invokeMethod<bool>('copyFileFromMediaStore', {
+        'contentUri': contentUri,
+        'destinationPath': destination.path,
+      });
+
+      if (result != true) {
+        throw Exception('MediaStore copy returned false');
+      }
+      _logger.i('AppInitNotifier: Model copied successfully to ${destination.path}');
+    } on PlatformException catch (e) {
+      throw Exception('Failed to copy from MediaStore: ${e.message}');
+    }
   }
 
   Future<void> _installFromFile(File modelFile) async {
