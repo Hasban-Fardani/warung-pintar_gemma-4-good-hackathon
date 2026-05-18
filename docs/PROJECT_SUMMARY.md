@@ -220,9 +220,28 @@ NEVER CUT — REJECT SUBMISSION IF MISSING:
 
 ```
 MODEL DELIVERY
-• NOT bundled in APK (~2.5GB) → download on first launch via Dio + resume (Range header)
-• SHA-256 verify post-download, fallback URL to GitHub Releases
-• Progress UI: linear bar + % + ETA, blocking overlay until complete
+• NOT bundled in APK — model chunks approach was removed (caused OOM, slow build, no live reload)
+• Model file: gemma-4-E2B-it.litertlm (2.59 GB, .litertlm format for LiteRT-LM)
+• Source: litert-community/gemma-4-E2B-it-litert-lm on HuggingFace
+
+INIT ORDER (app_init_notifier.dart):
+  1. Check app documents dir — if file exists and size > 100MB → install via fromFile()
+  2. Check sideload path /sdcard/Download/gemma-4-E2B-it.litertlm — if valid → copy → install
+  3. Fallback: download via Dio with Range header resume support
+
+DEV WORKFLOW:
+  • Download model once to ~/Downloads/gemma-4-E2B-it.litertlm
+  • Run scripts/push_model.sh to ADB push to device before flutter run
+  • Script skips push if file already on device with matching size
+  • Alias: wp → push_model.sh && flutter run
+
+DOWNLOAD (fallback only):
+  • Dio with Range header for resume support
+  • Connection timeout: 30s | Receive timeout: 30 minutes
+  • Progress UI: circular indicator + % + speed (MB/s) + ETA
+  • Partial file deleted automatically on failure
+  • No SHA-256 verify (removed — unnecessary for hackathon scope)
+  • No GitHub Releases fallback (file is 2.59GB, exceeds GitHub 2GB limit)
 
 COLD START STATE MACHINE
 AppInitState: ModelDownloading → ModelLoading → ModelReady | ModelFailed | AiDegraded
@@ -259,6 +278,32 @@ VISION QUALITY GATE (BEFORE INFERENCE)
 
 ---
 
+## 🛠️ DEV TOOLING & SCRIPTS
+
+scripts/push_model.sh
+  • Checks if model exists at ~/Downloads/gemma-4-E2B-it.litertlm
+  • Connects via ADB, checks if device already has model with matching file size
+  • Skips push if size matches (avoids re-pushing 2.59GB unnecessarily)
+  • Pushes to /sdcard/Download/gemma-4-E2B-it.litertlm on device
+
+DAILY DEV WORKFLOW:
+  1. Connect Android device via USB
+  2. Run: ./scripts/push_model.sh && flutter run
+  3. App detects sideloaded model on first launch, copies to app documents dir
+  4. Subsequent launches use copy in app documents dir directly
+
+MODEL LOAD FLOW (app_init_notifier.dart):
+  AppInitLoading
+    → check app documents dir
+    → check /sdcard/Download/ sideload
+    → [if needed] _downloadWithResume() via Dio
+    → FlutterGemma.installModel().fromFile().install()
+    → FlutterGemma.getActiveModel(preferredBackend: gpu)
+    → GemmaService.initialize(model)
+  AppInitModelReady
+
+---
+
 ## 🎨 UI/UX NON-NEGOTIABLES (DESIGN.md + ERP PRINCIPLES)
 
 ```
@@ -282,7 +327,12 @@ FORMS (erp-principles.md)
 
 NAVIGATION (erp-principles.md)
 • Max 3 clicks for frequent tasks (Ibu Warsih daily workflow)
-• FAB expands to 3 modes: 🎤 Voice | 📷 Foto | ✏️ Manual
+• FAB (ExpandableFab) expands to 3 mini FABs ABOVE main FAB, arranged horizontally
+  - 🎤 Suara → /voice-input (disabled if AI not ready)
+  - 📷 Foto → PhotoSourceBottomSheet (disabled if AI not ready)
+  - ✏️ Manual → /transaction/new (always enabled)
+• No backdrop/overlay when FAB is expanded
+• Mini FABs animate with SlideTransition + FadeTransition + ScaleTransition
 • Pending banner always on top if pending exists: "⏳ N transaksi pending [🎤 Konfirmasi]"
 ```
 
@@ -317,14 +367,18 @@ dependencies:
   flutter_riverpod: ^2.6.0    # State management (AutoDispose)
   get_it: ^7.6.0              # DI (service locator)
   go_router: ^14.0.0          # Declarative navigation
-  flutter_gemma: ^0.2.0       # LiteRT-LM on-device inference
+  flutter_gemma: ^0.14.x      # LiteRT-LM on-device inference (NOT ^0.2.0)
   speech_to_text: ^7.0.0      # Android on-device STT
   sqflite: ^2.3.0             # SQLite with WAL
   uuid: ^4.3.3                # UUIDv7 for offline-first PKs
   intl: ^0.19.0               # Currency formatting (id-ID)
-  dio: ^5.4.0                 # Model download with resume
+  dio: ^5.4.0                 # Model download with resume (Range header)
   crypto: ^3.0.3              # SHA-256 verification
-  # ... (see full PRD Appendix B for complete list)
+  logger: latest              # Structured logging (PrettyPrinter)
+  path_provider: latest       # App documents directory for model storage
+  injectable: ^2.6.0          # GetIt code generation
+  freezed: ^2.5.0             # Immutable state classes
+  fpdart: ^1.1.0              # Either/Result pattern
 ```
 
 ---

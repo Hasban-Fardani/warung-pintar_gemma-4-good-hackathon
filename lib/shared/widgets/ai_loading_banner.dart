@@ -28,9 +28,6 @@ class AiLoadingBanner extends ConsumerWidget {
   ) {
     final percentText = '${(progress * 100).toStringAsFixed(1)}%';
     final downloadedMB = (progress * 2594).toStringAsFixed(0);
-    final speedText = speedMBps > 0
-        ? '${speedMBps.toStringAsFixed(1)} MB/s'
-        : 'menghitung...';
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -52,20 +49,12 @@ class AiLoadingBanner extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Mengunduh model AI... $percentText',
+                      'Menyatukan model AI... $percentText',
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: const Color(0xFF856404),
                       ),
-                    ),
-                    const SizedBox(height: 2),
-                    Row(
-                      children: [
-                        _InfoChip(icon: Icons.speed, text: speedText),
-                        const SizedBox(width: 8),
-                        _InfoChip(icon: Icons.access_time, text: 'Sisa: $eta'),
-                      ],
                     ),
                   ],
                 ),

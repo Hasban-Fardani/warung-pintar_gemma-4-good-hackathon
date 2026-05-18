@@ -1,24 +1,38 @@
 #!/bin/bash
 
-MODEL_SRC="/Users/antonioperez/Desktop/hasban/sampingan/warung_pintar_cimahi/gemma_model/gemma-4-E2B-it.litertlm"
-PACKAGE="com.example.warung_pintar_cimahi"
-DEVICE="0O14219I22103DF3"  # USB device — lebih stabil dari WiFi ADB
+MODEL_NAME="gemma-4-E2B-it.litertlm"
+LOCAL_PATH="$HOME/Downloads/$MODEL_NAME"
+ANDROID_PATH="/sdcard/Download/$MODEL_NAME"
 
-echo "Using device: $DEVICE"
+echo "🔍 Checking local model..."
 
-echo "Creating models directory..."
-adb -s $DEVICE shell run-as $PACKAGE mkdir -p app_flutter/models
+if [ ! -f "$LOCAL_PATH" ]; then
+  echo "❌ Model not found at $LOCAL_PATH"
+  echo "   Download dulu dari HuggingFace ke ~/Downloads/"
+  exit 1
+fi
 
-echo "Pushing model (2.59GB)..."
-adb -s $DEVICE push "$MODEL_SRC" /sdcard/gemma-4-E2B-it.litertlm
+echo "📱 Checking ADB connection..."
+if ! adb devices | grep -q "device$"; then
+  echo "❌ No Android device connected"
+  exit 1
+fi
 
-echo "Moving to app directory..."
-adb -s $DEVICE shell run-as $PACKAGE cp /sdcard/gemma-4-E2B-it.litertlm app_flutter/models/gemma-4-E2B-it.litertlm
+# Cek apakah model sudah ada di device dan ukurannya sama
+LOCAL_SIZE=$(stat -f%z "$LOCAL_PATH" 2>/dev/null || stat -c%s "$LOCAL_PATH")
+REMOTE_SIZE=$(adb shell stat -c%s "$ANDROID_PATH" 2>/dev/null || echo "0")
 
-echo "Cleaning sdcard..."
-adb -s $DEVICE shell rm /sdcard/gemma-4-E2B-it.litertlm
+if [ "$LOCAL_SIZE" = "$REMOTE_SIZE" ]; then
+  echo "✅ Model already on device (size match: $LOCAL_SIZE bytes), skipping push"
+  exit 0
+fi
 
-echo "Verifying..."
-adb -s $DEVICE shell run-as $PACKAGE ls -lh app_flutter/models/
+echo "⬆️  Pushing model to device ($((LOCAL_SIZE / 1024 / 1024)) MB)..."
+adb push "$LOCAL_PATH" "$ANDROID_PATH"
 
-echo "Done. Kill and restart the app."
+if [ $? -eq 0 ]; then
+  echo "✅ Model pushed successfully to $ANDROID_PATH"
+else
+  echo "❌ Push failed"
+  exit 1
+fi

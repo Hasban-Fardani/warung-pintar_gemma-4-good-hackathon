@@ -238,6 +238,17 @@ freezed: ^2.5.0
 
 ---
 
+MODEL DELIVERY  : 
+  1. DEV: Auto-push via scripts/push_model.sh sebelum flutter run
+           Model source : ~/Downloads/gemma-4-E2B-it.litertlm
+           Android dest : /sdcard/Download/gemma-4-E2B-it.litertlm
+           App checks sideload path dulu sebelum network download
+  2. PROD: Download via Dio (resume support, Range header), NOT bundled in APK
+  
+  INIT ORDER (app_init_notifier.dart):
+    1. Cek app documents dir — jika valid (>100MB) → install langsung
+    2. Cek /sdcard/Download/gemma-4-E2B-it.litertlm — jika valid → copy → install
+    3. Fallback: download dari _modelUrl via Dio
 ## ✅ SUBMISSION PROOF CHECKLIST
 
 ```

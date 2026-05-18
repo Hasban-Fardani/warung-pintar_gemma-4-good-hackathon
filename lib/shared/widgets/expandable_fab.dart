@@ -76,33 +76,16 @@ class _ExpandableFabState extends ConsumerState<ExpandableFab>
       clipBehavior: Clip.none,
       alignment: Alignment.bottomCenter,
       children: [
-        if (_expanded) _buildBackdrop(),
         if (_expanded && isAiReady) _buildMiniFabs(),
         _buildMainFab(isAiDisabled),
       ],
     );
   }
 
-  Widget _buildBackdrop() {
-    return Positioned.fill(
-      child: GestureDetector(
-        onTap: _close,
-        child: AnimatedBuilder(
-          animation: _controller,
-          builder: (context, child) {
-            return Container(
-              color: Colors.black.withValues(alpha: 0.5 * _controller.value),
-            );
-          },
-        ),
-      ),
-    );
-  }
-
   Widget _buildMiniFabs() {
     return Positioned(
-      bottom: 0,
-      right: 32,
+      bottom: 72,
+      right: 0,
       child: AnimatedBuilder(
         animation: _controller,
         builder: (context, child) {
