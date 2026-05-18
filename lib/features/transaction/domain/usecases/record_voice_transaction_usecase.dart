@@ -1,9 +1,13 @@
+import 'dart:convert';
+
 import 'package:warung_pintar_cimahi/core/ai/ai_service.dart';
 import 'package:warung_pintar_cimahi/core/ai/inference_retry.dart';
 import 'package:warung_pintar_cimahi/core/ai/fallback/level1_json_repair.dart';
+import 'package:warung_pintar_cimahi/core/ai/prompts/voice_transaction_prompt.dart';
+import 'package:warung_pintar_cimahi/core/ai/tool_call_result.dart';
 import 'package:warung_pintar_cimahi/core/error/result.dart';
 import 'package:warung_pintar_cimahi/core/error/failures.dart';
-import 'package:warung_pintar_cimahi/core/ai/tool_call_result.dart';
+import 'package:warung_pintar_cimahi/core/utils/uuid_helper.dart';
 import 'package:warung_pintar_cimahi/features/transaction/domain/repositories/transaction_repository.dart';
 
 class RecordVoiceTransactionUseCase {
@@ -12,23 +16,10 @@ class RecordVoiceTransactionUseCase {
 
   const RecordVoiceTransactionUseCase(this._aiService, this._repository);
 
-  static const _systemPrompt = '''
-Kamu kasir WarungPintar. Ubah ucapan pengguna menjadi transaksi JSON.
-Aturan wajib:
-- "jual"/"laku"/"terjual" = sell (pemasukan)
-- "beli"/"kulakan"/"stok"/"masuk" = buy (pengeluaran)
-- total_price_sen = total rupiah × 100 (bukan per satuan)
-- Harga harus integer bulat, TIDAK boleh float
-- Jika harga tidak disebutkan, gunakan default_price_sen dari konteks
-- Jika item ambigu, set needs_clarification: true
-- Jangan pernah menebak harga jika tidak ada default
-- Output HANYA JSON valid, tanpa markdown fence, tanpa teks lain
-''';
-
   Future<Result<String, String>> call(String transcript) async {
     final inferenceResult = await InferenceRetry.runWithRetry(
       aiService: _aiService,
-      systemPrompt: _systemPrompt,
+      systemPrompt: voiceTransactionSystemPrompt,
       userInput: transcript,
     );
 
@@ -53,24 +44,35 @@ Aturan wajib:
       return const Failure('Tidak ada transaksi yang terdeteksi');
     }
 
+    // Build raw AI output string for audit trail
+    final aiRawOutput = jsonEncode({
+      'name': toolCall.name,
+      'arguments': toolCall.arguments,
+    });
+
     int count = 0;
     for (final tx in transactions) {
       if (tx is! Map) continue;
+
+      final priceSen = (tx['price_sen'] as num?)?.toInt() ?? 0;
+      final quantity = (tx['quantity'] as num?)?.toInt() ?? 1;
+
       final result = await _repository.insertPending(
-        idempotencyKey: tx['idempotency_key']?.toString() ?? '',
-        itemName: tx['item_name']?.toString() ?? '',
-        quantity: (tx['quantity'] as num?)?.toInt() ?? 1,
-        amountSen: (tx['total_price_sen'] as num?)?.toInt() ?? 0,
-        priceAtTransactionSen: (tx['total_price_sen'] as num?)?.toInt() ?? 0,
+        idempotencyKey: UuidHelper.generateIdempotencyKey(),
+        itemName: tx['name']?.toString() ?? '',
+        quantity: quantity,
+        amountSen: priceSen * quantity,
+        priceAtTransactionSen: priceSen,
         transactionType: tx['transaction_type']?.toString() ?? 'sell',
         inputMethod: 'voice',
         needsClarification: tx['needs_clarification'] == true,
         rawInputSource: transcript,
+        aiRawOutput: aiRawOutput,
       );
       if (result is Success) count++;
     }
 
-    return Success('$count transaksi dicatat');
+    return Success('$count transaksi dicatat sebagai pending');
   }
 
   Future<Result<String, String>> _attemptRepair(
@@ -80,7 +82,7 @@ Aturan wajib:
     if (error is InvalidJsonOutputFailure) {
       final repairResult = await Level1JsonRepair.attempt(
         aiService: _aiService,
-        systemPrompt: _systemPrompt,
+        systemPrompt: voiceTransactionSystemPrompt,
         userInput: transcript,
         rawMalformedOutput: error.rawOutput,
       );

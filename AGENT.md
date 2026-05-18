@@ -246,9 +246,10 @@ MODEL DELIVERY  :
   2. PROD: Download via Dio (resume support, Range header), NOT bundled in APK
   
   INIT ORDER (app_init_notifier.dart):
-    1. Cek app documents dir — jika valid (>100MB) → install langsung
-    2. Cek /sdcard/Download/gemma-4-E2B-it.litertlm — jika valid → copy → install
-    3. Fallback: download dari _modelUrl via Dio
+    1. Cek app documents dir — jika valid (>2GB, size match) → install langsung
+    2. Cek /sdcard/Download/gemma-4-E2B-it.litertlm — jika valid → copy ke app docs → uninstall stale metadata → install
+    3. Fallback: download dari _modelUrl via Dio (resume support, Range header)
+    4. Recovery: jika model load gagal → retry dari sideload jika tersedia
 ## ✅ SUBMISSION PROOF CHECKLIST
 
 ```

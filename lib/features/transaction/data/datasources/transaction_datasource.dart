@@ -22,6 +22,8 @@ class TransactionDatasource {
     required String transactionType,
     required String inputMethod,
     bool needsClarification = false,
+    String? rawInputSource,
+    String? aiRawOutput,
   }) async {
     final id = UuidHelper.generateId();
 
@@ -37,6 +39,8 @@ class TransactionDatasource {
         'status': 'pending',
         'needs_clarification': needsClarification ? 1 : 0,
         'input_method': inputMethod,
+        'raw_input_source': rawInputSource,
+        'ai_raw_output': aiRawOutput,
       });
       _logger.d('TransactionDatasource: Inserted pending tx=$id');
       return id;
@@ -99,6 +103,17 @@ class TransactionDatasource {
       limit: limit,
     );
     return rows.map((r) => TransactionModel.fromMap(r)).toList();
+  }
+
+  Future<TransactionModel?> getById(String id) async {
+    final rows = await _db.db.query(
+      'transactions',
+      where: 'id = ? AND is_deleted = ?',
+      whereArgs: [id, 0],
+      limit: 1,
+    );
+    if (rows.isEmpty) return null;
+    return TransactionModel.fromMap(rows.first);
   }
 
   Future<void> insertAuditLog({

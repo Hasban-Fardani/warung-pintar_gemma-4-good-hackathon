@@ -10,6 +10,7 @@ import '../../features/onboarding/presentation/pages/model_download_screen.dart'
 import '../../features/reports/presentation/pages/reports_page.dart';
 import '../../features/settings/presentation/pages/settings_page.dart';
 import '../../features/transaction/presentation/pages/pending_transactions_page.dart';
+import '../../features/transaction/presentation/pages/pending_detail_page.dart';
 import '../../features/transaction/presentation/pages/voice_confirm_page.dart';
 import '../../features/transaction/presentation/pages/voice_input_page.dart';
 import '../../features/transaction/presentation/pages/transaction_form_page.dart';
@@ -132,6 +133,13 @@ final appRouter = GoRouter(
       builder: (context, state) => const PendingTransactionsPage(),
     ),
     GoRoute(
+      path: '/pending/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id']!;
+        return PendingDetailPage(transactionId: id);
+      },
+    ),
+    GoRoute(
       path: '/voice-input',
       builder: (context, state) => const VoiceInputPage(),
     ),
@@ -141,6 +149,10 @@ final appRouter = GoRouter(
     ),
     GoRoute(
       path: '/transaction/new',
+      builder: (context, state) => const TransactionFormPage(),
+    ),
+    GoRoute(
+      path: '/transaction/edit/:id',
       builder: (context, state) => const TransactionFormPage(),
     ),
     GoRoute(

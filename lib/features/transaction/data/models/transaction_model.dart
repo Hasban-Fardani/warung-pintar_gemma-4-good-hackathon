@@ -13,6 +13,8 @@ class TransactionModel {
   final String inputMethod;
   final String? confirmedAt;
   final String createdAt;
+  final String? rawInputSource;
+  final String? aiRawOutput;
 
   const TransactionModel({
     required this.id,
@@ -27,6 +29,8 @@ class TransactionModel {
     required this.inputMethod,
     this.confirmedAt,
     required this.createdAt,
+    this.rawInputSource,
+    this.aiRawOutput,
   });
 
   factory TransactionModel.fromMap(Map<String, dynamic> map) {
@@ -43,6 +47,8 @@ class TransactionModel {
       inputMethod: map['input_method'] as String,
       confirmedAt: map['confirmed_at'] as String?,
       createdAt: map['created_at'] as String,
+      rawInputSource: map['raw_input_source'] as String?,
+      aiRawOutput: map['ai_raw_output'] as String?,
     );
   }
 
@@ -69,6 +75,8 @@ class TransactionModel {
       },
       confirmedAt: confirmedAt != null ? DateTime.parse(confirmedAt!) : null,
       createdAt: DateTime.parse(createdAt),
+      rawInputSource: rawInputSource,
+      aiRawOutput: aiRawOutput,
     );
   }
 }

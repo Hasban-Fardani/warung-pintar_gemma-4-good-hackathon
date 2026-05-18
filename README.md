@@ -5,11 +5,12 @@
   <img src="https://img.shields.io/badge/Dart-3.6+-0175C2?style=flat-square&logo=dart" alt="Dart">
   <img src="https://img.shields.io/badge/AI-Gemma%204%20E2B-FF6B6B?style=flat-square" alt="Gemma 4">
   <img src="https://img.shields.io/badge/License-Apache%202.0-green?style=flat-square" alt="License">
+  <img src="https://img.shields.io/badge/Offline-First-brightgreen?style=flat-square" alt="Offline First">
 </p>
 
 > **Gemma 4 Good Hackathon** — Digital Equity & LiteRT Track
 
-An offline-first, AI-powered ERP application for Indonesian micro-SMB owners (warung). Built with Flutter + Gemma 4 E2B, featuring voice transactions, multimodal vision parsing, and a non-blocking pending workflow — all running 100% offline on-device.
+An offline-first, AI-powered ERP application for Indonesian micro-SMB owners (**warung**). Built with Flutter + Gemma 4 E2B (LiteRT-LM), featuring voice transactions, multimodal vision parsing, and a non-blocking pending workflow — all running 100% offline on-device with zero network calls after model initialization.
 
 ---
 
@@ -25,6 +26,15 @@ An offline-first, AI-powered ERP application for Indonesian micro-SMB owners (wa
 | **Agent 4** | Vision receipt parsing — foto struk → pending queue |
 | **Agent 5** | Vision product cataloging — foto kemasan → pre-filled master data |
 
+### 🧠 AI Runtime Resilience
+
+- **Model download with resume** — interrupted downloads resume via `Range` header
+- **Sideload support** — push model via ADB to `/sdcard/Download/` for fast dev iteration; app detects it automatically before attempting network download
+- **File integrity validation** — rejects corrupted/partial models (<2.2 GB) before attempting to load
+- **Stale metadata cleanup** — calls `FlutterGemma.uninstallModel()` before re-installing to prevent stale cache issues
+- **Android scoped storage** — uses streaming copy (`openRead`/`openWrite`) instead of `File.copy()` to handle cross-mount `Permission denied` errors
+- **`MANAGE_EXTERNAL_STORAGE` permission** — requested at runtime for sideload path access on Android 11+
+
 ### 🏗️ Enterprise-Grade Architecture
 
 - **Offline-First** — 0 network requests after model download
@@ -32,6 +42,15 @@ An offline-first, AI-powered ERP application for Indonesian micro-SMB owners (wa
 - **Immutable Price History** — past transactions never affected by price changes
 - **Idempotency Protection** — double-tap proof via UUID + unique constraint
 - **Audit Log** — raw AI JSON output stored verbatim for every transaction
+- **Per-item Pricing** — each transaction item stores `price_sen` (price per unit × 100) independently
+
+### 🗣️ Voice Transaction Enhancements
+
+- **Persistent STT** — auto-restart on pause/done so users can speak freely without time pressure
+- **STT status indicator** — visual chip shows "Jeda..." when speech recognition is paused
+- **Credit handling** — `"nanti bayar"` / `"utang"` detected via `needs_clarification` flag
+- **AI prompt with examples** — improved prompting with real-world transaction examples in Bahasa Indonesia
+- **Pending detail page** — view individual pending transaction details before confirmation
 
 ### 📱 Accessibility-First UI
 
@@ -68,33 +87,33 @@ cd warung-pintar_gemma-4-good-hackathon
 flutter pub get
 ```
 
-### 3. Build Debug APK
+### 3. Push AI Model to Device (Development)
+
+The Gemma 4 E2B model (~2.6 GB) is **not bundled** in the APK. For development, push it via ADB:
+
+```bash
+# Download the model from HuggingFace:
+# https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm
+
+# Place it at ~/Downloads/gemma-4-E2B-it.litertlm, then:
+./scripts/push_model.sh
+
+# Build and install the app
+flutter run
+```
+
+On first launch, the app will:
+1. Check `getApplicationDocumentsDirectory()` for an existing valid model (≥2.2 GB)
+2. Check `/storage/emulated/0/Download/gemma-4-E2B-it.litertlm` for a sideloaded model
+3. Fall back to downloading from HuggingFace
+
+### 4. Build Debug APK
 
 ```bash
 flutter build apk --debug
 ```
 
 The APK will be at `build/app/outputs/flutter-apk/app-debug.apk`.
-
-### 4. Install on Device
-
-```bash
-flutter install
-```
-
----
-
-## First Launch — Model Download
-
-On first launch, the app downloads the **Gemma 4 E2B model (~2.6 GB)** from HuggingFace. This happens only once.
-
-The download screen shows:
-- Real-time progress percentage
-- Download speed (MB/s)
-- Estimated time remaining
-- Downloaded / Total MB
-
-**⚠️ Important:** Do not close the app during download. After download completes, the app runs 100% offline.
 
 ---
 
@@ -105,12 +124,22 @@ The download screen shows:
 ```
 App Launch
     │
-    ├── Model already installed?
-    │       ├── YES → Load model → Dashboard
+    ├── 📁 App docs dir has valid model (≥2.2 GB)?
+    │       ├── YES → Install & Load → Dashboard
     │       │
-    │       └── NO  → Download model (~2.6 GB)
+    │       └── NO  → 🔒 Request MANAGE_EXTERNAL_STORAGE
     │                   │
-    │                   └── Complete → Load model → Dashboard
+    │                   ├── 📁 /sdcard/Download/ has valid model?
+    │                   │       ├── YES → Streaming copy to app docs
+    │                   │       │        → Uninstall stale metadata
+    │                   │       │        → Install & Load → Dashboard
+    │                   │       │
+    │                   │       └── NO  → 🌐 Download model (~2.6 GB)
+    │                   │                   │
+    │                   │                   └── Resume supported
+    │                   │                        → Install & Load → Dashboard
+    │                   │
+    │                   └── (retry & recovery on failure)
     │
     └── Dashboard Ready
             ├── AI features active (voice, camera)
@@ -124,7 +153,9 @@ User taps Voice FAB 🎤
     │
     ├── Speak: "Jual beras 3 kilo 45 ribu, kopi 2 saset 6 ribu"
     │
-    ├── AI parses → multiple pending transactions
+    ├── STT streams transcript → AI parses via Gemma 4 E2B
+    │
+    ├── Multi-item pending transactions created
     │
     └── Dashboard shows pending banner
             │
@@ -159,29 +190,32 @@ User taps Camera FAB 📷 → "Foto Struk Supplier"
 | Dependency Injection | GetIt 7.6+ |
 | Routing | GoRouter 14.0+ |
 | Database | SQLite (WAL mode) |
-| AI Runtime | Gemma 4 E2B via LiteRT-LM |
-| Speech-to-Text | speech_to_text |
+| AI Runtime | Gemma 4 E2B via LiteRT-LM (FFI) |
+| Speech-to-Text | speech_to_text (Android SpeechRecognizer) |
 | Vision | flutter_gemma multimodal |
 
-### Clean Architecture Folder Structure
+### Project Structure
 
 ```
 lib/
 ├── core/
-│   ├── constant/       # Colors, strings
-│   ├── database/       # SQLite service, migrations
-│   ├── ai/            # Gemma service, prompts, parsers
-│   ├── di/            # GetIt injection
-│   ├── router/        # GoRouter configuration
-│   ├── error/         # Failures, Result pattern
-│   └── utils/         # Formatters, helpers
+│   ├── ai/              # Gemma service, prompts, init notifier, parsers
+│   ├── constant/        # Colors, strings, app-wide constants
+│   ├── database/        # SQLite service, migrations, WAL mode
+│   ├── di/              # GetIt + injectable registration
+│   ├── router/          # GoRouter + StatefulShellRoute
+│   ├── error/           # Sealed AiFailure hierarchy, Result pattern
+│   ├── utils/           # Money formatters, helpers
+│   └── voice/           # Voice service abstraction & implementation
 ├── features/
-│   ├── onboarding/    # Agent 1: conversational setup
-│   ├── transaction/    # Agents 2, 3: voice transactions
-│   ├── vision/        # Agents 4, 5: receipt & product parsing
-│   ├── catalog/        # Master data: items, categories
-│   ├── dashboard/      # Bento box, banners
-│   └── reports/        # PDF/CSV export
+│   ├── onboarding/      # Agent 1: conversational setup
+│   ├── transaction/     # Agents 2, 3: voice tx, pending confirmation
+│   ├── vision/          # Agents 4, 5: receipt & product parsing
+│   ├── catalog/         # Master data: items, categories, price history
+│   ├── dashboard/       # Bento box layout, pending banner, FAB
+│   └── reports/         # PDF/CSV export
+├── shared/
+│   └── widgets/         # Reusable widgets (FAB, banners, etc.)
 └── main.dart
 ```
 
@@ -190,17 +224,42 @@ lib/
 All state uses Riverpod with a **sealed class hierarchy** for exhaustive pattern matching:
 
 ```dart
-// Example: Transaction state
-sealed class TransactionState {}
-final class TransactionIdle extends TransactionState {}
-final class TransactionLoading extends TransactionState {}
-final class TransactionLoaded extends TransactionState {
-  final List<Transaction> transactions;
+// Example: App initialization state
+sealed class AppInitState {}
+final class AppInitLoading extends AppInitState {}
+final class AppInitModelDownloading extends AppInitState {
+  final double progress;
+  final double speedMBps;
+  final String eta;
 }
-final class TransactionError extends TransactionState {
-  final String message;
+final class AppInitModelReady extends AppInitState {}
+final class AppInitModelFailed extends AppInitState {
+  final String reason;
+}
+final class AppInitAiDegraded extends AppInitState {
+  final String reason;
 }
 ```
+
+### Routes
+
+| Route | Page | Purpose |
+|-------|------|---------|
+| `/` | DashboardScreen | Main dashboard with bento layout |
+| `/model-download` | ModelDownloadScreen | First-launch model download |
+| `/onboarding` | OnboardingWelcomePage | Agent 1: voice onboarding |
+| `/pending` | PendingTransactionsPage | Pending transaction list |
+| `/pending/:id` | PendingDetailPage | Single pending transaction detail |
+| `/voice-input` | VoiceInputPage | Agent 2: voice transaction input |
+| `/voice-confirm` | VoiceConfirmPage | Agent 3: voice bulk confirmation |
+| `/transaction/new` | TransactionFormPage | Manual transaction form |
+| `/transaction/edit/:id` | TransactionFormPage | Edit existing transaction |
+| `/receipt-capture` | ReceiptCapturePage | Agent 4: receipt photo |
+| `/product-capture` | ProductCapturePage | Agent 5: product photo |
+| `/catalog` | CatalogListPage | Item master data |
+| `/catalog/categories` | CategoryManagementPage | Category management |
+| `/settings` | SettingsPage | App settings |
+| `/reports` | ReportsPage | CSV/PDF export |
 
 ---
 
@@ -208,9 +267,10 @@ final class TransactionError extends TransactionState {
 
 After the initial model download:
 
-- ✅ Zero network requests
-- ✅ All AI inference runs on-device via LiteRT-LM
-- ✅ All data stored in local SQLite
+- ✅ Zero network requests during normal operation
+- ✅ All AI inference runs on-device via LiteRT-LM (FFI)
+- ✅ All data stored in local SQLite (WAL mode)
+- ✅ Android SpeechRecognizer works offline (id-ID language pack)
 - ✅ Works in Airplane Mode
 
 ---
@@ -229,9 +289,14 @@ flutter build appbundle --release
 
 ## Project Status
 
-| Feature | Status |
-|---------|--------|
+| Area | Status |
+|------|--------|
 | Gemma 4 E2B model loading | ✅ Complete |
+| Model download with resume | ✅ Complete |
+| Sideload via ADB (`/sdcard/Download/`) | ✅ Complete |
+| File integrity validation (≥2.2GB) | ✅ Complete |
+| Scoped storage streaming copy | ✅ Complete |
+| Stale metadata cleanup on reinstall | ✅ Complete |
 | Agent 1: Onboarding | ✅ Complete |
 | Agent 2: Voice transactions | ✅ Complete |
 | Agent 3: Pending confirmation | ✅ Complete |
@@ -239,10 +304,14 @@ flutter build appbundle --release
 | Agent 5: Vision product cataloging | ✅ Complete |
 | Non-blocking pending workflow | ✅ Complete |
 | Immutable price history | ✅ Complete |
+| Per-item pricing (`price_sen`) | ✅ Complete |
 | Audit log with raw AI JSON | ✅ Complete |
+| STT auto-restart on pause | ✅ Complete |
+| Pending detail page | ✅ Complete |
+| Edit transaction route | ✅ Complete |
 | SQLite with WAL mode | ✅ Complete |
-| GoRouter navigation | ✅ Complete |
-| GetIt dependency injection | ✅ Complete |
+| GoRouter + StatefulShell navigation | ✅ Complete |
+| GetIt + injectable DI | ✅ Complete |
 | Riverpod state management | ✅ Complete |
 
 ---

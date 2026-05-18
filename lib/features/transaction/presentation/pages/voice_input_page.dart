@@ -10,6 +10,8 @@ import 'package:warung_pintar_cimahi/core/di/injection.dart';
 import 'package:warung_pintar_cimahi/core/voice/voice_init_result.dart';
 import 'package:warung_pintar_cimahi/core/voice/voice_service_impl.dart';
 import 'package:warung_pintar_cimahi/features/transaction/presentation/widgets/waveform_widget.dart';
+import 'package:warung_pintar_cimahi/features/transaction/presentation/providers/voice_transaction_notifier.dart';
+import 'package:warung_pintar_cimahi/features/transaction/presentation/providers/pending_confirm_notifier.dart';
 import 'package:intl/intl.dart';
 
 enum VoiceInputState { idle, listening, processing, result, error }
@@ -48,6 +50,7 @@ class _VoiceInputPageState extends ConsumerState<VoiceInputPage>
   VoiceInputState _state = VoiceInputState.idle;
   bool _isUserStillRecording = false;
   bool _isInitialized = false;
+  bool _isSttPaused = false;
   String _fullTranscript = '';
   Timer? _timer;
   int _elapsedSeconds = 0;
@@ -91,6 +94,24 @@ class _VoiceInputPageState extends ConsumerState<VoiceInputPage>
       return;
     }
 
+    // Initialize local SpeechToText instance with status listener
+    await _speech.initialize(
+      onStatus: (status) {
+        if (!mounted) return;
+        setState(() {
+          _isSttPaused = status == 'notListening' || status == 'paused';
+        });
+        if ((status == 'done' || status == 'notListening') && _isUserStillRecording) {
+          _restartListening();
+        }
+      },
+      onError: (error) {
+        if (!mounted) return;
+        // ignore: avoid_print
+        print('STT Error: $error');
+      },
+    );
+
     setState(() => _isInitialized = true);
     await _startListening();
   }
@@ -101,6 +122,7 @@ class _VoiceInputPageState extends ConsumerState<VoiceInputPage>
     setState(() {
       _state = VoiceInputState.listening;
       _isUserStillRecording = true;
+      _isSttPaused = false;
       _fullTranscript = '';
       _transcriptController.clear();
       _elapsedSeconds = 0;
@@ -196,42 +218,44 @@ class _VoiceInputPageState extends ConsumerState<VoiceInputPage>
   }
 
   Future<void> _processTranscript(String transcript) async {
-    try {
-      final draftItems = await _mockParseTranscript(transcript);
+    setState(() => _state = VoiceInputState.processing);
 
-      if (draftItems != null && draftItems.isNotEmpty) {
+    await ref.read(voiceTransactionProvider.notifier).processTranscript(transcript);
+
+    final vtState = ref.read(voiceTransactionProvider);
+
+    if (vtState.isProcessing == false && vtState.resultMessage != null) {
+      await ref.read(pendingConfirmProvider.notifier).loadPending();
+      final pendingState = ref.read(pendingConfirmProvider);
+
+      if (pendingState.items.isNotEmpty) {
         setState(() {
-          _draftItems = draftItems;
-          _totalSen = _draftItems.fold(0, (sum, item) => sum + item.priceSen * item.quantity);
+          _draftItems = pendingState.items
+              .take(10)
+              .map((e) => DraftTransactionItem(
+                    name: e.itemName,
+                    quantity: e.quantity,
+                    priceSen: e.priceAtTransactionSen,
+                  ))
+              .toList();
+          _totalSen = _draftItems.fold(
+            0,
+            (sum, item) => sum + (item.priceSen * item.quantity),
+          );
           _state = VoiceInputState.result;
         });
       } else {
         setState(() {
           _state = VoiceInputState.error;
-          _errorMessage = 'Tidak dapat memahami transaksi';
+          _errorMessage = 'Tidak ada transaksi yang berhasil dicatat';
         });
       }
-    } catch (e) {
+    } else {
       setState(() {
         _state = VoiceInputState.error;
-        _errorMessage = 'Terjadi kesalahan: ${e.toString()}';
+        _errorMessage = vtState.resultMessage ?? 'Terjadi kesalahan';
       });
     }
-  }
-
-  Future<List<DraftTransactionItem>?> _mockParseTranscript(String transcript) async {
-    await Future.delayed(const Duration(seconds: 1));
-
-    if (transcript.toLowerCase().contains('indomie') ||
-        transcript.toLowerCase().contains('aqua') ||
-        transcript.toLowerCase().contains('rokok')) {
-      return [
-        const DraftTransactionItem(name: 'Inomie Goreng', quantity: 3, priceSen: 350000),
-        const DraftTransactionItem(name: 'Aqua Botol 600ml', quantity: 2, priceSen: 400000),
-        const DraftTransactionItem(name: 'Rokok Surya 1 Pak', quantity: 1, priceSen: 250000),
-      ];
-    }
-    return null;
   }
 
   void _onCancel() {
@@ -256,11 +280,11 @@ class _VoiceInputPageState extends ConsumerState<VoiceInputPage>
   }
 
   void _onConfirm() {
-    context.go('/pending');
+    context.push('/voice-confirm');
   }
 
   void _onEditManual() {
-    context.go('/transaction/form');
+    context.go('/transaction/new');
   }
 
   @override
@@ -379,6 +403,8 @@ class _VoiceInputPageState extends ConsumerState<VoiceInputPage>
       child: Column(
         children: [
           const Spacer(),
+          _SttStatusChip(isPaused: _isSttPaused),
+          const SizedBox(height: 16),
           FadeTransition(
             opacity: _pulseAnimation,
             child: Container(
@@ -552,10 +578,12 @@ class _VoiceInputPageState extends ConsumerState<VoiceInputPage>
                             fontSize: 16,
                             color: AppColors.onSurface,
                           ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       Text(
-                        '${item.quantity} × ${item.priceDisplay}',
+                        '${item.quantity} \u00D7 ${item.priceDisplay}',
                         style: const TextStyle(
                           fontSize: 16,
                           fontFeatures: [FontFeature.tabularFigures()],
@@ -717,6 +745,65 @@ class _VoiceInputPageState extends ConsumerState<VoiceInputPage>
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _SttStatusChip extends StatelessWidget {
+  final bool isPaused;
+
+  const _SttStatusChip({required this.isPaused});
+
+  @override
+  Widget build(BuildContext context) {
+    if (isPaused) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: AppColors.surfaceContainerHigh,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: AppColors.outlineVariant),
+        ),
+        child: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.pause_circle_outline, size: 20, color: AppColors.onSurfaceVariant),
+            SizedBox(width: 8),
+            Text(
+              'Jeda...',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: AppColors.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppColors.primary.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: AppColors.primary),
+      ),
+      child: const Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.hearing, size: 20, color: AppColors.primary),
+          SizedBox(width: 8),
+          Text(
+            'Mendengarkan...',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: AppColors.primary,
+            ),
+          ),
+        ],
       ),
     );
   }

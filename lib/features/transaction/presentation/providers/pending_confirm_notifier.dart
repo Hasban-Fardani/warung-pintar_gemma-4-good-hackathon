@@ -72,6 +72,23 @@ class PendingConfirmNotifier extends StateNotifier<PendingConfirmState> {
     }
   }
 
+  Future<void> deleteItem(String id) async {
+    final result = await _repository.deleteTransaction(id);
+    switch (result) {
+      case Success():
+        final updatedItems =
+            state.items.where((item) => item.id != id).toList();
+        state = state.copyWith(
+          items: updatedItems,
+          currentItemIndex: _clampIndex(updatedItems),
+          isProcessing: false,
+          resultMessage: '1 transaksi dihapus',
+        );
+      case Failure(:final error):
+        state = state.copyWith(isProcessing: false, error: error);
+    }
+  }
+
   Future<void> confirmAll() async {
     state = state.copyWith(isProcessing: true, error: null);
 

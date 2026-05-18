@@ -35,6 +35,8 @@ class TransactionRepositoryImpl implements TransactionRepository {
         transactionType: transactionType,
         inputMethod: inputMethod,
         needsClarification: needsClarification,
+        rawInputSource: rawInputSource,
+        aiRawOutput: aiRawOutput,
       );
 
       await _datasource.insertAuditLog(
@@ -140,6 +142,17 @@ class TransactionRepositoryImpl implements TransactionRepository {
       return Success(models.map((m) => m.toEntity()).toList());
     } catch (e) {
       return Failure('Gagal memuat transaksi terbaru: $e');
+    }
+  }
+
+  Future<Result<TransactionEntity?, String>> getTransactionById(
+    String id,
+  ) async {
+    try {
+      final model = await _datasource.getById(id);
+      return Success(model?.toEntity());
+    } catch (e) {
+      return Failure('Gagal memuat transaksi: $e');
     }
   }
 }

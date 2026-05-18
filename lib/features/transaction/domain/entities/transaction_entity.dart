@@ -41,6 +41,8 @@ class TransactionEntity {
   final InputMethod inputMethod;
   final DateTime? confirmedAt;
   final DateTime createdAt;
+  final String? rawInputSource;
+  final String? aiRawOutput;
 
   const TransactionEntity({
     required this.id,
@@ -55,5 +57,7 @@ class TransactionEntity {
     required this.inputMethod,
     this.confirmedAt,
     required this.createdAt,
+    this.rawInputSource,
+    this.aiRawOutput,
   });
 }

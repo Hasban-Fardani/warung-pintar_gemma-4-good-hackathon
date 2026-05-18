@@ -22,7 +22,7 @@ class DatabaseServiceImpl implements DatabaseService {
   static final _logger = Logger(printer: PrettyPrinter(methodCount: 0));
 
   Database? _db;
-  static const int _dbVersion = 2;
+  static const int _dbVersion = 3;
   static const String _dbName = 'warung_pintar.db';
 
   @override
@@ -105,6 +105,8 @@ class DatabaseServiceImpl implements DatabaseService {
         input_method             TEXT    NOT NULL
                                    CHECK(input_method IN ('voice', 'image', 'manual')),
         confirmed_at             DATETIME,
+        raw_input_source         TEXT,
+        ai_raw_output            TEXT,
         created_at               DATETIME DEFAULT CURRENT_TIMESTAMP,
         is_deleted               INTEGER DEFAULT 0
       )
@@ -170,6 +172,15 @@ class DatabaseServiceImpl implements DatabaseService {
         'ALTER TABLE categories ADD COLUMN parent_id TEXT REFERENCES categories(id)',
       );
       _logger.i('DatabaseService: Added parent_id column to categories');
+    }
+    if (oldVersion < 3) {
+      await db.execute(
+        'ALTER TABLE transactions ADD COLUMN raw_input_source TEXT',
+      );
+      await db.execute(
+        'ALTER TABLE transactions ADD COLUMN ai_raw_output TEXT',
+      );
+      _logger.i('DatabaseService: Added raw_input_source, ai_raw_output columns');
     }
   }
 }

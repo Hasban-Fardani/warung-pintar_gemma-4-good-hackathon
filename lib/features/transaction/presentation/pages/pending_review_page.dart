@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:warung_pintar_cimahi/core/constant/app_colors.dart';
 import 'package:warung_pintar_cimahi/core/constant/app_strings.dart';
@@ -173,7 +174,7 @@ class _PendingTransactionItem extends StatelessWidget {
     final isSell = item.type is TransactionSell;
 
     return InkWell(
-      onTap: () {},
+      onTap: () => context.push('/pending/${item.id}'),
       child: Container(
         constraints: const BoxConstraints(minHeight: 48),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
